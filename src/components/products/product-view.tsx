@@ -1,0 +1,95 @@
+'use client';
+
+import Image from 'next/image';
+import { type Product } from '@/lib/products';
+import { Button } from '@/components/ui/button';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { CheckCircle, Star, ShoppingCart } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { useCart } from '@/contexts/cart-context';
+
+interface ProductViewProps {
+  product: Product;
+}
+
+export function ProductView({ product }: ProductViewProps) {
+  const { addItem } = useCart();
+
+  const handleAddToCart = () => {
+    addItem(product);
+  };
+
+  return (
+    <div className="container mx-auto max-w-6xl px-4 py-8 md:py-12">
+      <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+        <div className="w-full">
+          <Carousel className="rounded-lg overflow-hidden">
+            <CarouselContent>
+              {product.images.map((src, index) => (
+                <CarouselItem key={index}>
+                  <Card className="border-0 rounded-none">
+                    <CardContent className="flex aspect-square items-center justify-center p-0">
+                      <Image
+                        src={src}
+                        alt={`${product.name} - image ${index + 1}`}
+                        width={800}
+                        height={800}
+                        className="object-cover w-full h-full"
+                        data-ai-hint={product.data_ai_hint}
+                      />
+                    </CardContent>
+                  </Card>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="left-4" />
+            <CarouselNext className="right-4" />
+          </Carousel>
+        </div>
+        <div className="flex flex-col gap-6">
+          <div>
+            <Badge variant="secondary" className="mb-2">{product.category}</Badge>
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tighter font-headline">{product.name}</h1>
+            <p className="text-2xl font-semibold text-primary mt-2">${product.price.toFixed(2)}</p>
+            <div className="flex items-center gap-2 text-muted-foreground mt-2">
+                <div className="flex items-center">
+                    {[...Array(5)].map((_, i) => (
+                        <Star key={i} className={`w-5 h-5 ${i < Math.round(product.rating) ? 'text-primary fill-primary' : 'text-muted-foreground'}`} />
+                    ))}
+                </div>
+                <span>({product.reviews} avis)</span>
+            </div>
+          </div>
+          <p className="text-muted-foreground leading-relaxed">{product.description}</p>
+          <div>
+            <Button size="lg" variant="glass" className="w-full sm:w-auto" onClick={handleAddToCart} disabled={product.stock <= 0}>
+              <ShoppingCart className="mr-2"/>
+              {product.stock > 0 ? 'Ajouter au panier' : 'Épuisé'}
+            </Button>
+            <p className={product.stock > 0 ? "text-sm text-green-400 mt-2" : "text-sm text-destructive mt-2"}>{product.stock > 0 ? `${product.stock} en stock` : 'Épuisé'}</p>
+          </div>
+          <Separator />
+          <div>
+            <h3 className="font-semibold text-lg mb-3">Caractéristiques</h3>
+            <ul className="space-y-2 text-muted-foreground">
+                {product.features.map((feature, i) => (
+                    <li key={i} className="flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-primary" />
+                        <span>{feature}</span>
+                    </li>
+                ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
