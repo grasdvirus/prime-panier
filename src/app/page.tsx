@@ -1,8 +1,8 @@
 import { ProductGrid } from '@/components/products/product-grid';
 import { getProducts } from '@/lib/products';
 
-export default function Home() {
-  const products = getProducts();
+export default async function Home() {
+  const products = await getProducts();
 
   return (
     <div className="container mx-auto px-4 py-8">

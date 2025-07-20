@@ -1,17 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { getProducts, type Product } from '@/lib/products';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
 
 export function InstantSearch() {
@@ -21,14 +15,18 @@ export function InstantSearch() {
   const allProducts = useRef<Product[]>([]);
 
   useEffect(() => {
-    allProducts.current = getProducts();
+    async function fetchAllProducts() {
+        allProducts.current = await getProducts();
+    }
+    fetchAllProducts();
   }, []);
 
-  useEffect(() => {
-    if (searchTerm.length > 1) {
+  const handleSearch = useCallback((term: string) => {
+    setSearchTerm(term);
+    if (term.length > 1) {
       const filtered = allProducts.current
         .filter((product) =>
-          product.name.toLowerCase().includes(searchTerm.toLowerCase())
+          product.name.toLowerCase().includes(term.toLowerCase())
         )
         .slice(0, 5);
       setResults(filtered);
@@ -37,7 +35,7 @@ export function InstantSearch() {
       setResults([]);
       setIsOpen(false);
     }
-  }, [searchTerm]);
+  }, []);
 
   const handleSelect = () => {
     setIsOpen(false);
@@ -53,7 +51,7 @@ export function InstantSearch() {
                     placeholder="Rechercher un article..."
                     className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => handleSearch(e.target.value)}
                     onFocus={() => searchTerm.length > 1 && setIsOpen(true)}
                 />
             </div>

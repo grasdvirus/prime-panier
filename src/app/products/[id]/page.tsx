@@ -9,14 +9,14 @@ type ProductPageProps = {
 };
 
 export async function generateStaticParams() {
-  const products = getProducts();
+  const products = await getProducts();
   return products.map((product) => ({
     id: product.id.toString(),
   }));
 }
 
-export default function ProductPage({ params }: ProductPageProps) {
-  const product = getProductById(parseInt(params.id, 10));
+export default async function ProductPage({ params }: ProductPageProps) {
+  const product = await getProductById(parseInt(params.id, 10));
 
   if (!product) {
     notFound();

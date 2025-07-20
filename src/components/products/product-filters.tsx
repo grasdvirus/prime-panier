@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useState, useEffect } from 'react';
 import { getProductCategories } from '@/lib/products';
 import {
   Select,
@@ -16,7 +17,15 @@ interface ProductFiltersProps {
 }
 
 export function ProductFilters({ filters, setFilters }: ProductFiltersProps) {
-    const categories = ['all', ...getProductCategories()];
+    const [categories, setCategories] = useState<string[]>(['all']);
+
+    useEffect(() => {
+        async function fetchCategories() {
+            const fetchedCategories = await getProductCategories();
+            setCategories(['all', ...fetchedCategories]);
+        }
+        fetchCategories();
+    }, []);
 
     const handleReset = () => {
         setFilters({ category: 'all', sort: 'popularity' });
