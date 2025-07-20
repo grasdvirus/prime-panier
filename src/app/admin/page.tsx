@@ -13,8 +13,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, PlusCircle, Trash2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ImageUpload } from '@/components/admin/image-upload';
 
 export default function AdminPage() {
   const { user, loading: authLoading } = useAuth();
@@ -139,7 +140,7 @@ export default function AdminPage() {
                     <Table>
                     <TableHeader>
                         <TableRow>
-                        <TableHead className="w-[100px]">Image</TableHead>
+                        <TableHead className="w-[250px]">Image</TableHead>
                         <TableHead className="min-w-[200px]">Nom</TableHead>
                         <TableHead className="min-w-[300px]">Description</TableHead>
                         <TableHead>Prix</TableHead>
@@ -152,7 +153,10 @@ export default function AdminPage() {
                         {products.map((product) => (
                         <TableRow key={product.id}>
                             <TableCell>
-                            <Input value={product.images[0]} onChange={e => handleProductInputChange(product.id, 'images', [e.target.value])} className="text-xs" />
+                                <ImageUpload
+                                    value={product.images[0]}
+                                    onChange={(url) => handleProductInputChange(product.id, 'images', [url])}
+                                />
                             </TableCell>
                             <TableCell>
                             <Input value={product.name} onChange={e => handleProductInputChange(product.id, 'name', e.target.value)} />
@@ -213,7 +217,10 @@ export default function AdminPage() {
                                 <Textarea value={slide.description} onChange={e => handleSlideInputChange(slide.id, 'description', e.target.value)} />
                             </TableCell>
                             <TableCell>
-                                <Input value={slide.imageUrl} onChange={e => handleSlideInputChange(slide.id, 'imageUrl', e.target.value)} />
+                                <ImageUpload
+                                    value={slide.imageUrl}
+                                    onChange={(url) => handleSlideInputChange(slide.id, 'imageUrl', url)}
+                                />
                             </TableCell>
                         </TableRow>
                         ))}
