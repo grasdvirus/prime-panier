@@ -13,33 +13,39 @@ interface HomepageCarouselProps {
 }
 
 export function HomepageCarousel({ slides }: HomepageCarouselProps) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, []);
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'center' }, []);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
 
+  const onInit = useCallback((emblaApi: EmblaCarouselType) => {
+    setScrollSnaps(emblaApi.scrollSnapList());
+  }, []);
+  
   const onSelect = useCallback((emblaApi: EmblaCarouselType) => {
     setSelectedIndex(emblaApi.selectedScrollSnap());
   }, []);
 
   useEffect(() => {
     if (!emblaApi) return;
+    onInit(emblaApi);
     onSelect(emblaApi);
     emblaApi.on('select', onSelect);
-    emblaApi.on('reInit', onSelect);
+    emblaApi.on('reInit', onInit);
 
     const interval = setInterval(() => {
-        emblaApi.scrollNext();
+        emblaApi?.scrollNext();
     }, 5000);
 
     return () => clearInterval(interval);
 
-  }, [emblaApi, onSelect]);
+  }, [emblaApi, onInit, onSelect]);
 
   return (
     <div className="relative">
-      <div className="embla-fade" ref={emblaRef}>
-        <div className="embla-fade__container">
-          {slides.map((slide) => (
-            <div className="embla-fade__slide" key={slide.id}>
+      <div className="embla" ref={emblaRef}>
+        <div className="embla__container">
+          {slides.map((slide, index) => (
+            <div className={cn("embla__slide", index === selectedIndex ? "is-selected" : "")} key={slide.id}>
               <Card className="border-0 rounded-lg overflow-hidden">
                 <CardContent className="relative flex aspect-video items-center justify-center p-0">
                   <Image
@@ -70,7 +76,7 @@ export function HomepageCarousel({ slides }: HomepageCarouselProps) {
       <CarouselNext />
       
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-        {slides.map((_, index) => (
+        {scrollSnaps.map((_, index) => (
           <button
             key={index}
             onClick={() => emblaApi?.scrollTo(index)}

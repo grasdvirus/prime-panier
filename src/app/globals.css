@@ -97,24 +97,22 @@
   }
 }
 
-/* Embla Carousel Fade Plugin Styles */
-.embla-fade {
+.embla {
   overflow: hidden;
 }
-.embla-fade__container {
-  backface-visibility: hidden;
+.embla__container {
   display: flex;
-  touch-action: pan-y;
-  margin-left: -1rem;
 }
-.embla-fade__slide {
+.embla__slide {
   flex: 0 0 100%;
   min-width: 0;
-  position: relative;
-  padding-left: 1rem;
-  opacity: 0;
-  transition: opacity 0.4s ease-in-out;
+  opacity: 0.4;
+  filter: blur(4px);
+  transform: scale(0.95);
+  transition: opacity 0.3s ease-in-out, filter 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
-.embla-fade__slide.is-in-view {
+.embla__slide.is-selected {
   opacity: 1;
+  filter: blur(0);
+  transform: scale(1);
 }
