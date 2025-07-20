@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -46,11 +47,13 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="flex min-h-[80vh] items-center justify-center">
-      <Card className="mx-auto max-w-sm w-full">
-        <CardHeader>
-          <CardTitle className="text-xl">S'inscrire</CardTitle>
-          <CardDescription>Entrez vos informations pour créer un compte</CardDescription>
+    <div className="flex min-h-[80vh] items-center justify-center p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl">Créer un compte</CardTitle>
+          <CardDescription>
+            Rejoignez notre communauté pour une expérience d'achat unique.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignup} className="grid gap-4">
@@ -86,7 +89,7 @@ export default function SignupPage() {
           </form>
           <div className="mt-4 text-center text-sm">
             Vous avez déjà un compte?{' '}
-            <Link href="/login" className="underline">
+            <Link href="/login" className="underline hover:text-primary">
               Se connecter
             </Link>
           </div>
