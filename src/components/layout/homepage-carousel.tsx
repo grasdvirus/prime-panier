@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
-import useEmblaCarousel, { type EmblaCarouselType, type EmblaOptionsType } from 'embla-carousel-react';
+import useEmblaCarousel, { type EmblaCarouselType } from 'embla-carousel-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { type Slide } from '@/lib/slides';
 import { cn } from '@/lib/utils';
+import { CarouselNext, CarouselPrevious } from '../ui/carousel';
 
 interface HomepageCarouselProps {
   slides: Slide[];
@@ -24,6 +25,13 @@ export function HomepageCarousel({ slides }: HomepageCarouselProps) {
     onSelect(emblaApi);
     emblaApi.on('select', onSelect);
     emblaApi.on('reInit', onSelect);
+
+    const interval = setInterval(() => {
+        emblaApi.scrollNext();
+    }, 5000);
+
+    return () => clearInterval(interval);
+
   }, [emblaApi, onSelect]);
 
   return (
@@ -57,13 +65,17 @@ export function HomepageCarousel({ slides }: HomepageCarouselProps) {
           ))}
         </div>
       </div>
+
+      <CarouselPrevious />
+      <CarouselNext />
+      
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
         {slides.map((_, index) => (
           <button
             key={index}
             onClick={() => emblaApi?.scrollTo(index)}
             className={cn(
-              'h-2 w-2 rounded-full transition-all duration-300',
+              'h-2 w-2 rounded-full transition-all duration-300 backdrop-blur-sm',
               selectedIndex === index ? 'w-6 bg-primary' : 'bg-white/50'
             )}
             aria-label={`Go to slide ${index + 1}`}
