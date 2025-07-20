@@ -8,8 +8,17 @@
     "rating": 4.8,
     "stock": 25,
     "reviews": 124,
-    "images": ["https://placehold.co/600x600/000000/FFFFFF.png", "https://placehold.co/600x600/111111/FFFFFF.png", "https://placehold.co/600x600/222222/FFFFFF.png"],
-    "features": ["Réduction de bruit active", "Autonomie de 20h", "Bluetooth 5.2", "Ultra-léger"],
+    "images": [
+      "https://placehold.co/600x600/000000/FFFFFF.png",
+      "https://placehold.co/600x600/111111/FFFFFF.png",
+      "https://placehold.co/600x600/222222/FFFFFF.png"
+    ],
+    "features": [
+      "Réduction de bruit active",
+      "Autonomie de 20h",
+      "Bluetooth 5.2",
+      "Ultra-léger"
+    ],
     "data_ai_hint": "headphones elegant"
   },
   {
@@ -21,8 +30,15 @@
     "rating": 4.9,
     "stock": 150,
     "reviews": 230,
-    "images": ["https://placehold.co/600x600/000000/FFFFFF.png", "https://placehold.co/600x600/111111/FFFFFF.png"],
-    "features": ["100% Coton Biologique GOTS", "Coupe ajustée", "Col rond durable"],
+    "images": [
+      "https://placehold.co/600x600/000000/FFFFFF.png",
+      "https://placehold.co/600x600/111111/FFFFFF.png"
+    ],
+    "features": [
+      "100% Coton Biologique GOTS",
+      "Coupe ajustée",
+      "Col rond durable"
+    ],
     "data_ai_hint": "black t-shirt"
   },
   {
@@ -34,34 +50,55 @@
     "rating": 4.7,
     "stock": 40,
     "reviews": 98,
-    "images": ["https://placehold.co/600x600/000000/FFFFFF.png", "https://placehold.co/600x600/111111/FFFFFF.png"],
-    "features": ["Compartiment pour ordinateur 15\"", "Tissu déperlant", "Poches de sécurité"],
+    "images": [
+      "https://placehold.co/600x600/000000/FFFFFF.png",
+      "https://placehold.co/600x600/111111/FFFFFF.png"
+    ],
+    "features": [
+      "Compartiment pour ordinateur 15\"",
+      "Tissu déperlant",
+      "Poches de sécurité"
+    ],
     "data_ai_hint": "minimalist backpack"
   },
   {
     "id": 4,
     "name": "Lampe de Bureau LED",
     "description": "Éclairez votre espace de travail avec style. Lumière ajustable et design moderne.",
-    "price": 75.0,
+    "price": 75,
     "category": "Maison",
     "rating": 4.6,
     "stock": 30,
     "reviews": 75,
-    "images": ["https://placehold.co/600x600/000000/FFFFFF.png", "https://placehold.co/600x600/111111/FFFFFF.png"],
-    "features": ["Intensité et température de couleur réglables", "Bras articulé", "Port USB intégré"],
+    "images": [
+      "https://placehold.co/600x600/000000/FFFFFF.png",
+      "https://placehold.co/600x600/111111/FFFFFF.png"
+    ],
+    "features": [
+      "Intensité et température de couleur réglables",
+      "Bras articulé",
+      "Port USB intégré"
+    ],
     "data_ai_hint": "desk lamp"
   },
   {
     "id": 5,
     "name": "Montre Classique Noire",
     "description": "L'élégance au poignet. Un cadran sobre et un bracelet en cuir véritable.",
-    "price": 220.0,
+    "price": 220,
     "category": "Accessoires",
     "rating": 4.9,
     "stock": 15,
     "reviews": 150,
-    "images": ["https://placehold.co/600x600/000000/FFFFFF.png", "https://placehold.co/600x600/111111/FFFFFF.png"],
-    "features": ["Mouvement à quartz suisse", "Verre saphir inrayable", "Bracelet en cuir interchangeable"],
+    "images": [
+      "https://placehold.co/600x600/000000/FFFFFF.png",
+      "https://placehold.co/600x600/111111/FFFFFF.png"
+    ],
+    "features": [
+      "Mouvement à quartz suisse",
+      "Verre saphir inrayable",
+      "Bracelet en cuir interchangeable"
+    ],
     "data_ai_hint": "black watch"
   },
   {
@@ -73,8 +110,15 @@
     "rating": 4.8,
     "stock": 60,
     "reviews": 88,
-    "images": ["https://placehold.co/600x600/000000/FFFFFF.png", "https://placehold.co/600x600/111111/FFFFFF.png"],
-    "features": ["Tissu respirant", "Intérieur brossé pour la chaleur", "Poches zippées"],
+    "images": [
+      "https://placehold.co/600x600/000000/FFFFFF.png",
+      "https://placehold.co/600x600/111111/FFFFFF.png"
+    ],
+    "features": [
+      "Tissu respirant",
+      "Intérieur brossé pour la chaleur",
+      "Poches zippées"
+    ],
     "data_ai_hint": "black hoodie"
   },
   {
@@ -86,8 +130,15 @@
     "rating": 4.7,
     "stock": 55,
     "reviews": 112,
-    "images": ["https://placehold.co/600x600/000000/FFFFFF.png", "https://placehold.co/600x600/111111/FFFFFF.png"],
-    "features": ["Son à 360°", "Résistante à l'eau (IPX7)", "12h d'autonomie"],
+    "images": [
+      "https://placehold.co/600x600/000000/FFFFFF.png",
+      "https://placehold.co/600x600/111111/FFFFFF.png"
+    ],
+    "features": [
+      "Son à 360°",
+      "Résistante à l'eau (IPX7)",
+      "12h d'autonomie"
+    ],
     "data_ai_hint": "bluetooth speaker"
   },
   {
@@ -99,8 +150,14 @@
     "rating": 4.9,
     "stock": 200,
     "reviews": 310,
-    "images": ["https://placehold.co/600x600/000000/FFFFFF.png"],
-    "features": ["Finition mate", "Passe au lave-vaisselle et au micro-ondes", "Contenance de 350ml"],
+    "images": [
+      "https://placehold.co/600x600/000000/FFFFFF.png"
+    ],
+    "features": [
+      "Finition mate",
+      "Passe au lave-vaisselle et au micro-ondes",
+      "Contenance de 350ml"
+    ],
     "data_ai_hint": "black mug"
   }
 ]
