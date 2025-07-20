@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "title": "Collection Exclusive",
+    "description": "Un design minimaliste pour un style de vie moderne.",
+    "imageUrl": "https://placehold.co/1200x600.png",
+    "data_ai_hint": "minimalist fashion"
+  },
+  {
+    "id": 2,
+    "title": "Nouveautés Tech",
+    "description": "La technologie qui simplifie votre quotidien.",
+    "imageUrl": "https://placehold.co/1200x600.png",
+    "data_ai_hint": "modern tech"
+  },
+  {
+    "id": 3,
+    "title": "Élégance Urbaine",
+    "description": "Des articles conçus pour la vie en ville.",
+    "imageUrl": "https://placehold.co/1200x600.png",
+    "data_ai_hint": "urban lifestyle"
+  }
+]

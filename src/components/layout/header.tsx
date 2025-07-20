@@ -29,7 +29,7 @@ export function Header() {
         <div className="flex items-center gap-6">
           <Link href="/" className="hidden items-center gap-2 md:flex">
             <span className="text-lg font-bold tracking-tighter">
-              Noir Élégant
+              prime_panier
             </span>
           </Link>
           <div className="hidden md:block">

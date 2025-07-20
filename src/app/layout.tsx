@@ -14,7 +14,7 @@ const fontInter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Noir Élégant',
+  title: 'prime_panier',
   description: "Vente et promotion d'articles via une interface élégante",
 };
 
