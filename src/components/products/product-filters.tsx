@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '../ui/button';
-import { type Product } from '@/lib/products';
+import { getProductsClient } from '@/lib/products-client';
 
 interface ProductFiltersProps {
   filters: { category: string; sort: string };
@@ -18,15 +18,10 @@ interface ProductFiltersProps {
 
 async function getCategoriesClient(): Promise<string[]> {
     try {
-        const response = await fetch('/products.json');
-        if (!response.ok) {
-            console.error('Failed to fetch products.json:', response.statusText);
-            return [];
-        }
-        const products: Product[] = await response.json();
+        const products = await getProductsClient();
         return [...new Set(products.map(p => p.category))];
     } catch (error) {
-        console.error('Failed to read or parse products.json:', error);
+        console.error('Failed to get categories:', error);
         return [];
     }
 }

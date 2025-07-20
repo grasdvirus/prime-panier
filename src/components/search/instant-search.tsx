@@ -7,20 +7,7 @@ import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { type Product } from '@/lib/products';
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
-
-async function getProductsClient(): Promise<Product[]> {
-    try {
-        const response = await fetch('/products.json');
-        if (!response.ok) {
-            console.error('Failed to fetch products.json:', response.statusText);
-            return [];
-        }
-        return await response.json();
-    } catch (error) {
-        console.error('Failed to read or parse products.json:', error);
-        return [];
-    }
-}
+import { getProductsClient } from '@/lib/products-client';
 
 export function InstantSearch() {
   const [searchTerm, setSearchTerm] = useState('');
