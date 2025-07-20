@@ -46,7 +46,7 @@ export function HomepageCarousel({ slides }: HomepageCarouselProps) {
         <div className="embla__container">
           {slides.map((slide, index) => (
             <div className={cn("embla__slide", index === selectedIndex ? "is-selected" : "")} key={slide.id}>
-              <Card className="border-0 rounded-lg overflow-hidden">
+              <Card className="border-0 rounded-none overflow-hidden">
                 <CardContent className="relative flex aspect-video items-center justify-center p-0">
                   <Image
                     src={slide.imageUrl}
