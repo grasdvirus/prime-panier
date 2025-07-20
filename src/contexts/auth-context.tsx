@@ -1,16 +1,14 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
-
-type User = {
-  email: string;
-  name: string;
-};
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { type User, onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
+import { Loader2 } from 'lucide-react';
 
 type AuthContextType = {
   user: User | null;
   loading: boolean;
-  login: (user: User | null) => void;
+  logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -20,30 +18,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      const storedUser = localStorage.getItem('currentUser');
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
-      }
-    } catch (error) {
-      console.error('Failed to parse user from localStorage', error);
-      setUser(null);
-    } finally {
-        setLoading(false);
-    }
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const login = useCallback((userToLogin: User | null) => {
-    if (userToLogin) {
-      localStorage.setItem('currentUser', JSON.stringify(userToLogin));
-    } else {
-      localStorage.removeItem('currentUser');
-    }
-    setUser(userToLogin);
-  }, []);
+  const logout = async () => {
+    await firebaseSignOut(auth);
+    setUser(null);
+  };
+  
+  if (loading) {
+    return (
+        <div className="flex justify-center items-center min-h-screen">
+            <Loader2 className="h-16 w-16 animate-spin" />
+        </div>
+    );
+  }
 
   return (
-    <AuthContext.Provider value={{ user, login, loading }}>
+    <AuthContext.Provider value={{ user, loading, logout }}>
       {children}
     </AuthContext.Provider>
   );

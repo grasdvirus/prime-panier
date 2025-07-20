@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Menu, User, LogOut, Shield } from 'lucide-react';
+import { Menu, User, LogOut, Shield, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { InstantSearch } from '@/components/search/instant-search';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -16,12 +16,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-const adminUser = { email: 'grasdvirus@gmail.com', name: 'Admin' };
-const guestUser = { email: 'guest@example.com', name: 'Guest' };
-
 export function Header() {
-  const { user, login } = useAuth();
-  const isAdmin = user?.email === adminUser.email;
+  const { user, logout } = useAuth();
+  const isAdmin = user?.email === 'grasdvirus@gmail.com';
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur-sm">
@@ -40,7 +37,7 @@ export function Header() {
         <div className="flex items-center gap-2">
           {isAdmin && (
              <Button variant="outline" asChild>
-                <Link href="/admin"><Shield className="mr-2" /> Admin</Link>
+                <Link href="/admin"><Shield className="mr-2 h-4 w-4" /> Admin</Link>
             </Button>
           )}
           <CartSheet />
@@ -53,20 +50,32 @@ export function Header() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>
-                {user ? `Connecté en tant que ${user.name}` : 'Non connecté'}
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={() => login(adminUser)}>
-                <Shield className="mr-2" /> Se connecter (Admin)
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => login(guestUser)}>
-                <User className="mr-2" /> Se connecter (Invité)
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={() => login(null)}>
-                <LogOut className="mr-2" /> Se déconnecter
-              </DropdownMenuItem>
+              {user ? (
+                <>
+                  <DropdownMenuLabel>
+                    Connecté en tant que {user.displayName || user.email}
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onSelect={logout}>
+                    <LogOut className="mr-2 h-4 w-4" /> Se déconnecter
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <>
+                  <DropdownMenuLabel>Non connecté</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <Link href="/login" passHref>
+                    <DropdownMenuItem>
+                        <LogIn className="mr-2 h-4 w-4" /> Se connecter
+                    </DropdownMenuItem>
+                  </Link>
+                   <Link href="/signup" passHref>
+                    <DropdownMenuItem>
+                        <User className="mr-2 h-4 w-4" /> S'inscrire
+                    </DropdownMenuItem>
+                  </Link>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
 

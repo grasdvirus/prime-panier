@@ -32,17 +32,19 @@ export default function AdminPage() {
   }, [user, authLoading, router]);
 
   useEffect(() => {
-    async function loadData() {
-      setLoading(true);
-      const [prods, slds] = await Promise.all([getProductsClient(), getSlidesClient()]);
-      setProducts(prods);
-      setSlides(slds);
-      setLoading(false);
+    if (user?.email === 'grasdvirus@gmail.com') {
+        async function loadData() {
+            setLoading(true);
+            const [prods, slds] = await Promise.all([getProductsClient(), getSlidesClient()]);
+            setProducts(prods);
+            setSlides(slds);
+            setLoading(false);
+        }
+        loadData();
     }
-    loadData();
-  }, []);
+  }, [user]);
 
-  const handleProductInputChange = (productId: number, field: keyof Product, value: string | number) => {
+  const handleProductInputChange = (productId: number, field: keyof Product, value: string | number | string[]) => {
     setProducts(prevProducts =>
       prevProducts.map(p => {
         if (p.id === productId) {
@@ -108,8 +110,10 @@ export default function AdminPage() {
   }
 
   if (user?.email !== 'grasdvirus@gmail.com') {
-    return null;
+    // This will be handled by the redirect in useEffect, but as a fallback:
+    return <p className="text-center py-10">Vous n'avez pas l'autorisation d'accéder à cette page.</p>;
   }
+
 
   return (
     <div className="container mx-auto px-4 py-8">
