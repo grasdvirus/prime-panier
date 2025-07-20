@@ -28,7 +28,7 @@ export function ProductView({ product }: ProductViewProps) {
   };
 
   return (
-    <div className="container mx-auto max-w-6xl px-4 py-8 md:py-12">
+    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
       <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
         <div className="w-full">
           <Carousel className="rounded-lg overflow-hidden">

@@ -116,7 +116,7 @@ export default function AdminPage() {
 
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
       <Tabs defaultValue="products">
         <div className="flex justify-between items-center mb-4">
             <TabsList>

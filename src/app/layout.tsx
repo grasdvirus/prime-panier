@@ -7,6 +7,7 @@ import { Footer } from '@/components/layout/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { CartProvider } from '@/contexts/cart-context';
 import { AuthProvider } from '@/contexts/auth-context';
+import { Marquee } from '@/components/layout/marquee';
 
 const fontInter = Inter({
   subsets: ['latin'],
@@ -47,6 +48,7 @@ export default function RootLayout({
           <CartProvider>
             <div className="relative flex min-h-screen flex-col">
               <Header />
+              <Marquee />
               <main className="flex-1">{children}</main>
               <Footer />
             </div>
