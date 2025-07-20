@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { getProductCategories } from '@/lib/products';
 import {
   Select,
   SelectContent,
@@ -10,10 +9,26 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '../ui/button';
+import { type Product } from '@/lib/products';
 
 interface ProductFiltersProps {
   filters: { category: string; sort: string };
   setFilters: React.Dispatch<React.SetStateAction<{ category: string; sort: string }>>;
+}
+
+async function getCategoriesClient(): Promise<string[]> {
+    try {
+        const response = await fetch('/products.json');
+        if (!response.ok) {
+            console.error('Failed to fetch products.json:', response.statusText);
+            return [];
+        }
+        const products: Product[] = await response.json();
+        return [...new Set(products.map(p => p.category))];
+    } catch (error) {
+        console.error('Failed to read or parse products.json:', error);
+        return [];
+    }
 }
 
 export function ProductFilters({ filters, setFilters }: ProductFiltersProps) {
@@ -21,7 +36,7 @@ export function ProductFilters({ filters, setFilters }: ProductFiltersProps) {
 
     useEffect(() => {
         async function fetchCategories() {
-            const fetchedCategories = await getProductCategories();
+            const fetchedCategories = await getCategoriesClient();
             setCategories(['all', ...fetchedCategories]);
         }
         fetchCategories();

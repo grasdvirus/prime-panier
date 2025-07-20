@@ -1,3 +1,7 @@
+import 'server-only';
+
+import fs from 'fs/promises';
+import path from 'path';
 
 export type Product = {
   id: number;
@@ -15,18 +19,15 @@ export type Product = {
 
 let productsCache: Product[] | null = null;
 
-async function fetchProducts(): Promise<Product[]> {
+// This function is marked as 'server-only' and will be used by server components.
+async function fetchProductsOnServer(): Promise<Product[]> {
     if (productsCache) {
         return productsCache;
     }
     try {
-        // Assuming the app is served from the root, /products.json will resolve to public/products.json
-        const response = await fetch('/products.json');
-        if (!response.ok) {
-            console.error('Failed to fetch products.json:', response.statusText);
-            return [];
-        }
-        const products: Product[] = await response.json();
+        const filePath = path.join(process.cwd(), 'public', 'products.json');
+        const fileContent = await fs.readFile(filePath, 'utf-8');
+        const products: Product[] = JSON.parse(fileContent);
         productsCache = products;
         return products;
     } catch (error) {
@@ -36,15 +37,15 @@ async function fetchProducts(): Promise<Product[]> {
 }
 
 export async function getProducts(): Promise<Product[]> {
-  return await fetchProducts();
+  return await fetchProductsOnServer();
 }
 
 export async function getProductById(id: number): Promise<Product | undefined> {
-  const products = await fetchProducts();
+  const products = await fetchProductsOnServer();
   return products.find((p) => p.id === id);
 }
 
 export async function getProductCategories(): Promise<string[]> {
-  const products = await fetchProducts();
+  const products = await fetchProductsOnServer();
   return [...new Set(products.map(p => p.category))];
 }

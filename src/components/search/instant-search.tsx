@@ -5,8 +5,22 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { getProducts, type Product } from '@/lib/products';
+import { type Product } from '@/lib/products';
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from '@/components/ui/command';
+
+async function getProductsClient(): Promise<Product[]> {
+    try {
+        const response = await fetch('/products.json');
+        if (!response.ok) {
+            console.error('Failed to fetch products.json:', response.statusText);
+            return [];
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to read or parse products.json:', error);
+        return [];
+    }
+}
 
 export function InstantSearch() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -16,7 +30,7 @@ export function InstantSearch() {
 
   useEffect(() => {
     async function fetchAllProducts() {
-        allProducts.current = await getProducts();
+        allProducts.current = await getProductsClient();
     }
     fetchAllProducts();
   }, []);
