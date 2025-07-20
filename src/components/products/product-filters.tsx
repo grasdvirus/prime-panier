@@ -42,7 +42,7 @@ export function ProductFilters({ filters, setFilters }: ProductFiltersProps) {
     }
 
   return (
-    <div className="mb-8 flex flex-col gap-4 rounded-lg border border-border/60 bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="mb-8 flex flex-col gap-4 rounded-lg bg-card/50 p-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
         <div className="flex items-center gap-2">
             <label htmlFor="category-select" className="text-sm font-medium text-muted-foreground">Catégorie</label>

@@ -38,7 +38,7 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
   }
 
   .dark {
@@ -95,4 +95,26 @@
   ::-webkit-scrollbar-thumb:hover {
     background: hsl(var(--accent));
   }
+}
+
+/* Embla Carousel Fade Plugin Styles */
+.embla-fade {
+  overflow: hidden;
+}
+.embla-fade__container {
+  backface-visibility: hidden;
+  display: flex;
+  touch-action: pan-y;
+  margin-left: -1rem;
+}
+.embla-fade__slide {
+  flex: 0 0 100%;
+  min-width: 0;
+  position: relative;
+  padding-left: 1rem;
+  opacity: 0;
+  transition: opacity 0.4s ease-in-out;
+}
+.embla-fade__slide.is-in-view {
+  opacity: 1;
 }
