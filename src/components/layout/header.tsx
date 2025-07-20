@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Menu, User, LogOut, Shield, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { InstantSearch } from '@/components/search/instant-search';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { CartSheet } from '@/components/cart/cart-sheet';
 import { useAuth } from '@/contexts/auth-context';
 import {
@@ -87,6 +87,9 @@ export function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[300px] sm:w-[400px]">
+                <SheetHeader>
+                    <SheetTitle>Menu</SheetTitle>
+                </SheetHeader>
               <div className="p-4">
                  <InstantSearch />
               </div>
