@@ -20,7 +20,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, PlusCircle, Trash2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -252,66 +252,99 @@ export default function AdminPage() {
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
       <Tabs defaultValue="products" className="w-full">
-        <div className="flex flex-wrap justify-between items-center mb-4 gap-4">
-            <TabsList>
+        <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
+            <TabsList className="grid grid-cols-3 sm:flex">
                 <TabsTrigger value="products">Produits</TabsTrigger>
                 <TabsTrigger value="slides">Diaporama</TabsTrigger>
-                <TabsTrigger value="bento">Grille Bento</TabsTrigger>
+                <TabsTrigger value="bento">Bento</TabsTrigger>
                 <TabsTrigger value="collections">Collections</TabsTrigger>
-                <TabsTrigger value="info">Section Info</TabsTrigger>
+                <TabsTrigger value="info">Info</TabsTrigger>
                 <TabsTrigger value="marquee">Bandeau</TabsTrigger>
             </TabsList>
-             <Button onClick={handleSaveChanges} disabled={saveStatus === 'saving' || saveStatus === 'idle'}>
+             <Button onClick={handleSaveChanges} disabled={saveStatus === 'saving' || saveStatus === 'idle'} className="w-full sm:w-auto">
                 <SaveButtonContent />
             </Button>
         </div>
 
         <TabsContent value="products">
             <Card>
-                <CardHeader className="flex flex-row items-center justify-between">
+                <CardHeader className="flex flex-col md:flex-row items-center justify-between gap-4">
                     <CardTitle>Gestion des Produits</CardTitle>
-                    <Button onClick={handleAddProduct} variant="outline">
+                    <Button onClick={handleAddProduct} variant="outline" className="w-full md:w-auto">
                         <PlusCircle className="mr-2 h-4 w-4" />
                         Ajouter un produit
                     </Button>
                 </CardHeader>
                 <CardContent>
-                <div className="overflow-x-auto">
-                    <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead className="w-[350px]">Image 1</TableHead>
-                            <TableHead className="w-[350px]">Image 2</TableHead>
-                            <TableHead className="min-w-[200px]">Nom</TableHead>
-                            <TableHead className="min-w-[300px]">Description</TableHead>
-                            <TableHead className="min-w-[150px]">Prix / Stock / Catégorie</TableHead>
-                            <TableHead className="min-w-[250px]">Caractéristiques</TableHead>
-                            <TableHead>Action</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {products.map((product) => (
-                        <TableRow key={product.id}>
-                            <TableCell><ImageUpload value={product.images[0] || ''} onChange={(url) => handleProductImageChange(product.id, 0, url)} /></TableCell>
-                            <TableCell><ImageUpload value={product.images[1] || ''} onChange={(url) => handleProductImageChange(product.id, 1, url)} /></TableCell>
-                            <TableCell><Input value={product.name} onChange={e => handleInputChange(setProducts, product.id, 'name', e.target.value)} /></TableCell>
-                            <TableCell><Textarea value={product.description} onChange={e => handleInputChange(setProducts, product.id, 'description', e.target.value)} /></TableCell>
-                            <TableCell className="space-y-2">
-                                <Input type="number" placeholder="Prix" value={product.price} onChange={e => handleInputChange(setProducts, product.id, 'price', Number(e.target.value))} />
-                                <Input type="number" placeholder="Stock" value={product.stock} onChange={e => handleInputChange(setProducts, product.id, 'stock', Number(e.target.value))} />
-                                <Input placeholder="Catégorie" value={product.category} onChange={e => handleInputChange(setProducts, product.id, 'category', e.target.value)} />
-                            </TableCell>
-                            <TableCell><div className="space-y-2">{product.features.map((feature, fIndex) => (<Input key={fIndex} value={feature} placeholder={`Caractéristique ${fIndex + 1}`} onChange={e => handleProductFeatureChange(product.id, fIndex, e.target.value)} />))}</div></TableCell>
-                            <TableCell>
-                                <Button variant="destructive" size="icon" onClick={() => handleDeleteProduct(product)}>
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
-                            </TableCell>
-                        </TableRow>
+                    <div className="hidden md:block">
+                        <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead className="w-[250px]">Image 1</TableHead>
+                                <TableHead className="w-[250px]">Image 2</TableHead>
+                                <TableHead className="min-w-[150px]">Nom</TableHead>
+                                <TableHead className="min-w-[250px]">Description</TableHead>
+                                <TableHead className="min-w-[200px]">Détails</TableHead>
+                                <TableHead className="min-w-[250px]">Caractéristiques</TableHead>
+                                <TableHead>Action</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {products.map((product) => (
+                            <TableRow key={product.id}>
+                                <TableCell><ImageUpload value={product.images[0] || ''} onChange={(url) => handleProductImageChange(product.id, 0, url)} /></TableCell>
+                                <TableCell><ImageUpload value={product.images[1] || ''} onChange={(url) => handleProductImageChange(product.id, 1, url)} /></TableCell>
+                                <TableCell><Input value={product.name} onChange={e => handleInputChange(setProducts, product.id, 'name', e.target.value)} /></TableCell>
+                                <TableCell><Textarea value={product.description} onChange={e => handleInputChange(setProducts, product.id, 'description', e.target.value)} /></TableCell>
+                                <TableCell className="space-y-2">
+                                    <Input type="number" placeholder="Prix" value={product.price} onChange={e => handleInputChange(setProducts, product.id, 'price', Number(e.target.value))} />
+                                    <Input type="number" placeholder="Stock" value={product.stock} onChange={e => handleInputChange(setProducts, product.id, 'stock', Number(e.target.value))} />
+                                    <Input placeholder="Catégorie" value={product.category} onChange={e => handleInputChange(setProducts, product.id, 'category', e.target.value)} />
+                                </TableCell>
+                                <TableCell><div className="space-y-2">{product.features.map((feature, fIndex) => (<Input key={fIndex} value={feature} placeholder={`Caractéristique ${fIndex + 1}`} onChange={e => handleProductFeatureChange(product.id, fIndex, e.target.value)} />))}</div></TableCell>
+                                <TableCell>
+                                    <Button variant="destructive" size="icon" onClick={() => handleDeleteProduct(product)}>
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                            ))}
+                        </TableBody>
+                        </Table>
+                    </div>
+                    <div className="md:hidden space-y-4">
+                        {products.map(product => (
+                            <Card key={product.id}>
+                                <CardHeader>
+                                    <Input className="text-lg font-bold" value={product.name} onChange={e => handleInputChange(setProducts, product.id, 'name', e.target.value)} />
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <ImageUpload value={product.images[0] || ''} onChange={(url) => handleProductImageChange(product.id, 0, url)} />
+                                        <ImageUpload value={product.images[1] || ''} onChange={(url) => handleProductImageChange(product.id, 1, url)} />
+                                     </div>
+                                     <div>
+                                        <Label>Description</Label>
+                                        <Textarea value={product.description} onChange={e => handleInputChange(setProducts, product.id, 'description', e.target.value)} />
+                                     </div>
+                                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                        <div><Label>Prix</Label><Input type="number" placeholder="Prix" value={product.price} onChange={e => handleInputChange(setProducts, product.id, 'price', Number(e.target.value))} /></div>
+                                        <div><Label>Stock</Label><Input type="number" placeholder="Stock" value={product.stock} onChange={e => handleInputChange(setProducts, product.id, 'stock', Number(e.target.value))} /></div>
+                                        <div><Label>Catégorie</Label><Input placeholder="Catégorie" value={product.category} onChange={e => handleInputChange(setProducts, product.id, 'category', e.target.value)} /></div>
+                                     </div>
+                                      <div>
+                                        <Label>Caractéristiques</Label>
+                                        <div className="space-y-2">{product.features.map((feature, fIndex) => (<Input key={fIndex} value={feature} placeholder={`Caractéristique ${fIndex + 1}`} onChange={e => handleProductFeatureChange(product.id, fIndex, e.target.value)} />))}</div>
+                                     </div>
+                                </CardContent>
+                                <CardFooter>
+                                    <Button variant="destructive" className="w-full" onClick={() => handleDeleteProduct(product)}>
+                                        <Trash2 className="mr-2 h-4 w-4" /> Supprimer le produit
+                                    </Button>
+                                </CardFooter>
+                            </Card>
                         ))}
-                    </TableBody>
-                    </Table>
-                </div>
+                    </div>
                 </CardContent>
             </Card>
         </TabsContent>

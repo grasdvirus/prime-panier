@@ -3,13 +3,14 @@
     "id": 1,
     "name": "Casque Audio Minimaliste",
     "description": "Un son immersif dans un design épuré. Confort et performance pour vos oreilles.",
-    "price": 149.99,
+    "price": 200000,
     "category": "Tech",
     "rating": 4.8,
     "stock": 25,
     "reviews": 124,
     "images": [
-      "/uploads/1753031103248-902591231-meches-blondes-sur-cheveux-brun-e1700746883168_prev_ui.png"
+      "/uploads/1753031103248-902591231-meches-blondes-sur-cheveux-brun-e1700746883168_prev_ui.png",
+      "/uploads/1753313109974-294496617-96629ce1a1424fd832a4d112f4e3fdb1.jpg"
     ],
     "features": [
       "Réduction de bruit active",
