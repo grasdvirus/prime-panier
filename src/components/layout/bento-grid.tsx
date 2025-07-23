@@ -31,13 +31,13 @@ const BentoCardContent = ({ item }: { item: Bento }) => {
                 src={item.imageUrl}
                 alt={item.title}
                 fill
-                className="object-cover rounded-lg -z-10"
+                className="object-cover rounded-lg"
                 data-ai-hint={item.data_ai_hint}
             />
             <div className="bg-black/30 absolute inset-0 rounded-lg -z-10" />
         </>
       )}
-      <div>
+      <div className='z-10'>
         <p className="text-sm font-medium text-foreground/80">
           {item.title}
         </p>
@@ -45,7 +45,7 @@ const BentoCardContent = ({ item }: { item: Bento }) => {
           {item.subtitle}
         </h3>
       </div>
-      <Link href={item.href} className="flex items-center gap-2 text-white font-semibold hover:underline mt-4">
+      <Link href={item.href} className="z-10 flex items-center gap-2 text-white font-semibold hover:underline mt-4">
         {hasImage ? 'Explorer' : ''} <ArrowRight size={16} />
       </Link>
     </CardContent>

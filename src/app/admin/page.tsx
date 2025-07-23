@@ -22,7 +22,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2 } from 'lucide-react';
+import { Loader2, PlusCircle } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ImageUpload } from '@/components/admin/image-upload';
 
@@ -120,6 +120,25 @@ export default function AdminPage() {
     markAsDirty();
   }, []);
 
+  const handleAddProduct = () => {
+    const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+    const newProduct: Product = {
+      id: newId,
+      name: 'Nouveau Produit',
+      description: '',
+      price: 0,
+      category: 'Vêtements',
+      rating: 0,
+      stock: 0,
+      reviews: 0,
+      images: [''],
+      features: ['', '', ''],
+      data_ai_hint: ''
+    };
+    setProducts(prev => [...prev, newProduct]);
+    markAsDirty();
+  };
+
   const handleSaveChanges = async () => {
     setSaveStatus('saving');
     try {
@@ -203,7 +222,13 @@ export default function AdminPage() {
 
         <TabsContent value="products">
             <Card>
-                <CardHeader><CardTitle>Gestion des Produits</CardTitle></CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle>Gestion des Produits</CardTitle>
+                    <Button onClick={handleAddProduct} variant="outline">
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Ajouter un produit
+                    </Button>
+                </CardHeader>
                 <CardContent>
                 <div className="overflow-x-auto">
                     <Table>

@@ -12,7 +12,7 @@
     "id": 2,
     "title": "Caméras de sécurité",
     "subtitle": "Voyez ce qui se passe à la maison.",
-    "imageUrl": "https://placehold.co/800x400.png",
+    "imageUrl": "/uploads/1753310230704-956250685-4185c572a5a88894d7a4fd6fed451822.jpg",
     "href": "#",
     "className": "lg:col-span-2",
     "data_ai_hint": "security camera"
