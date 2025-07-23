@@ -1,10 +1,9 @@
-
 [
   {
     "id": 1,
     "title": "Systèmes Audio",
     "subtitle": "Un son incroyable. À votre commande.",
-    "imageUrl": "https://placehold.co/800x800.png",
+    "imageUrl": "/uploads/1753295325674-832999024-59a17410d0f3b1dee7fed83582467d45.jpg",
     "href": "#",
     "className": "md:col-span-2 lg:col-span-2 row-span-2",
     "data_ai_hint": "audio device"

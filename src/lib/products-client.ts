@@ -23,7 +23,7 @@ export async function updateProductsClient(products: Product[]): Promise<void> {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(products),
+    body: JSON.stringify(products, null, 2),
   });
 
   if (!response.ok) {

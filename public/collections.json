@@ -1,9 +1,44 @@
-
 [
-  { "id": 1, "name": "Vêtements", "href": "#", "image": "https://placehold.co/400x500.png", "data_ai_hint": "fashion clothing" },
-  { "id": 2, "name": "Accessoires", "href": "#", "image": "https://placehold.co/400x500.png", "data_ai_hint": "stylish accessories" },
-  { "id": 3, "name": "Tech", "href": "#", "image": "https://placehold.co/400x500.png", "data_ai_hint": "modern gadgets" },
-  { "id": 4, "name": "Maison", "href": "#", "image": "https://placehold.co/400x500.png", "data_ai_hint": "home decor" },
-  { "id": 5, "name": "Nouveautés", "href": "#", "image": "https://placehold.co/400x500.png", "data_ai_hint": "new arrivals" },
-  { "id": 6, "name": "Promotions", "href": "#", "image": "https://placehold.co/400x500.png", "data_ai_hint": "sale items" }
+  {
+    "id": 1,
+    "name": "Vêtements",
+    "href": "#",
+    "image": "https://placehold.co/400x500.png",
+    "data_ai_hint": "fashion clothing"
+  },
+  {
+    "id": 2,
+    "name": "Accessoires",
+    "href": "#",
+    "image": "https://placehold.co/400x500.png",
+    "data_ai_hint": "stylish accessories"
+  },
+  {
+    "id": 3,
+    "name": "Tech",
+    "href": "#",
+    "image": "https://placehold.co/400x500.png",
+    "data_ai_hint": "modern gadgets"
+  },
+  {
+    "id": 4,
+    "name": "Maison",
+    "href": "#",
+    "image": "https://placehold.co/400x500.png",
+    "data_ai_hint": "home decor"
+  },
+  {
+    "id": 5,
+    "name": "Nouveautés",
+    "href": "#",
+    "image": "https://placehold.co/400x500.png",
+    "data_ai_hint": "new arrivals"
+  },
+  {
+    "id": 6,
+    "name": "Promotions",
+    "href": "#",
+    "image": "https://placehold.co/400x500.png",
+    "data_ai_hint": "sale items"
+  }
 ]
