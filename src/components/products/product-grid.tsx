@@ -22,19 +22,8 @@ export function ProductGrid({ products }: ProductGridProps) {
       filtered = filtered.filter((p) => p.category === filters.category);
     }
 
-    switch (filters.sort) {
-      case 'popularity':
-        filtered.sort((a, b) => b.reviews - a.reviews);
-        break;
-      case 'price-asc':
-        filtered.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-desc':
-        filtered.sort((a, b) => b.price - a.price);
-        break;
-      default:
-        break;
-    }
+    // You can re-add sorting logic here if needed, for now it's removed to match the new design
+    // switch (filters.sort) { ... }
 
     return filtered;
   }, [products, filters]);
