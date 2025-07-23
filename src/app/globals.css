@@ -135,3 +135,99 @@
  .bento-card:hover {
   transform: scale(0.98);
  }
+
+/* Filter Menu Styles */
+.filter-menu {
+  padding: 0.5rem;
+  background-color: hsl(var(--secondary));
+  position: relative;
+  display: flex;
+  justify-content: center;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px 0 rgba(0, 0, 0, 0.075);
+}
+
+.filter-link {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 70px;
+  height: 50px;
+  border-radius: 8px;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+  transform-origin: center left;
+  transition: width 0.2s ease-in;
+  text-decoration: none;
+  color: hsl(var(--foreground));
+  cursor: pointer;
+}
+
+.filter-link:before {
+  position: absolute;
+  z-index: -1;
+  content: "";
+  display: block;
+  border-radius: 8px;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  transform: translateX(100%);
+  transition: transform 0.2s ease-in;
+  transform-origin: center right;
+  background-color: hsl(var(--muted));
+}
+
+.filter-link:hover,
+.filter-link:focus,
+.filter-link.active {
+  outline: 0;
+  width: 130px;
+}
+
+.filter-link:hover:before,
+.filter-link:focus:before,
+.filter-link.active:before {
+  transform: translateX(0);
+}
+.filter-link:hover .filter-link-title,
+.filter-link:focus .filter-link-title,
+.filter-link.active .filter-link-title {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.filter-link-icon {
+  width: 28px;
+  height: 28px;
+  display: block;
+  flex-shrink: 0;
+  left: 21px; /* Centered in 70px width */
+  position: absolute;
+  transition: left 0.2s ease-in;
+}
+
+.filter-link:hover .filter-link-icon,
+.filter-link:focus .filter-link-icon,
+.filter-link.active .filter-link-icon {
+    left: 18px;
+}
+
+.filter-link-icon svg {
+  width: 28px;
+  height: 28px;
+  color: hsl(var(--primary));
+}
+
+.filter-link-title {
+  transform: translateX(100%);
+  opacity: 0;
+  transition: transform 0.2s ease-in, opacity 0.1s ease-in;
+  transform-origin: center right;
+  display: block;
+  text-align: center;
+  text-indent: 28px;
+  width: 100%;
+  font-weight: 500;
+}
