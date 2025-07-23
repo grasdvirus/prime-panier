@@ -7,17 +7,13 @@ import Image from 'next/image';
 import { Card, CardContent } from '../ui/card';
 import { cn } from '@/lib/utils';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import type { Collection } from '@/lib/collections';
 
-const collections = [
-  { name: 'Vêtements', href: '#', image: 'https://placehold.co/400x500.png', data_ai_hint: 'fashion clothing' },
-  { name: 'Accessoires', href: '#', image: 'https://placehold.co/400x500.png', data_ai_hint: 'stylish accessories' },
-  { name: 'Tech', href: '#', image: 'https://placehold.co/400x500.png', data_ai_hint: 'modern gadgets' },
-  { name: 'Maison', href: '#', image: 'https://placehold.co/400x500.png', data_ai_hint: 'home decor' },
-  { name: 'Nouveautés', href: '#', image: 'https://placehold.co/400x500.png', data_ai_hint: 'new arrivals' },
-  { name: 'Promotions', href: '#', image: 'https://placehold.co/400x500.png', data_ai_hint: 'sale items' },
-];
+interface CollectionCarouselProps {
+    collections: Collection[];
+}
 
-export function CollectionCarousel() {
+export function CollectionCarousel({ collections }: CollectionCarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: 'start',
     dragFree: true,
@@ -32,6 +28,7 @@ export function CollectionCarousel() {
     if (emblaApi) emblaApi.scrollNext();
   }, [emblaApi]);
 
+  if (!collections || collections.length === 0) return null;
 
   return (
     <div className="relative max-w-7xl mx-auto">

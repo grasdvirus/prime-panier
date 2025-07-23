@@ -1,0 +1,21 @@
+
+[
+    {
+        "id": 1,
+        "iconName": "Lock",
+        "title": "Sécurité garantie",
+        "description": "Votre sécurité est notre priorité absolue. Nous utilisons les technologies de cryptage les plus avancées pour protéger vos informations personnelles et de paiement à chaque étape de votre parcours d'achat."
+    },
+    {
+        "id": 2,
+        "iconName": "Heart",
+        "title": "R.D.V avec nous",
+        "description": "Votre satisfaction nous est précieuse. Nous nous engageons à vous offrir une expérience client exceptionnelle, avec des produits de qualité et un service attentif pour répondre à toutes vos attentes et envies."
+    },
+    {
+        "id": 3,
+        "iconName": "Phone",
+        "title": "Nous contacter",
+        "description": "Une question ? N'hésitez pas à nous joindre.\nTéléphone: 0704542909\nEmail: publixstore.exe@gmail.com"
+    }
+]

@@ -1,0 +1,39 @@
+
+[
+  {
+    "id": 1,
+    "title": "Systèmes Audio",
+    "subtitle": "Un son incroyable. À votre commande.",
+    "imageUrl": "https://placehold.co/800x800.png",
+    "href": "#",
+    "className": "md:col-span-2 lg:col-span-2 row-span-2",
+    "data_ai_hint": "audio device"
+  },
+  {
+    "id": 2,
+    "title": "Caméras de sécurité",
+    "subtitle": "Voyez ce qui se passe à la maison.",
+    "imageUrl": "https://placehold.co/800x400.png",
+    "href": "#",
+    "className": "lg:col-span-2",
+    "data_ai_hint": "security camera"
+  },
+  {
+    "id": 3,
+    "title": "Gestion à distance",
+    "subtitle": "Gérez à distance tous vos appareils connectés.",
+    "imageUrl": "",
+    "href": "#",
+    "className": "",
+    "data_ai_hint": "smart home"
+  },
+  {
+    "id": 4,
+    "title": "Smartwatches Hybrides",
+    "subtitle": "Explorer",
+    "imageUrl": "https://placehold.co/400x400.png",
+    "href": "#",
+    "className": "",
+    "data_ai_hint": "smartwatch person"
+  }
+]

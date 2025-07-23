@@ -1,29 +1,33 @@
 import { cn } from "@/lib/utils";
+import { getMarquee } from "@/lib/marquee";
 
-export function Marquee({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+export async function Marquee() {
+  const marqueeData = await getMarquee();
+  const { messages } = marqueeData;
+
+  if (!messages || messages.length === 0) return null;
+
+  const MarqueeContent = () => (
+    <>
+      {messages.map((message, index) => (
+        <span key={index} className="mx-4 text-sm font-medium">{message}</span>
+      ))}
+    </>
+  );
+
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-2">
         <div
             className={cn(
-                "relative flex w-full overflow-x-hidden bg-muted/50 text-muted-foreground rounded-lg p-2",
-                className
+                "relative flex w-full overflow-x-hidden bg-muted/50 text-muted-foreground rounded-lg p-2"
             )}
-            {...props}
         >
             <div className="animate-marquee whitespace-nowrap">
-                <span className="mx-4 text-sm font-medium">Livraison gratuite pour les commandes de plus de 50€</span>
-                <span className="mx-4 text-sm font-medium">Retours faciles sous 30 jours</span>
-                <span className="mx-4 text-sm font-medium">Nouvelles collections chaque semaine</span>
-                <span className="mx-4 text-sm font-medium">Inscrivez-vous et obtenez 10% de réduction</span>
-                <span className="mx-4 text-sm font-medium">Suivez-nous sur les réseaux sociaux</span>
+                <MarqueeContent />
             </div>
 
             <div className="absolute top-0 animate-marquee2 whitespace-nowrap h-full flex items-center">
-                <span className="mx-4 text-sm font-medium">Livraison gratuite pour les commandes de plus de 50€</span>
-                <span className="mx-4 text-sm font-medium">Retours faciles sous 30 jours</span>
-                <span className="mx-4 text-sm font-medium">Nouvelles collections chaque semaine</span>
-                <span className="mx-4 text-sm font-medium">Inscrivez-vous et obtenez 10% de réduction</span>
-                <span className="mx-4 text-sm font-medium">Suivez-nous sur les réseaux sociaux</span>
+                <MarqueeContent />
             </div>
         </div>
     </div>
