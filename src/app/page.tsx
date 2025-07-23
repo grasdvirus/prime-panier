@@ -10,8 +10,8 @@ export default async function Home() {
   const slides = await getSlides();
 
   return (
-    <div className="w-full">
-      <section className="mb-12">
+    <div className="w-full space-y-2">
+      <section>
         <Carousel
           opts={{
             align: 'start',
@@ -25,11 +25,11 @@ export default async function Home() {
         </Carousel>
       </section>
 
-      <section className="px-4 sm:px-6 lg:px-8 py-8 mb-12">
+      <section className="px-4 sm:px-6 lg:px-8 py-2">
         <BentoGrid />
       </section>
 
-      <div className="px-4 sm:px-6 lg:px-8 py-8">
+      <div className="px-4 sm:px-6 lg:px-8 py-2">
         <h2 className="text-3xl font-bold tracking-tighter text-center mb-8">Nouveaux Produits</h2>
         <ProductGrid products={products} />
       </div>
