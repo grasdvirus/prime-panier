@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Menu, User, LogOut, Shield, LogIn } from 'lucide-react';
+import { Menu, User, LogOut, Shield, LogIn, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { InstantSearch } from '@/components/search/instant-search';
 import {
@@ -50,6 +50,11 @@ export function Header() {
                 </Link>
               </Button>
             )}
+            <Button variant="ghost" asChild>
+                <Link href="/contact">
+                  <MessageCircle className="mr-2 h-4 w-4" /> Contact
+                </Link>
+            </Button>
             <CartSheet />
 
             <DropdownMenu>
