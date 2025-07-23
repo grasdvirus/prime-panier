@@ -3,6 +3,7 @@ import { getProducts } from '@/lib/products';
 import { HomepageCarousel } from '@/components/layout/homepage-carousel';
 import { getSlides } from '@/lib/slides';
 import { Carousel, CarouselContent } from '@/components/ui/carousel';
+import { BentoGrid } from '@/components/layout/bento-grid';
 
 export default async function Home() {
   const products = await getProducts();
@@ -24,7 +25,12 @@ export default async function Home() {
         </Carousel>
       </section>
 
+      <section className="px-4 sm:px-6 lg:px-8 py-8 mb-12">
+        <BentoGrid />
+      </section>
+
       <div className="px-4 sm:px-6 lg:px-8 py-8">
+        <h2 className="text-3xl font-bold tracking-tighter text-center mb-8">Nouveaux Produits</h2>
         <ProductGrid products={products} />
       </div>
     </div>
