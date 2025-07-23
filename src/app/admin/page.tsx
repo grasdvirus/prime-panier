@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'next/navigation';
 import { getProductsClient, updateProductsClient } from '@/lib/products-client';
@@ -25,17 +25,24 @@ import { Loader2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ImageUpload } from '@/components/admin/image-upload';
 
+type SaveStatus = 'idle' | 'dirty' | 'saving' | 'success';
+
 export default function AdminPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  
+  // Data states
   const [products, setProducts] = useState<Product[]>([]);
   const [slides, setSlides] = useState<Slide[]>([]);
   const [bentoItems, setBentoItems] = useState<Bento[]>([]);
   const [collections, setCollections] = useState<Collection[]>([]);
   const [infoFeatures, setInfoFeatures] = useState<InfoFeature[]>([]);
   const [marquee, setMarquee] = useState<Marquee>({ messages: [] });
+  
+  // UI states
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  
   const { toast } = useToast();
 
   useEffect(() => {
@@ -63,13 +70,19 @@ export default function AdminPage() {
             setInfoFeatures(info);
             setMarquee(marq);
             setLoading(false);
+            setSaveStatus('idle');
         }
         loadData();
     }
   }, [user]);
 
-  // Generic handler to update state for any list
-  const handleInputChange = <T extends { id: number }>(
+  const markAsDirty = () => {
+    if (saveStatus === 'idle' || saveStatus === 'success') {
+      setSaveStatus('dirty');
+    }
+  }
+
+  const handleInputChange = useCallback(<T extends { id: number }>(
     setState: React.Dispatch<React.SetStateAction<T[]>>,
     id: number,
     field: keyof T,
@@ -80,9 +93,10 @@ export default function AdminPage() {
         item.id === id ? { ...item, [field]: value } : item
       )
     );
-  };
+    markAsDirty();
+  }, [saveStatus]);
 
-  const handleProductFeatureChange = (productId: number, featureIndex: number, value: string) => {
+  const handleProductFeatureChange = useCallback((productId: number, featureIndex: number, value: string) => {
      setProducts(prevProducts =>
       prevProducts.map(p => {
         if (p.id === productId) {
@@ -93,18 +107,20 @@ export default function AdminPage() {
         return p;
       })
     );
-  }
+    markAsDirty();
+  }, [saveStatus]);
 
-  const handleMarqueeChange = (index: number, value: string) => {
+  const handleMarqueeChange = useCallback((index: number, value: string) => {
     setMarquee(prev => {
         const newMessages = [...prev.messages];
         newMessages[index] = value;
         return { ...prev, messages: newMessages };
     });
-  };
+    markAsDirty();
+  }, [saveStatus]);
 
   const handleSaveChanges = async () => {
-    setSaving(true);
+    setSaveStatus('saving');
     try {
       await Promise.all([
           updateProductsClient(products),
@@ -118,6 +134,8 @@ export default function AdminPage() {
         title: 'Succès',
         description: 'Les données ont été mises à jour.',
       });
+      setSaveStatus('success');
+      setTimeout(() => setSaveStatus('idle'), 3000);
     } catch (error) {
       console.error('Failed to save data:', error);
       toast({
@@ -125,8 +143,7 @@ export default function AdminPage() {
         description: 'Impossible de sauvegarder les modifications.',
         variant: 'destructive',
       });
-    } finally {
-      setSaving(false);
+      setSaveStatus('dirty'); // Revert to dirty if save fails
     }
   };
   
@@ -142,6 +159,29 @@ export default function AdminPage() {
     return <p className="text-center py-10">Vous n'avez pas l'autorisation d'accéder à cette page.</p>;
   }
 
+  const SaveButtonContent = () => {
+    switch (saveStatus) {
+        case 'saving':
+            return <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Enregistrement...</>;
+        case 'dirty':
+            return <>
+                <span className="relative flex h-3 w-3 mr-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
+                </span>
+                Enregistrer les modifications
+            </>;
+        case 'success':
+            return <>
+                <span className="relative flex h-3 w-3 mr-2">
+                    <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                </span>
+                Enregistré !
+            </>;
+        default:
+            return 'Enregistrer les modifications';
+    }
+  };
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
@@ -155,9 +195,8 @@ export default function AdminPage() {
                 <TabsTrigger value="info">Section Info</TabsTrigger>
                 <TabsTrigger value="marquee">Bandeau</TabsTrigger>
             </TabsList>
-             <Button onClick={handleSaveChanges} disabled={saving}>
-                {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                Enregistrer les modifications
+             <Button onClick={handleSaveChanges} disabled={saveStatus === 'saving' || saveStatus === 'idle'}>
+                <SaveButtonContent />
             </Button>
         </div>
 

@@ -10,14 +10,14 @@
     "id": 2,
     "title": "vas loin ",
     "description": "La technologie qui simplifie votre quotidien.",
-    "imageUrl": "https://placehold.co/1200x600.png",
+    "imageUrl": "/uploads/1753297952447-805371429-1e8f0b0e84b98648f8238f9f1c4b0803.jpg",
     "data_ai_hint": "modern tech"
   },
   {
     "id": 3,
     "title": "Élégance Urbaine",
     "description": "Des articles conçus pour la vie en ville.",
-    "imageUrl": "https://placehold.co/1200x600.png",
+    "imageUrl": "/uploads/1753297859286-361546132-6ce1a12801f2eada11dd1f60a3df1b78.jpg",
     "data_ai_hint": "urban lifestyle"
   }
 ]
