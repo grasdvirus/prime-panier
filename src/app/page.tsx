@@ -5,6 +5,7 @@ import { getSlides } from '@/lib/slides';
 import { Carousel, CarouselContent } from '@/components/ui/carousel';
 import { BentoGrid } from '@/components/layout/bento-grid';
 import { CollectionCarousel } from '@/components/products/collection-carousel';
+import { InfoSection } from '@/components/layout/info-section';
 
 export default async function Home() {
   const products = await getProducts();
@@ -39,6 +40,10 @@ export default async function Home() {
          <h2 className="text-3xl font-bold tracking-tighter text-center mb-8">Parcourir par collection</h2>
          <CollectionCarousel />
       </div>
+
+      <section className="px-4 sm:px-6 lg:px-8 py-12">
+        <InfoSection />
+      </section>
     </div>
   );
 }
