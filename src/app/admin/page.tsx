@@ -22,9 +22,19 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, PlusCircle } from 'lucide-react';
+import { Loader2, PlusCircle, Trash2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ImageUpload } from '@/components/admin/image-upload';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 type SaveStatus = 'idle' | 'dirty' | 'saving' | 'success';
 
@@ -43,6 +53,7 @@ export default function AdminPage() {
   // UI states
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   
   const { toast } = useToast();
 
@@ -64,7 +75,7 @@ export default function AdminPage() {
                 getInfoFeaturesClient(),
                 getMarqueeClient(),
             ]);
-            setProducts(prods);
+            setProducts(prods.map(p => ({ ...p, images: p.images.length > 0 ? p.images : ['', ''] })));
             setSlides(slds);
             setBentoItems(bento);
             setCollections(colls);
@@ -93,6 +104,20 @@ export default function AdminPage() {
       prevState.map(item =>
         item.id === id ? { ...item, [field]: value } : item
       )
+    );
+    markAsDirty();
+  }, []);
+
+  const handleProductImageChange = useCallback((productId: number, imageIndex: number, url: string) => {
+    setProducts(prevProducts =>
+        prevProducts.map(p => {
+            if (p.id === productId) {
+                const newImages = [...p.images];
+                newImages[imageIndex] = url;
+                return { ...p, images: newImages };
+            }
+            return p;
+        })
     );
     markAsDirty();
   }, []);
@@ -131,7 +156,7 @@ export default function AdminPage() {
       rating: 0,
       stock: 0,
       reviews: 0,
-      images: [''],
+      images: ['', ''],
       features: ['', '', ''],
       data_ai_hint: ''
     };
@@ -139,11 +164,32 @@ export default function AdminPage() {
     markAsDirty();
   };
 
+  const handleDeleteProduct = (product: Product) => {
+    setProductToDelete(product);
+  };
+
+  const confirmDeleteProduct = () => {
+    if (productToDelete) {
+      setProducts(prev => prev.filter(p => p.id !== productToDelete.id));
+      markAsDirty();
+      setProductToDelete(null);
+      toast({
+        title: "Produit supprimé",
+        description: `Le produit "${productToDelete.name}" a été supprimé.`,
+      });
+    }
+  };
+
   const handleSaveChanges = async () => {
     setSaveStatus('saving');
     try {
+      const productsToSave = products.map(p => ({
+        ...p,
+        images: p.images.filter(img => img && img.trim() !== '')
+      }));
+
       await Promise.all([
-          updateProductsClient(products),
+          updateProductsClient(productsToSave),
           updateSlidesClient(slides),
           updateBentoClient(bentoItems),
           updateCollectionsClient(collections),
@@ -234,25 +280,33 @@ export default function AdminPage() {
                     <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="w-[350px]">Image</TableHead>
+                            <TableHead className="w-[350px]">Image 1</TableHead>
+                            <TableHead className="w-[350px]">Image 2</TableHead>
                             <TableHead className="min-w-[200px]">Nom</TableHead>
                             <TableHead className="min-w-[300px]">Description</TableHead>
-                            <TableHead>Prix</TableHead>
-                            <TableHead>Stock</TableHead>
-                            <TableHead>Catégorie</TableHead>
+                            <TableHead className="min-w-[150px]">Prix / Stock / Catégorie</TableHead>
                             <TableHead className="min-w-[250px]">Caractéristiques</TableHead>
+                            <TableHead>Action</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {products.map((product) => (
                         <TableRow key={product.id}>
-                            <TableCell><ImageUpload value={product.images[0]} onChange={(url) => handleInputChange(setProducts, product.id, 'images', [url])} /></TableCell>
+                            <TableCell><ImageUpload value={product.images[0] || ''} onChange={(url) => handleProductImageChange(product.id, 0, url)} /></TableCell>
+                            <TableCell><ImageUpload value={product.images[1] || ''} onChange={(url) => handleProductImageChange(product.id, 1, url)} /></TableCell>
                             <TableCell><Input value={product.name} onChange={e => handleInputChange(setProducts, product.id, 'name', e.target.value)} /></TableCell>
                             <TableCell><Textarea value={product.description} onChange={e => handleInputChange(setProducts, product.id, 'description', e.target.value)} /></TableCell>
-                            <TableCell><Input type="number" value={product.price} onChange={e => handleInputChange(setProducts, product.id, 'price', Number(e.target.value))} /></TableCell>
-                            <TableCell><Input type="number" value={product.stock} onChange={e => handleInputChange(setProducts, product.id, 'stock', Number(e.target.value))} /></TableCell>
-                            <TableCell><Input value={product.category} onChange={e => handleInputChange(setProducts, product.id, 'category', e.target.value)} /></TableCell>
-                            <TableCell><div className="space-y-2">{product.features.map((feature, fIndex) => (<Input key={fIndex} value={feature} onChange={e => handleProductFeatureChange(product.id, fIndex, e.target.value)} />))}</div></TableCell>
+                            <TableCell className="space-y-2">
+                                <Input type="number" placeholder="Prix" value={product.price} onChange={e => handleInputChange(setProducts, product.id, 'price', Number(e.target.value))} />
+                                <Input type="number" placeholder="Stock" value={product.stock} onChange={e => handleInputChange(setProducts, product.id, 'stock', Number(e.target.value))} />
+                                <Input placeholder="Catégorie" value={product.category} onChange={e => handleInputChange(setProducts, product.id, 'category', e.target.value)} />
+                            </TableCell>
+                            <TableCell><div className="space-y-2">{product.features.map((feature, fIndex) => (<Input key={fIndex} value={feature} placeholder={`Caractéristique ${fIndex + 1}`} onChange={e => handleProductFeatureChange(product.id, fIndex, e.target.value)} />))}</div></TableCell>
+                            <TableCell>
+                                <Button variant="destructive" size="icon" onClick={() => handleDeleteProduct(product)}>
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </TableCell>
                         </TableRow>
                         ))}
                     </TableBody>
@@ -378,6 +432,20 @@ export default function AdminPage() {
         </TabsContent>
 
       </Tabs>
+      <AlertDialog open={!!productToDelete} onOpenChange={(open) => !open && setProductToDelete(null)}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
+                <AlertDialogDescription>
+                    Cette action est irréversible. Le produit "{productToDelete?.name}" sera définitivement supprimé.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setProductToDelete(null)}>Annuler</AlertDialogCancel>
+                <AlertDialogAction onClick={confirmDeleteProduct}>Supprimer</AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

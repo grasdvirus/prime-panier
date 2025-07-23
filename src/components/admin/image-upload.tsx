@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Upload, ImageIcon } from 'lucide-react';
+import { Loader2, Upload, ImageIcon, X } from 'lucide-react';
 
 interface ImageUploadProps {
   value: string;
@@ -79,26 +79,43 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
                 {isUploading ? <Loader2 className="animate-spin" /> : <Upload />}
                 <span className="sr-only">Téléverser une image</span>
             </Button>
+            {value && (
+                 <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    onClick={() => onChange('')}
+                >
+                    <X />
+                    <span className="sr-only">Supprimer l'image</span>
+                </Button>
+            )}
         </div>
-        {value ? (
-            <div className="relative w-full h-40 rounded-md border bg-muted/50 overflow-hidden flex items-center justify-center">
-                 <Image 
-                    src={value} 
-                    alt="Aperçu de l'image" 
-                    fill
-                    className="object-contain"
-                    onError={(e) => e.currentTarget.style.display = 'none'} // Hide if image fails to load
-                 />
-                 {/* Fallback in case image is broken or onError is triggered */}
-                 <div className="absolute inset-0 flex items-center justify-center -z-10">
+        <div className="relative w-full h-40 rounded-md border bg-muted/50 overflow-hidden flex items-center justify-center">
+            {value ? (
+                <>
+                    <Image 
+                        src={value} 
+                        alt="Aperçu de l'image" 
+                        fill
+                        className="object-contain"
+                        onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"; // transparent 1x1 pixel
+                            target.srcset = "";
+                            target.parentElement?.querySelector('.fallback-icon')?.classList.remove('hidden');
+                        }}
+                    />
+                    <div className="fallback-icon hidden absolute inset-0 flex items-center justify-center -z-10">
+                        <ImageIcon className="h-10 w-10 text-muted-foreground" />
+                    </div>
+                </>
+            ) : (
+                <div className="flex items-center justify-center">
                     <ImageIcon className="h-10 w-10 text-muted-foreground" />
-                 </div>
-            </div>
-        ) : (
-            <div className="w-full h-40 rounded-md border bg-muted/50 flex items-center justify-center">
-                <ImageIcon className="h-10 w-10 text-muted-foreground" />
-            </div>
-        )}
+                </div>
+            )}
+        </div>
     </div>
   );
 }

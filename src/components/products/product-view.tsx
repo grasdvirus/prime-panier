@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { type Product } from '@/lib/products';
 import { Button } from '@/components/ui/button';
 import {
@@ -56,7 +57,9 @@ export function ProductView({ product }: ProductViewProps) {
         </div>
         <div className="flex flex-col gap-6">
           <div>
-            <Badge variant="secondary" className="mb-2">{product.category}</Badge>
+            <Link href={`/collections/${product.category}`} passHref>
+                <Badge variant="secondary" className="mb-2 hover:bg-primary/20 transition-colors cursor-pointer">{product.category}</Badge>
+            </Link>
             <h1 className="text-3xl md:text-4xl font-bold tracking-tighter font-headline">{product.name}</h1>
             <p className="text-2xl font-semibold text-primary mt-2">${product.price.toFixed(2)}</p>
             <div className="flex items-center gap-2 text-muted-foreground mt-2">

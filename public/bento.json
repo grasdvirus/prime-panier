@@ -4,7 +4,7 @@
     "title": "Systèmes Audio",
     "subtitle": "Un son incroyable. À votre commande.",
     "imageUrl": "/uploads/1753295325674-832999024-59a17410d0f3b1dee7fed83582467d45.jpg",
-    "href": "#",
+    "href": "#habit",
     "className": "md:col-span-2 lg:col-span-2 row-span-2",
     "data_ai_hint": "audio device"
   },
@@ -19,8 +19,8 @@
   },
   {
     "id": 3,
-    "title": "Gestion à distance",
-    "subtitle": "Gérez à distance tous vos appareils connectés.",
+    "title": "section christian",
+    "subtitle": "achat en tout comfiance",
     "imageUrl": "",
     "href": "#",
     "className": "",
@@ -30,7 +30,7 @@
     "id": 4,
     "title": "Smartwatches Hybrides",
     "subtitle": "Explorer",
-    "imageUrl": "https://placehold.co/400x400.png",
+    "imageUrl": "/uploads/1753311562707-736492787-961be3d921a17e10d1b57c656350156b.jpg",
     "href": "#",
     "className": "",
     "data_ai_hint": "smartwatch person"
