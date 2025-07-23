@@ -16,20 +16,13 @@ export type Product = {
   data_ai_hint: string;
 };
 
-let productsCache: Product[] | null = null;
-
 async function fetchProductsOnServer(): Promise<Product[]> {
     // In a real app, you'd fetch from a database.
     // For this demo, we read from a local JSON file.
-    // We cache it in memory to avoid re-reading the file on every request.
-    if (productsCache) {
-        return productsCache;
-    }
     try {
         const filePath = path.join(process.cwd(), 'public', 'products.json');
         const fileContent = await fs.readFile(filePath, 'utf-8');
         const products: Product[] = JSON.parse(fileContent);
-        productsCache = products;
         return products;
     } catch (error) {
         // If the file doesn't exist or is invalid, return empty array

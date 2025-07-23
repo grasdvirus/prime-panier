@@ -12,17 +12,11 @@ export type Bento = {
   data_ai_hint: string;
 };
 
-let bentoCache: Bento[] | null = null;
-
 async function fetchBentoOnServer(): Promise<Bento[]> {
-    if (bentoCache) {
-        return bentoCache;
-    }
     try {
         const filePath = path.join(process.cwd(), 'public', 'bento.json');
         const fileContent = await fs.readFile(filePath, 'utf-8');
         const bentoItems: Bento[] = JSON.parse(fileContent);
-        bentoCache = bentoItems;
         return bentoItems;
     } catch (error) {
         console.error('Failed to read or parse bento.json:', error);
