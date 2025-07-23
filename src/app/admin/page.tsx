@@ -94,7 +94,7 @@ export default function AdminPage() {
       )
     );
     markAsDirty();
-  }, [saveStatus]);
+  }, []);
 
   const handleProductFeatureChange = useCallback((productId: number, featureIndex: number, value: string) => {
      setProducts(prevProducts =>
@@ -108,7 +108,7 @@ export default function AdminPage() {
       })
     );
     markAsDirty();
-  }, [saveStatus]);
+  }, []);
 
   const handleMarqueeChange = useCallback((index: number, value: string) => {
     setMarquee(prev => {
@@ -117,7 +117,7 @@ export default function AdminPage() {
         return { ...prev, messages: newMessages };
     });
     markAsDirty();
-  }, [saveStatus]);
+  }, []);
 
   const handleSaveChanges = async () => {
     setSaveStatus('saving');
@@ -208,7 +208,7 @@ export default function AdminPage() {
                     <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="w-[250px]">Image</TableHead>
+                            <TableHead className="w-[350px]">Image</TableHead>
                             <TableHead className="min-w-[200px]">Nom</TableHead>
                             <TableHead className="min-w-[300px]">Description</TableHead>
                             <TableHead>Prix</TableHead>
@@ -242,7 +242,7 @@ export default function AdminPage() {
                 <CardContent>
                 <div className="overflow-x-auto">
                     <Table>
-                    <TableHeader><TableRow><TableHead>Titre</TableHead><TableHead>Description</TableHead><TableHead>URL de l'image</TableHead></TableRow></TableHeader>
+                    <TableHeader><TableRow><TableHead>Titre</TableHead><TableHead>Description</TableHead><TableHead className="w-[350px]">Image</TableHead></TableRow></TableHeader>
                     <TableBody>
                         {slides.map((slide) => (
                         <TableRow key={slide.id}>
@@ -266,10 +266,22 @@ export default function AdminPage() {
                         <Card key={item.id} className="p-4">
                             <h3 className="font-semibold mb-2">Élément {item.id}</h3>
                             <div className="grid gap-4 md:grid-cols-2">
-                                <Input placeholder="Titre" value={item.title} onChange={e => handleInputChange(setBentoItems, item.id, 'title', e.target.value)} />
-                                <Input placeholder="Lien" value={item.href} onChange={e => handleInputChange(setBentoItems, item.id, 'href', e.target.value)} />
-                                <Textarea placeholder="Description/Sous-titre" value={item.subtitle} onChange={e => handleInputChange(setBentoItems, item.id, 'subtitle', e.target.value)} />
-                                <ImageUpload value={item.imageUrl} onChange={url => handleInputChange(setBentoItems, item.id, 'imageUrl', url)} />
+                                <div className="space-y-2">
+                                   <Label>Titre</Label>
+                                   <Input value={item.title} onChange={e => handleInputChange(setBentoItems, item.id, 'title', e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                   <Label>Sous-titre / Description</Label>
+                                   <Input value={item.subtitle} onChange={e => handleInputChange(setBentoItems, item.id, 'subtitle', e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                   <Label>Lien de redirection</Label>
+                                   <Input value={item.href} onChange={e => handleInputChange(setBentoItems, item.id, 'href', e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                   <Label>Image</Label>
+                                   <ImageUpload value={item.imageUrl} onChange={url => handleInputChange(setBentoItems, item.id, 'imageUrl', url)} />
+                                </div>
                             </div>
                         </Card>
                     ))}
@@ -283,7 +295,7 @@ export default function AdminPage() {
                 <CardContent>
                     <div className="overflow-x-auto">
                         <Table>
-                            <TableHeader><TableRow><TableHead>Nom</TableHead><TableHead>Lien</TableHead><TableHead>Image</TableHead></TableRow></TableHeader>
+                            <TableHeader><TableRow><TableHead>Nom</TableHead><TableHead>Lien</TableHead><TableHead className="w-[350px]">Image</TableHead></TableRow></TableHeader>
                             <TableBody>
                                 {collections.map(item => (
                                     <TableRow key={item.id}>
@@ -307,8 +319,14 @@ export default function AdminPage() {
                          <Card key={item.id} className="p-4">
                              <h3 className="font-semibold mb-2">{item.title}</h3>
                              <div className="grid gap-4">
-                                <Input placeholder="Titre" value={item.title} onChange={e => handleInputChange(setInfoFeatures, item.id, 'title', e.target.value)} />
-                                <Textarea placeholder="Description" value={item.description} onChange={e => handleInputChange(setInfoFeatures, item.id, 'description', e.target.value)} rows={4}/>
+                                <div className="space-y-2">
+                                    <Label>Titre</Label>
+                                    <Input value={item.title} onChange={e => handleInputChange(setInfoFeatures, item.id, 'title', e.target.value)} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Description</Label>
+                                    <Textarea value={item.description} onChange={e => handleInputChange(setInfoFeatures, item.id, 'description', e.target.value)} rows={4}/>
+                                </div>
                              </div>
                          </Card>
                     ))}
@@ -321,11 +339,13 @@ export default function AdminPage() {
                 <CardHeader><CardTitle>Gestion du Bandeau Défilant</CardTitle></CardHeader>
                 <CardContent className="space-y-2">
                     {marquee.messages.map((message, index) => (
-                        <Input 
-                            key={index} 
-                            value={message}
-                            onChange={e => handleMarqueeChange(index, e.target.value)}
-                        />
+                        <div key={index} className="space-y-2">
+                            <Label>Message {index + 1}</Label>
+                            <Input 
+                                value={message}
+                                onChange={e => handleMarqueeChange(index, e.target.value)}
+                            />
+                        </div>
                     ))}
                 </CardContent>
             </Card>
