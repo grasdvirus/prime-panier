@@ -1,22 +1,22 @@
 [
   {
     "id": 1,
-    "name": "Casque Audio Minimaliste",
-    "description": "Un son immersif dans un design épuré. Confort et performance pour vos oreilles.",
-    "price": 200000,
-    "category": "Tech",
+    "name": "Perruque Bob courte ombrée blonde",
+    "description": "Perruque longue ondulée – Volume glamour et reflets captivants\nDonnez vie à votre style avec cette perruque ondulée brun doré, conçue pour exprimer votre personnalité tout en finesse. Grâce à ses boucles souples et son brun lumineux, elle incarne l’équilibre parfait entre naturel et sophistication.\n\n💎 Caractéristiques :\n\nCouleur : Brun chocolat avec reflets dorés subtils\n\nTexture : Ondulations douces et fluides\n\nLongueur : Épaule +, idéale pour un rendu élégant\n\nRaie : Centrale pour une structure équilibrée\n\nFinition : Brillance naturelle et mouvement dynamique\n\nConfort : Fixation stable, idéale pour une utilisation prolongée\n\n🌟 Parfaite pour :\n\nValoriser les visages ovales, ronds ou allongés\n\nCérémonies, shootings, soirées ou looks quotidiens\n\nCelles qui aiment les styles doux avec du caractère",
+    "price": 240000,
+    "category": "accessoires",
     "rating": 4.8,
     "stock": 25,
     "reviews": 124,
     "images": [
-      "/uploads/1753031103248-902591231-meches-blondes-sur-cheveux-brun-e1700746883168_prev_ui.png",
-      "/uploads/1753313109974-294496617-96629ce1a1424fd832a4d112f4e3fdb1.jpg"
+      "/uploads/1753321613515-115472520-fca929a09aa1113a5ebd02da0b9c3695.jpg",
+      "/uploads/1753321638534-518049620-6ce1a12801f2eada11dd1f60a3df1b78.jpg"
     ],
     "features": [
-      "Réduction de bruit active",
-      "Autonomie de 20h",
-      "Bluetooth 5.2",
-      "Ultra-léger"
+      "mèche ultra fin et durable",
+      "Brillance naturelle et mouvement dynamique",
+      " Fixation stable, idéale pour une utilisation prolongée",
+      "Épaule +, idéale pour un rendu élégant"
     ],
     "data_ai_hint": "headphones elegant"
   },
@@ -30,8 +30,8 @@
     "stock": 150,
     "reviews": 230,
     "images": [
-      "/uploads/1753295176182-770274460-6ce1a12801f2eada11dd1f60a3df1b78.jpg",
-      "/uploads/1753315911053-834877572-0bf725b80ed289cea25de6bfccffab4c.jpg"
+      "/uploads/1753321683268-220420448-3eda503083b4eb948ea0fa062bcc10ac.jpg",
+      "/uploads/1753321711721-130388372-ee03923956682433bb227ab7a138dfb7.jpg"
     ],
     "features": [
       "100% Coton Biologique GOTS",

@@ -35,8 +35,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type SaveStatus = 'idle' | 'dirty' | 'saving' | 'success';
+
+const productCategories: Product['category'][] = ['Vêtements', 'Accessoires', 'Tech', 'Maison'];
 
 export default function AdminPage() {
   const { user, loading: authLoading } = useAuth();
@@ -249,6 +258,19 @@ export default function AdminPage() {
     }
   };
 
+  const CategorySelector = ({ value, onChange }: { value: Product['category'], onChange: (value: Product['category']) => void }) => (
+    <Select value={value} onValueChange={onChange}>
+        <SelectTrigger>
+            <SelectValue placeholder="Choisir une catégorie" />
+        </SelectTrigger>
+        <SelectContent>
+            {productCategories.map(cat => (
+                <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+            ))}
+        </SelectContent>
+    </Select>
+  );
+
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
       <Tabs defaultValue="products" className="w-full">
@@ -299,7 +321,7 @@ export default function AdminPage() {
                                 <TableCell className="space-y-2">
                                     <Input type="number" placeholder="Prix" value={product.price} onChange={e => handleInputChange(setProducts, product.id, 'price', Number(e.target.value))} />
                                     <Input type="number" placeholder="Stock" value={product.stock} onChange={e => handleInputChange(setProducts, product.id, 'stock', Number(e.target.value))} />
-                                    <Input placeholder="Catégorie" value={product.category} onChange={e => handleInputChange(setProducts, product.id, 'category', e.target.value)} />
+                                    <CategorySelector value={product.category} onChange={value => handleInputChange(setProducts, product.id, 'category', value)} />
                                 </TableCell>
                                 <TableCell><div className="space-y-2">{product.features.map((feature, fIndex) => (<Input key={fIndex} value={feature} placeholder={`Caractéristique ${fIndex + 1}`} onChange={e => handleProductFeatureChange(product.id, fIndex, e.target.value)} />))}</div></TableCell>
                                 <TableCell>
@@ -330,7 +352,7 @@ export default function AdminPage() {
                                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                         <div><Label>Prix</Label><Input type="number" placeholder="Prix" value={product.price} onChange={e => handleInputChange(setProducts, product.id, 'price', Number(e.target.value))} /></div>
                                         <div><Label>Stock</Label><Input type="number" placeholder="Stock" value={product.stock} onChange={e => handleInputChange(setProducts, product.id, 'stock', Number(e.target.value))} /></div>
-                                        <div><Label>Catégorie</Label><Input placeholder="Catégorie" value={product.category} onChange={e => handleInputChange(setProducts, product.id, 'category', e.target.value)} /></div>
+                                        <div><Label>Catégorie</Label><CategorySelector value={product.category} onChange={value => handleInputChange(setProducts, product.id, 'category', value)} /></div>
                                      </div>
                                       <div>
                                         <Label>Caractéristiques</Label>
