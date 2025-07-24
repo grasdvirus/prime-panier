@@ -22,7 +22,7 @@
     "title": "info pub",
     "subtitle": "a visitez resume IA l'application qui vous permet de faire des résumer PDF YOUTUBE etc",
     "imageUrl": "/uploads/1753327858570-544779997-Design sans titre (4).png",
-    "href": "/collections/Maison",
+    "href": "https://resume-ia-five.vercel.app/",
     "className": "",
     "data_ai_hint": "smart home"
   },
@@ -34,5 +34,32 @@
     "href": "/collections/Accessoires",
     "className": "",
     "data_ai_hint": "smartwatch person"
+  },
+  {
+    "id": 5,
+    "title": "Nouveau titre",
+    "subtitle": "Nouveau sous-titre",
+    "imageUrl": "https://placehold.co/600x400.png",
+    "href": "/collections/Vêtements",
+    "className": "md:col-span-1",
+    "data_ai_hint": "item"
+  },
+  {
+    "id": 6,
+    "title": "Nouveau titre",
+    "subtitle": "Nouveau sous-titre",
+    "imageUrl": "https://placehold.co/600x400.png",
+    "href": "/collections/Vêtements",
+    "className": "md:col-span-1",
+    "data_ai_hint": "item"
+  },
+  {
+    "id": 7,
+    "title": "Nouveau titre",
+    "subtitle": "Nouveau sous-titre",
+    "imageUrl": "https://placehold.co/600x400.png",
+    "href": "/collections/Vêtements",
+    "className": "md:col-span-1",
+    "data_ai_hint": "item"
   }
 ]

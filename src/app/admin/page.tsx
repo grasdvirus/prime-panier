@@ -72,6 +72,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  const [bentoItemToDelete, setBentoItemToDelete] = useState<Bento | null>(null);
   const [isAddCategoryDialogOpen, setIsAddCategoryDialogOpen] = useState(false);
   const [newCategory, setNewCategory] = useState('');
 
@@ -203,6 +204,22 @@ export default function AdminPage() {
       toast({
         title: "Produit supprimé",
         description: `Le produit "${productToDelete.name}" a été supprimé.`,
+      });
+    }
+  };
+
+  const handleDeleteBentoItem = (item: Bento) => {
+    setBentoItemToDelete(item);
+  };
+  
+  const confirmDeleteBentoItem = () => {
+    if (bentoItemToDelete) {
+      setBentoItems(prev => prev.filter(item => item.id !== bentoItemToDelete.id));
+      markAsDirty();
+      setBentoItemToDelete(null);
+      toast({
+        title: "Élément Bento supprimé",
+        description: `L'élément "${bentoItemToDelete.title}" a été supprimé.`,
       });
     }
   };
@@ -490,7 +507,12 @@ export default function AdminPage() {
                 <CardContent className="space-y-4">
                     {bentoItems.map(item => (
                         <Card key={item.id} className="p-4">
-                            <h3 className="font-semibold mb-2">Élément {item.id}</h3>
+                             <div className="flex justify-between items-start">
+                                <h3 className="font-semibold mb-2">Élément {item.id}</h3>
+                                <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDeleteBentoItem(item)}>
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </div>
                             <div className="grid gap-4 md:grid-cols-2">
                                 <div className="space-y-2">
                                    <Label>Titre</Label>
@@ -597,6 +619,22 @@ export default function AdminPage() {
             </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <AlertDialog open={!!bentoItemToDelete} onOpenChange={(open) => !open && setBentoItemToDelete(null)}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
+                <AlertDialogDescription>
+                    Cette action est irréversible. L'élément "{bentoItemToDelete?.title}" sera définitivement supprimé.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setBentoItemToDelete(null)}>Annuler</AlertDialogCancel>
+                <AlertDialogAction onClick={confirmDeleteBentoItem}>Supprimer</AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
     </div>
   );
 }
