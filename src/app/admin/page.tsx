@@ -258,7 +258,7 @@ export default function AdminPage() {
     }
   };
 
-  const CategorySelector = ({ value, onChange }: { value: Product['category'], onChange: (value: Product['category']) => void }) => (
+  const CategorySelector = ({ value, onChange }: { value: string, onChange: (value: any) => void }) => (
     <Select value={value} onValueChange={onChange}>
         <SelectTrigger>
             <SelectValue placeholder="Choisir une catégorie" />
@@ -410,8 +410,11 @@ export default function AdminPage() {
                                    <Input value={item.subtitle} onChange={e => handleInputChange(setBentoItems, item.id, 'subtitle', e.target.value)} />
                                 </div>
                                 <div className="space-y-2">
-                                   <Label>Lien de redirection</Label>
-                                   <Input value={item.href} onChange={e => handleInputChange(setBentoItems, item.id, 'href', e.target.value)} />
+                                   <Label>Lien vers la catégorie</Label>
+                                   <CategorySelector 
+                                        value={item.href.startsWith('/collections/') ? item.href.replace('/collections/', '') : ''} 
+                                        onChange={value => handleInputChange(setBentoItems, item.id, 'href', `/collections/${value}`)} 
+                                    />
                                 </div>
                                 <div className="space-y-2">
                                    <Label>Image</Label>
@@ -430,12 +433,17 @@ export default function AdminPage() {
                 <CardContent>
                     <div className="overflow-x-auto">
                         <Table>
-                            <TableHeader><TableRow><TableHead>Nom</TableHead><TableHead>Lien</TableHead><TableHead className="w-[350px]">Image</TableHead></TableRow></TableHeader>
+                            <TableHeader><TableRow><TableHead>Nom</TableHead><TableHead>Lien vers la catégorie</TableHead><TableHead className="w-[350px]">Image</TableHead></TableRow></TableHeader>
                             <TableBody>
                                 {collections.map(item => (
                                     <TableRow key={item.id}>
                                         <TableCell><Input value={item.name} onChange={e => handleInputChange(setCollections, item.id, 'name', e.target.value)} /></TableCell>
-                                        <TableCell><Input value={item.href} onChange={e => handleInputChange(setCollections, item.id, 'href', e.target.value)} /></TableCell>
+                                        <TableCell>
+                                            <CategorySelector 
+                                                value={item.href.startsWith('/collections/') ? item.href.replace('/collections/', '') : ''} 
+                                                onChange={value => handleInputChange(setCollections, item.id, 'href', `/collections/${value}`)} 
+                                            />
+                                        </TableCell>
                                         <TableCell><ImageUpload value={item.image} onChange={url => handleInputChange(setCollections, item.id, 'image', url)}/></TableCell>
                                     </TableRow>
                                 ))}
