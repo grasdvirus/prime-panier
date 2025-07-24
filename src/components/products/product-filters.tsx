@@ -7,7 +7,7 @@ import { LayoutGrid, Shirt, Headphones, Home } from 'lucide-react';
 
 interface ProductFiltersProps {
   filters: { category: string; };
-  setFilters: React.Dispatch<React.SetStateAction<{ category: string; sort: string; }>>;
+  setFilters: React.Dispatch<React.SetStateAction<{ category: string; }>>;
 }
 
 async function getCategoriesClient(): Promise<string[]> {
