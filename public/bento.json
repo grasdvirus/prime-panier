@@ -1,37 +1,37 @@
 [
   {
     "id": 1,
-    "title": "Systèmes Audio",
-    "subtitle": "Un son incroyable. À votre commande.",
+    "title": "article de femme",
+    "subtitle": "des perruque vietamien",
     "imageUrl": "/uploads/1753295325674-832999024-59a17410d0f3b1dee7fed83582467d45.jpg",
-    "href": "#habit",
+    "href": "/collections/Vêtements",
     "className": "md:col-span-2 lg:col-span-2 row-span-2",
     "data_ai_hint": "audio device"
   },
   {
     "id": 2,
-    "title": "Caméras de sécurité",
-    "subtitle": "Voyez ce qui se passe à la maison.",
+    "title": "style en plus",
+    "subtitle": "des meilleur pour le quotidien",
     "imageUrl": "/uploads/1753310230704-956250685-4185c572a5a88894d7a4fd6fed451822.jpg",
-    "href": "#",
+    "href": "/collections/Vêtements",
     "className": "lg:col-span-2",
     "data_ai_hint": "security camera"
   },
   {
     "id": 3,
-    "title": "section christian",
-    "subtitle": "achat en tout comfiance",
-    "imageUrl": "",
-    "href": "#",
+    "title": "info pub",
+    "subtitle": "a visitez resume IA ",
+    "imageUrl": "/uploads/1753327858570-544779997-Design sans titre (4).png",
+    "href": "/collections/Maison",
     "className": "",
     "data_ai_hint": "smart home"
   },
   {
     "id": 4,
-    "title": "Smartwatches Hybrides",
-    "subtitle": "Explorer",
+    "title": "qualité jefe",
+    "subtitle": "lux et prestige",
     "imageUrl": "/uploads/1753311562707-736492787-961be3d921a17e10d1b57c656350156b.jpg",
-    "href": "#",
+    "href": "/collections/Accessoires",
     "className": "",
     "data_ai_hint": "smartwatch person"
   }

@@ -13,7 +13,7 @@
       "/uploads/1753321638534-518049620-6ce1a12801f2eada11dd1f60a3df1b78.jpg"
     ],
     "features": [
-      "mèche ultra fin et durable",
+      "longueur 16",
       "Brillance naturelle et mouvement dynamique",
       " Fixation stable, idéale pour une utilisation prolongée",
       "Épaule +, idéale pour un rendu élégant"
@@ -22,10 +22,10 @@
   },
   {
     "id": 2,
-    "name": "T-shirt en Coton Bio",
-    "description": "Le basique essentiel, réinventé avec une coupe parfaite et un coton biologique ultra-doux.",
-    "price": 39.99,
-    "category": "Vêtements",
+    "name": "Perruque courte Bob en cheveux humains vietnamiens",
+    "description": "Perruque bob lisse – Élégance chic et minimaliste\nAdoptez un look audacieux et raffiné avec notre perruque bob noire mi-longue, à la texture lisse et aux racines subtilement contrastées. Idéale pour les styles affirmés, elle encadre le visage avec précision et apporte une touche de sophistication naturelle à chaque tenue.\n\n💎 Caractéristiques :\n\nCoupe : Bob droit avec longueur aux épaules\n\nRaie : Centrale, pour une symétrie parfaite\n\nCouleur : Noir intense avec racines brun clair\n\nTexture : Cheveux lisses et doux au toucher\n\nVolume : Modéré – effet naturel et soigné\n\nStyle : Minimaliste, moderne et élégant\n\n💃 Pour qui ? Parfaite pour les femmes qui aiment les looks nets, professionnels ou tendance. Elle s’adapte aux événements chics comme aux journées casual. Facile à",
+    "price": 140000,
+    "category": "Accessoires",
     "rating": 4.9,
     "stock": 150,
     "reviews": 230,
@@ -34,123 +34,129 @@
       "/uploads/1753321711721-130388372-ee03923956682433bb227ab7a138dfb7.jpg"
     ],
     "features": [
-      "100% Coton Biologique GOTS",
-      "Coupe ajustée",
-      "Col rond durable"
+      "longueur 16",
+      "Modéré – effet naturel et soigné",
+      "Bob droit avec longueur aux épaules"
     ],
     "data_ai_hint": "black t-shirt"
   },
   {
     "id": 3,
-    "name": "Sac à Dos Urbain",
-    "description": "Le compagnon idéal pour vos aventures quotidiennes. Fonctionnel, durable et résistant à l'eau.",
-    "price": 89.99,
+    "name": "Perruque courte bouclée en cheveux humains, coupe au carré, avec dentelle",
+    "description": "Perruque bouclée premium – Élégance naturelle\nOffrez à votre look une touche de caractère et de douceur avec notre perruque bouclée noire à texture définie. Conçue pour imiter parfaitement les boucles naturelles, elle apporte volume, légèreté et sophistication à chaque coiffure.\n\n💎 Caractéristiques :\n\nTexture : Boucles serrées et bien définies\n\nCouleur : Noir intense, finition brillante\n\nLongueur : Moyenne – atteint les épaules\n\nCoiffure : Raie centrale pour un style équilibré\n\nConfort : Ajustement sécurisé et léger, idéal pour un usage prolongé\n\nStyle : Polyvalente, adaptée aux looks quotidiens ou aux occasions spéciales\n\n🎯 Pourquoi vous allez l’adorer : Cette perruque donne une allure naturelle et ultra-tendance sans effort. Elle est parfaite pour celles qui veulent varier de style sans compromettre confort ni authenticité. Avec son volume généreux, elle encadre le visage avec élégance et magnifie votre expression.",
+    "price": 270000,
     "category": "Accessoires",
     "rating": 4.7,
     "stock": 40,
     "reviews": 98,
     "images": [
-      "/uploads/1753310516461-872403318-0b65b3328292be2cf668a0554bfe2b6e.jpg"
+      "/uploads/1753324231015-508033176-42603ebdef3dc689fdda03b21df74392.jpg",
+      "/uploads/1753324310367-753315260-ff3a3fdc59ae645f5673a11e47dad7cc.jpg"
     ],
     "features": [
-      "Compartiment pour ordinateur 15\"",
-      "Tissu déperlant",
-      "Poches de sécurité"
+      "longueur 16",
+      "Boucles serrées et bien définies",
+      "Style : Polyvalente, adaptée aux looks quotidiens ou aux occasions spéciales"
     ],
     "data_ai_hint": "minimalist backpack"
   },
   {
     "id": 4,
-    "name": "Lampe de Bureau LED",
-    "description": "Éclairez votre espace de travail avec style. Lumière ajustable et design moderne.",
-    "price": 75,
-    "category": "Maison",
+    "name": "Perruque de cheveux humains vietnamiens raides",
+    "description": "Perruque lisse extra-longue – Allure royale et finesse absolue\nAffirme ton style avec cette perruque noire lisse ultra-longue, à la brillance naturelle et au tombé fluide. Son design épuré et sa longueur majestueuse en font un incontournable pour celles qui recherchent un look à la fois élégant, affirmé et intemporel.\n\n💎 Caractéristiques :\n\nTexture : Cheveux lisses, souples et brillants\n\nCouleur : Noir profond avec effet miroir\n\nLongueur : XXL – descend bien au-dessous du dos\n\nRaie : Centrale pour une structure symétrique\n\nStyle : Minimaliste et chic, idéal pour les tenues habillées ou décontractées\n\nConfort : Bon maintien, sensation légère pour un port prolongé\n\n🌟 Ce que cette perruque incarne : Un équilibre parfait entre sobriété et puissance visuelle. Son volume maîtrisé et sa finition impeccable garantissent une présence élégante en toutes circonstances – du quotidien aux grandes occasions.",
+    "price": 310000,
+    "category": "Accessoires",
     "rating": 4.6,
     "stock": 30,
     "reviews": 75,
     "images": [
-      "/uploads/1753302026685-348967468-59a17410d0f3b1dee7fed83582467d45.jpg"
+      "/uploads/1753324872041-49265794-b8bcee20a49ae9ae49a76fa18ab17825.jpg",
+      "/uploads/1753324887701-7767094-685c6c15d815967e3575b6bab94d1146.jpg"
     ],
     "features": [
-      "Intensité et température de couleur réglables",
-      "Bras articulé",
-      "Port USB intégré"
+      "longueur 18",
+      "densité 300",
+      "Cheveux lisses, souples et brillants"
     ],
     "data_ai_hint": "desk lamp"
   },
   {
     "id": 5,
-    "name": "Montre Classique Noire",
-    "description": "L'élégance au poignet. Un cadran sobre et un bracelet en cuir véritable.",
-    "price": 220,
+    "name": "Perruque Lace Frontal Wig Body Wave",
+    "description": "Perruque bouclée longue – Volume intense et glamour naturel\nRévélez votre beauté avec cette perruque bouclée noire ultra-volumineuse, à la texture généreuse et au mouvement spectaculaire. Ses boucles larges et brillantes encadrent le visage avec élégance, créant un style affirmé et féminin, idéal pour celles qui aiment se démarquer.\n\n💎 Caractéristiques :\n\nTexture : Boucles larges et rebondies\n\nCouleur : Noir profond, finition brillante\n\nLongueur : Étendue au bas du dos – effet dramatique garanti\n\nStyle : Raie centrale pour une structure classique et symétrique\n\nConfort : Fixation légère, idéale pour un port prolongé\n\nPolyvalence : Adaptée aux looks glam, urbains ou professionnels\n\n💃 Pourquoi elle séduit ? Cette perruque est parfaite pour transformer instantanément votre allure avec élégance. Son volume captivant et sa fluidité naturelle apportent une présence visuelle forte et une prestance unique.",
+    "price": 250000,
     "category": "Accessoires",
     "rating": 4.9,
-    "stock": 15,
+    "stock": 40,
     "reviews": 150,
     "images": [
-      "/uploads/1753310525077-24546787-b8bcee20a49ae9ae49a76fa18ab17825.jpg"
+      "/uploads/1753325193738-963791640-8929aca22efc177c9c7b83c1d81b4347(1).jpg",
+      "/uploads/1753325220369-248651338-4185c572a5a88894d7a4fd6fed451822.jpg"
     ],
     "features": [
-      "Mouvement à quartz suisse",
-      "Verre saphir inrayable",
-      "Bracelet en cuir interchangeable"
+      "longueur 16",
+      "couleur noir",
+      "couleur gris"
     ],
     "data_ai_hint": "black watch"
   },
   {
     "id": 6,
-    "name": "Sweat à Capuche Technique",
-    "description": "Confort thermique et liberté de mouvement. Un vêtement technique au look décontracté.",
-    "price": 99.99,
-    "category": "Vêtements",
+    "name": "Perruques de cheveux humains crépus lisses",
+    "description": "Perruque lisse noire – Élégance affirmée, style intemporel\nAffichez un look sophistiqué et naturel grâce à notre perruque lisse noire à raie centrale. Sa texture fluide et sa densité généreuse offrent un rendu impeccable, parfait pour sublimer votre silhouette en toute occasion.\n\n💎 Caractéristiques :\n\nTexture : Cheveux lisses et épais, finition soyeuse\n\nCouleur : Noir intense, éclat profond\n\nLongueur : Étendue jusqu’au bas du dos\n\nCoiffure : Raie centrale pour une symétrie élégante\n\nConfort : Fixation discrète et légère, adaptée à un port quotidien\n\nStyle : Convient aux tenues professionnelles, cérémonies ou looks urbains\n\n🌟 Ce que vous allez adorer : Cette perruque incarne l’élégance sans effort. Que ce soit pour un changement de style ou une coiffure protectrice, elle est idéale pour les femmes qui veulent rester audacieuses, raffinées et authentiques.",
+    "price": 150000,
+    "category": "Accessoires",
     "rating": 4.8,
     "stock": 60,
     "reviews": 88,
     "images": [
-      "/uploads/1753310542300-832308586-ad4b068ffe632840b721938637df84e3.jpg"
+      "/uploads/1753325600098-848324911-0e6431cdcc479fb8e88c3d396392f07e.jpg",
+      "/uploads/1753325634439-144020914-f171dc9b29f6678e013283115ca781b8.jpg"
     ],
     "features": [
-      "Tissu respirant",
-      "Intérieur brossé pour la chaleur",
-      "Poches zippées"
+      "longueur 16",
+      "Cheveux lisses et épais, finition soyeuse",
+      "Étendue jusqu’au bas du dos"
     ],
     "data_ai_hint": "black hoodie"
   },
   {
     "id": 7,
-    "name": "Enceinte Bluetooth Portable",
-    "description": "La bande-son de votre vie, où que vous soyez. Un son puissant dans un format compact.",
-    "price": 119.99,
-    "category": "Tech",
+    "name": "Perruques en cheveux humains avec dentelle frontale",
+    "description": "Perruque bouclée brune dégradée – Audace et douceur en parfaite harmonie\nÉblouis ton entourage avec cette perruque bouclée au dégradé brun intense, qui allie volume généreux, raie centrale élégante, et reflets caramel subtils. Chaque boucle apporte une texture vivante et un mouvement naturel, pour un look expressif et irrésistible.\n\n💎 Caractéristiques clés :\n\nCouleur : Dégradé brun foncé → brun clair effet soleil\n\nTexture : Boucles rebondies, bien définies\n\nLongueur : Mi-longue à longue – touche glamour garantie\n\nRaie centrale : Pour une structure équilibrée et affirmée\n\nFinition : Éclat naturel avec reflets chauds\n\n✨ Pourquoi elle te fera craquer : Ce modèle incarne la féminité audacieuse : confortable sans colle, facile à porter, et ultra-tendance. Que ce soit pour un look casual, une séance photo ou une sortie de luxe, elle te donne une allure confiante, soignée et pleine de charme.",
+    "price": 210000,
+    "category": "Accessoires",
     "rating": 4.7,
     "stock": 55,
     "reviews": 112,
     "images": [
-      "/uploads/1753310554063-263747567-ee03923956682433bb227ab7a138dfb7.jpg"
+      "/uploads/1753326203109-500488175-961be3d921a17e10d1b57c656350156b.jpg",
+      "/uploads/1753326335276-165732474-96629ce1a1424fd832a4d112f4e3fdb1.jpg"
     ],
     "features": [
-      "Son à 360°",
-      "Résistante à l'eau (IPX7)",
-      "12h d'autonomie"
+      "longueur 16",
+      "densité 180",
+      "Boucles rebondies, bien définies"
     ],
     "data_ai_hint": "bluetooth speaker"
   },
   {
     "id": 8,
-    "name": "Tasse en Céramique Mate",
-    "description": "Pour vos boissons chaudes, une tasse au design sobre et à la prise en main agréable.",
-    "price": 24.99,
-    "category": "Maison",
+    "name": "Perruques sans colle marron chocolat, cheveux humains",
+    "description": "Perruque longue ondulée – Charme naturel et féminité affirmée\nOptez pour un style à la fois doux et puissant avec notre perruque ondulée brun chocolat, à la texture soyeuse et au volume irrésistible. Ses ondulations souples créent un mouvement fluide qui sublime chaque visage avec élégance et authenticité.\n\n✨ Points forts :\n\nStyle : Boucles légères et naturelles\n\nCouleur : Brun profond avec reflets chauds\n\nLongueur : Tombée généreuse jusqu'au bas du dos\n\nCoiffure : Raie centrale pour un look structuré\n\nConfort : Fibre respirante, légère et agréable à porter\n\nEntretien : Facile à coiffer et à conserver\n\n💃 Parfaite pour :\n\nSorties glam, shooting photos, événements spéciaux\n\nChangement de style sans agresser vos cheveux\n\nMettre en valeur la beauté naturelle avec une touche de chic",
+    "price": 180000,
+    "category": "Accessoires",
     "rating": 4.9,
     "stock": 200,
     "reviews": 310,
     "images": [
-      "/uploads/1753310578936-760427685-foot1.jpg"
+      "/uploads/1753326769858-608591676-771b37c7631d96d27982b519f61fca80.jpg",
+      "/uploads/1753326880560-573144747-e16d3dda017a88c7bcd79bd69637e746(1).jpg"
     ],
     "features": [
-      "Finition mate",
-      "Passe au lave-vaisselle et au micro-ondes",
-      "Contenance de 350ml"
+      "longueur 16",
+      "Facile à coiffer et à conserver",
+      "Boucles légères et naturelles"
     ],
     "data_ai_hint": "black mug"
   }

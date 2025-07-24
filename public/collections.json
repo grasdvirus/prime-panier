@@ -2,7 +2,7 @@
   {
     "id": 1,
     "name": "Vêtements",
-    "href": "#habit",
+    "href": "/collections/Vêtements",
     "image": "/uploads/1753311861153-518356042-63ac57f7bf0d98f06a941492a9423321.jpg",
     "data_ai_hint": "fashion clothing"
   },

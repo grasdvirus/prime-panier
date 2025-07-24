@@ -1,15 +1,15 @@
 [
   {
     "id": 1,
-    "title": "tes bon petit",
-    "description": "Un design minimaliste pour un style de vie moderne.",
-    "imageUrl": "/uploads/1753031217197-166486706-P.png",
+    "title": "prime-panier",
+    "description": "bienvenue dans votre boutique qui vous offre plusieurs produit utile.",
+    "imageUrl": "/uploads/1753327311388-721425575-Design sans titre (5).png",
     "data_ai_hint": "minimalist fashion"
   },
   {
     "id": 2,
-    "title": "vas loin ",
-    "description": "La technologie qui simplifie votre quotidien.",
+    "title": "shop garantie",
+    "description": "délais de livraisons de 5 à 7 jour",
     "imageUrl": "/uploads/1753313365687-573454220-Design sans titre (2).png",
     "data_ai_hint": "modern tech"
   },
@@ -17,7 +17,7 @@
     "id": 3,
     "title": "Élégance Urbaine",
     "description": "Des articles conçus pour la vie en ville.",
-    "imageUrl": "/uploads/1753297859286-361546132-6ce1a12801f2eada11dd1f60a3df1b78.jpg",
+    "imageUrl": "/uploads/1753327604023-255971538-Design sans titre (38).png",
     "data_ai_hint": "urban lifestyle"
   }
 ]
