@@ -34,32 +34,5 @@
     "href": "/collections/Accessoires",
     "className": "",
     "data_ai_hint": "smartwatch person"
-  },
-  {
-    "id": 5,
-    "title": "Nouveau titre",
-    "subtitle": "Nouveau sous-titre",
-    "imageUrl": "https://placehold.co/600x400.png",
-    "href": "/collections/Vêtements",
-    "className": "md:col-span-1",
-    "data_ai_hint": "item"
-  },
-  {
-    "id": 6,
-    "title": "Nouveau titre",
-    "subtitle": "Nouveau sous-titre",
-    "imageUrl": "https://placehold.co/600x400.png",
-    "href": "/collections/Vêtements",
-    "className": "md:col-span-1",
-    "data_ai_hint": "item"
-  },
-  {
-    "id": 7,
-    "title": "Nouveau titre",
-    "subtitle": "Nouveau sous-titre",
-    "imageUrl": "https://placehold.co/600x400.png",
-    "href": "/collections/Vêtements",
-    "className": "md:col-span-1",
-    "data_ai_hint": "item"
   }
 ]
