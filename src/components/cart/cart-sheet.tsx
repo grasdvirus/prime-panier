@@ -72,7 +72,7 @@ export function CartSheet() {
                       >
                         {item.product.name}
                       </Link>
-                      <p className="text-sm text-muted-foreground">${item.product.price.toFixed(2)}</p>
+                      <p className="text-sm text-muted-foreground">{item.product.price.toLocaleString('fr-FR')} FCFA</p>
                       <div className="mt-2 flex items-center gap-2">
                         <Button
                           variant="outline"
@@ -94,7 +94,7 @@ export function CartSheet() {
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-2">
-                      <p className='font-semibold'>${(item.product.price * item.quantity).toFixed(2)}</p>
+                      <p className='font-semibold'>{(item.product.price * item.quantity).toLocaleString('fr-FR')} FCFA</p>
                       <Button
                         variant="ghost"
                         size="icon"
@@ -113,7 +113,7 @@ export function CartSheet() {
               <div className="flex w-full flex-col gap-4">
                 <div className="flex justify-between text-lg font-semibold">
                   <span>Sous-total</span>
-                  <span>${cartTotal.toFixed(2)}</span>
+                  <span>{cartTotal.toLocaleString('fr-FR')} FCFA</span>
                 </div>
                 <SheetClose asChild>
                   <Button asChild size="lg" className="w-full">

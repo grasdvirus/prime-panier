@@ -73,7 +73,7 @@ export function InstantSearch() {
                                 />
                                 <div className="flex flex-col">
                                     <span className="font-medium">{product.name}</span>
-                                    <span className="text-xs text-muted-foreground">${product.price}</span>
+                                    <span className="text-xs text-muted-foreground">{product.price.toLocaleString('fr-FR')} FCFA</span>
                                 </div>
                             </Link>
                         </CommandItem>

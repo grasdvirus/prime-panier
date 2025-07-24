@@ -61,7 +61,7 @@ export function ProductView({ product }: ProductViewProps) {
                 <Badge variant="secondary" className="mb-2 hover:bg-primary/20 transition-colors cursor-pointer">{product.category}</Badge>
             </Link>
             <h1 className="text-3xl md:text-4xl font-bold tracking-tighter font-headline">{product.name}</h1>
-            <p className="text-2xl font-semibold text-primary mt-2">${product.price.toFixed(2)}</p>
+            <p className="text-2xl font-semibold text-primary mt-2">{product.price.toLocaleString('fr-FR')} FCFA</p>
             <div className="flex items-center gap-2 text-muted-foreground mt-2">
                 <div className="flex items-center">
                     {[...Array(5)].map((_, i) => (

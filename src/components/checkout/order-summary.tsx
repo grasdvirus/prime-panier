@@ -8,7 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 export function OrderSummary() {
   const { items, getCartTotal } = useCart();
   const subtotal = getCartTotal();
-  const shipping = subtotal > 0 ? 5.0 : 0;
+  const shipping = subtotal > 0 ? 5000 : 0; // Assuming shipping is 5000 FCFA
   const total = subtotal + shipping;
 
   return (
@@ -34,7 +34,7 @@ export function OrderSummary() {
                 <p className="font-medium">{item.product.name}</p>
                 <p className="text-sm text-muted-foreground">Qté: {item.quantity}</p>
               </div>
-              <p className="font-medium">${(item.product.price * item.quantity).toFixed(2)}</p>
+              <p className="font-medium">{(item.product.price * item.quantity).toLocaleString('fr-FR')} FCFA</p>
             </div>
           ))}
         </div>
@@ -45,11 +45,11 @@ export function OrderSummary() {
       <div className="space-y-2">
         <div className="flex justify-between text-muted-foreground">
           <span>Sous-total</span>
-          <span>${subtotal.toFixed(2)}</span>
+          <span>{subtotal.toLocaleString('fr-FR')} FCFA</span>
         </div>
         <div className="flex justify-between text-muted-foreground">
           <span>Livraison</span>
-          <span>${shipping.toFixed(2)}</span>
+          <span>{shipping.toLocaleString('fr-FR')} FCFA</span>
         </div>
       </div>
       
@@ -57,7 +57,7 @@ export function OrderSummary() {
 
       <div className="flex justify-between text-xl font-bold">
         <span>Total</span>
-        <span>${total.toFixed(2)}</span>
+        <span>{total.toLocaleString('fr-FR')} FCFA</span>
       </div>
     </div>
   );

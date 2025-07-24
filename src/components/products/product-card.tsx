@@ -38,7 +38,7 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
           <CardContent className="p-4">
             <h3 className="text-base font-medium group-hover:text-primary transition-colors truncate">{product.name}</h3>
-            <p className="text-lg font-semibold">${product.price.toFixed(2)}</p>
+            <p className="text-lg font-semibold">{product.price.toLocaleString('fr-FR')} FCFA</p>
           </CardContent>
           <Button 
             size="icon" 
