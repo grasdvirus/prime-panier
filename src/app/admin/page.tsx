@@ -234,7 +234,7 @@ export default function AdminPage() {
         title: "Nouveau titre",
         subtitle: "Nouveau sous-titre",
         imageUrl: "https://placehold.co/600x400.png",
-        href: `/collections/${productCategories[0] || ''}`,
+        href: "/collections/Vêtements",
         className: "md:col-span-1",
         data_ai_hint: "item"
     };
@@ -501,11 +501,8 @@ export default function AdminPage() {
                                    <Input value={item.subtitle} onChange={e => handleInputChange(setBentoItems, item.id, 'subtitle', e.target.value)} />
                                 </div>
                                 <div className="space-y-2">
-                                   <Label>Lien vers la catégorie</Label>
-                                   <CategorySelector 
-                                        value={item.href.startsWith('/collections/') ? item.href.replace('/collections/', '') : ''} 
-                                        onChange={value => handleInputChange(setBentoItems, item.id, 'href', `/collections/${value}`)} 
-                                    />
+                                   <Label>Lien (interne ou externe)</Label>
+                                   <Input value={item.href} onChange={e => handleInputChange(setBentoItems, item.id, 'href', e.target.value)} placeholder="/collections/Vêtements ou https://..."/>
                                 </div>
                                 <div className="space-y-2">
                                    <Label>Image</Label>
