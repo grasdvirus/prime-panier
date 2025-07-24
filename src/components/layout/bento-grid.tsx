@@ -14,7 +14,7 @@ const BentoItem = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => {
   return (
-    <div className={cn('bento-card-wrapper', className)}>
+    <div className={cn('bento-card-wrapper h-full', className)}>
       <Card className="bento-card h-full w-full" {...props}>
         {children}
       </Card>
@@ -26,7 +26,7 @@ const BentoCardContent = ({ item }: { item: Bento }) => {
   const hasImage = !!item.imageUrl;
 
   return (
-    <CardContent className={cn("relative flex flex-col justify-between h-full p-6 min-h-[200px]", !hasImage && "bg-gradient-to-br from-blue-400 to-indigo-600")}>
+    <CardContent className={cn("relative flex flex-col justify-between h-full p-6", !hasImage && "bg-gradient-to-br from-blue-400 to-indigo-600")}>
       {hasImage && (
         <>
             <Image
@@ -48,7 +48,7 @@ const BentoCardContent = ({ item }: { item: Bento }) => {
         </h3>
       </div>
       <Link href={item.href} className="z-10 flex items-center gap-2 text-white font-semibold hover:underline mt-4">
-        {hasImage ? 'Explorer' : ''} <ArrowRight size={16} />
+        Explorer <ArrowRight size={16} />
       </Link>
     </CardContent>
   );
@@ -72,24 +72,22 @@ export function BentoGrid() {
     <div className="max-w-7xl mx-auto">
         <h2 className="text-3xl font-bold tracking-tighter text-center mb-8">Nos Offres</h2>
         
-        {/* Desktop Grid */}
-        <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-4 md:gap-6">
+        {/* Desktop Grid: Restores the original bento grid layout */}
+        <div className="hidden md:grid md:auto-rows-[250px] md:grid-cols-3 lg:grid-cols-4 md:gap-6">
             {bentoItems.map((item) => (
-                <div key={item.id} className={cn(item.className)}>
-                    <BentoItem>
-                        <BentoCardContent item={item} />
-                    </BentoItem>
-                </div>
+                <BentoItem key={item.id} className={cn(item.className)}>
+                   <BentoCardContent item={item} />
+                </BentoItem>
             ))}
         </div>
 
         {/* Mobile Vertical Scroll Container */}
         <div className="md:hidden max-h-[400px] overflow-y-auto space-y-4 pr-2">
             {bentoItems.map((item) => (
-                <div key={item.id} className={cn('h-[250px]', item.className)}>
-                        <BentoItem className="h-full">
-                            <BentoCardContent item={item} />
-                        </BentoItem>
+                <div key={item.id} className={'h-[250px]'}>
+                    <BentoItem>
+                        <BentoCardContent item={item} />
+                    </BentoItem>
                 </div>
             ))}
         </div>
