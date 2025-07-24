@@ -58,14 +58,12 @@ export async function BentoGrid() {
     if (!bentoItems.length) return null;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto md:overflow-hidden overflow-x-auto pb-4">
-      <div className="flex md:grid md:grid-cols-3 md:lg:grid-cols-4 gap-6 md:w-full">
+    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
         {bentoItems.map((item) => (
-            <BentoItem key={item.id} className={cn(item.className, "flex-shrink-0 w-[80vw] md:w-auto")}>
+            <BentoItem key={item.id} className={cn(item.className)}>
                 <BentoCardContent item={item} />
             </BentoItem>
         ))}
-      </div>
     </div>
   );
 }

@@ -45,7 +45,7 @@ export function ProductFilters({ filters, setFilters }: ProductFiltersProps) {
     }
 
   return (
-    <div className="mb-8 flex items-center justify-center">
+    <div className="mb-8 flex items-center justify-center w-full">
       <div className="filter-menu">
         {categories.map((category) => (
            <a 

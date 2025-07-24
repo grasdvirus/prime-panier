@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { type Product } from '@/lib/products';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,7 +14,7 @@ import {
 } from '@/components/ui/carousel';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Star, ShoppingCart } from 'lucide-react';
+import { CheckCircle, Star, ShoppingCart, ArrowLeft } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useCart } from '@/contexts/cart-context';
 
@@ -23,6 +24,7 @@ interface ProductViewProps {
 
 export function ProductView({ product }: ProductViewProps) {
   const { addItem } = useCart();
+  const router = useRouter();
 
   const handleAddToCart = () => {
     addItem(product);
@@ -30,6 +32,12 @@ export function ProductView({ product }: ProductViewProps) {
 
   return (
     <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <div className="mb-6">
+            <Button variant="ghost" onClick={() => router.back()} className="text-muted-foreground">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Retour
+            </Button>
+        </div>
       <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
         <div className="w-full">
           <Carousel className="rounded-lg overflow-hidden">
