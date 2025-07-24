@@ -24,7 +24,7 @@ const BentoCardContent = ({ item }: { item: Bento }) => {
   const hasImage = !!item.imageUrl;
 
   return (
-    <CardContent className={cn("relative flex flex-col justify-between h-full p-6", !hasImage && "bg-gradient-to-br from-blue-400 to-indigo-600")}>
+    <CardContent className={cn("relative flex flex-col justify-between h-full p-6 min-h-[200px]", !hasImage && "bg-gradient-to-br from-blue-400 to-indigo-600")}>
       {hasImage && (
         <>
             <Image
@@ -58,12 +58,17 @@ export async function BentoGrid() {
     if (!bentoItems.length) return null;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-        {bentoItems.map((item) => (
-            <BentoItem key={item.id} className={cn(item.className)}>
-                <BentoCardContent item={item} />
-            </BentoItem>
-        ))}
+    <div className="max-w-7xl mx-auto">
+        <h2 className="text-3xl font-bold tracking-tighter text-center mb-8">Nos Offres</h2>
+        <div className="md:grid md:grid-cols-3 lg:grid-cols-4 md:gap-6 space-y-6 md:space-y-0 md:h-auto h-[600px] overflow-y-auto rounded-lg">
+            {bentoItems.map((item) => (
+                <div key={item.id} className={cn(item.className, 'md:block')}>
+                    <BentoItem>
+                        <BentoCardContent item={item} />
+                    </BentoItem>
+                </div>
+            ))}
+        </div>
     </div>
   );
 }
