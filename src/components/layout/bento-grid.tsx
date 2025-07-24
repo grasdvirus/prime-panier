@@ -3,7 +3,6 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import useEmblaCarousel from 'embla-carousel-react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '../ui/card';
 import { ArrowRight } from 'lucide-react';
@@ -58,11 +57,6 @@ const BentoCardContent = ({ item }: { item: Bento }) => {
 
 export function BentoGrid() {
     const [bentoItems, setBentoItems] = React.useState<Bento[]>([]);
-    const [emblaRef] = useEmblaCarousel({
-        align: 'start',
-        dragFree: true,
-        containScroll: 'trimSnaps',
-    });
 
     React.useEffect(() => {
         const fetchBento = async () => {
@@ -89,19 +83,15 @@ export function BentoGrid() {
             ))}
         </div>
 
-        {/* Mobile Carousel */}
-        <div className="md:hidden overflow-hidden" ref={emblaRef}>
-             <div className="flex gap-4 py-2">
-                {bentoItems.map((item) => (
-                    <div className="flex-[0_0_80%] sm:flex-[0_0_60%]" key={item.id}>
-                        <div className={cn('h-[300px]', item.className)}>
-                             <BentoItem className="h-full">
-                                <BentoCardContent item={item} />
-                            </BentoItem>
-                        </div>
-                    </div>
-                ))}
-             </div>
+        {/* Mobile Vertical Scroll Container */}
+        <div className="md:hidden max-h-[400px] overflow-y-auto space-y-4 pr-2">
+            {bentoItems.map((item) => (
+                <div key={item.id} className={cn('h-[250px]', item.className)}>
+                        <BentoItem className="h-full">
+                            <BentoCardContent item={item} />
+                        </BentoItem>
+                </div>
+            ))}
         </div>
     </div>
   );
