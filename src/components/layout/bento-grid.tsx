@@ -1,10 +1,13 @@
+'use client';
+
+import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import useEmblaCarousel from 'embla-carousel-react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '../ui/card';
-import { Button } from '../ui/button';
 import { ArrowRight } from 'lucide-react';
-import { getBento, type Bento } from '@/lib/bento';
+import { getBentoClient, type Bento } from '@/lib/bento-client';
 
 const BentoItem = ({
   className,
@@ -34,7 +37,7 @@ const BentoCardContent = ({ item }: { item: Bento }) => {
                 className="object-cover rounded-lg"
                 data-ai-hint={item.data_ai_hint}
             />
-            <div className="bg-black/30 absolute inset-0 rounded-lg -z-10" />
+            <div className="bg-black/30 absolute inset-0 rounded-lg" />
         </>
       )}
       <div className='z-10'>
@@ -53,21 +56,52 @@ const BentoCardContent = ({ item }: { item: Bento }) => {
 };
 
 
-export async function BentoGrid() {
-    const bentoItems = await getBento();
+export function BentoGrid() {
+    const [bentoItems, setBentoItems] = React.useState<Bento[]>([]);
+    const [emblaRef] = useEmblaCarousel({
+        align: 'start',
+        dragFree: true,
+        containScroll: 'trimSnaps',
+    });
+
+    React.useEffect(() => {
+        const fetchBento = async () => {
+            const items = await getBentoClient();
+            setBentoItems(items);
+        };
+        fetchBento();
+    }, []);
+
     if (!bentoItems.length) return null;
 
   return (
     <div className="max-w-7xl mx-auto">
         <h2 className="text-3xl font-bold tracking-tighter text-center mb-8">Nos Offres</h2>
-        <div className="md:grid md:grid-cols-3 lg:grid-cols-4 md:gap-6 space-y-6 md:space-y-0 md:h-auto h-[600px] overflow-y-auto rounded-lg">
+        
+        {/* Desktop Grid */}
+        <div className="hidden md:grid md:grid-cols-3 lg:grid-cols-4 md:gap-6">
             {bentoItems.map((item) => (
-                <div key={item.id} className={cn(item.className, 'md:block')}>
+                <div key={item.id} className={cn(item.className)}>
                     <BentoItem>
                         <BentoCardContent item={item} />
                     </BentoItem>
                 </div>
             ))}
+        </div>
+
+        {/* Mobile Carousel */}
+        <div className="md:hidden overflow-hidden" ref={emblaRef}>
+             <div className="flex gap-4 py-2">
+                {bentoItems.map((item) => (
+                    <div className="flex-[0_0_80%] sm:flex-[0_0_60%]" key={item.id}>
+                        <div className={cn('h-[300px]', item.className)}>
+                             <BentoItem className="h-full">
+                                <BentoCardContent item={item} />
+                            </BentoItem>
+                        </div>
+                    </div>
+                ))}
+             </div>
         </div>
     </div>
   );
