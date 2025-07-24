@@ -17,6 +17,19 @@ export async function getProductsClient(): Promise<Product[]> {
     }
 }
 
+export async function getProductCategoriesClient(): Promise<string[]> {
+    try {
+        const products = await getProductsClient();
+        const categories = products.map(p => p.category);
+        const defaultCategories = ['Vêtements', 'Accessoires', 'Tech', 'Maison'];
+        const allCategories = [...new Set([...defaultCategories, ...categories])];
+        return allCategories;
+    } catch (error) {
+        console.error('Failed to get categories on client:', error);
+        return ['Vêtements', 'Accessoires', 'Tech', 'Maison'];
+    }
+}
+
 export async function updateProductsClient(products: Product[]): Promise<void> {
   const response = await fetch('/admin/update-products', {
     method: 'POST',

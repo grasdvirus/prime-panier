@@ -7,7 +7,7 @@ export type Product = {
   name: string;
   description: string;
   price: number;
-  category: 'Accessoires' | 'Vêtements' | 'Tech' | 'Maison';
+  category: string; // Changed from enum to string to support dynamic categories
   rating: number;
   stock: number;
   reviews: number;
@@ -16,22 +16,18 @@ export type Product = {
   data_ai_hint: string;
 };
 
+const productsFilePath = path.join(process.cwd(), 'public', 'products.json');
+
 async function fetchProductsOnServer(): Promise<Product[]> {
-    // In a real app, you'd fetch from a database.
-    // For this demo, we read from a local JSON file.
     try {
-        const filePath = path.join(process.cwd(), 'public', 'products.json');
-        const fileContent = await fs.readFile(filePath, 'utf-8');
+        const fileContent = await fs.readFile(productsFilePath, 'utf-8');
         const products: Product[] = JSON.parse(fileContent);
         return products;
     } catch (error) {
-        // If the file doesn't exist or is invalid, return empty array
-        // and log the error.
         console.error('Failed to read or parse products.json:', error);
         return [];
     }
 }
-
 
 export async function getProducts(): Promise<Product[]> {
   return await fetchProductsOnServer();
@@ -44,5 +40,9 @@ export async function getProductById(id: number): Promise<Product | undefined> {
 
 export async function getProductCategories(): Promise<string[]> {
   const products = await fetchProductsOnServer();
-  return [...new Set(products.map(p => p.category))];
+  const categories = products.map(p => p.category);
+  // Add default categories if they don't exist
+  const defaultCategories = ['Vêtements', 'Accessoires', 'Tech', 'Maison'];
+  const allCategories = [...new Set([...defaultCategories, ...categories])];
+  return allCategories;
 }

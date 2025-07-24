@@ -9,6 +9,7 @@ import { getBentoClient, updateBentoClient } from '@/lib/bento-client';
 import { getCollectionsClient, updateCollectionsClient } from '@/lib/collections-client';
 import { getInfoFeaturesClient, updateInfoFeaturesClient } from '@/lib/info-features-client';
 import { getMarqueeClient, updateMarqueeClient } from '@/lib/marquee-client';
+import { getProductCategoriesClient } from '@/lib/products-client';
 import { type Product } from '@/lib/products';
 import { type Slide } from '@/lib/slides';
 import { type Bento } from '@/lib/bento';
@@ -36,6 +37,15 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -44,8 +54,6 @@ import {
 } from "@/components/ui/select";
 
 type SaveStatus = 'idle' | 'dirty' | 'saving' | 'success';
-
-const productCategories: Product['category'][] = ['Vêtements', 'Accessoires', 'Tech', 'Maison'];
 
 export default function AdminPage() {
   const { user, loading: authLoading } = useAuth();
@@ -58,13 +66,21 @@ export default function AdminPage() {
   const [collections, setCollections] = useState<Collection[]>([]);
   const [infoFeatures, setInfoFeatures] = useState<InfoFeature[]>([]);
   const [marquee, setMarquee] = useState<Marquee>({ messages: [] });
+  const [productCategories, setProductCategories] = useState<string[]>([]);
   
   // UI states
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
-  
+  const [isAddCategoryDialogOpen, setIsAddCategoryDialogOpen] = useState(false);
+  const [newCategory, setNewCategory] = useState('');
+
   const { toast } = useToast();
+
+  const fetchCategories = useCallback(async () => {
+    const cats = await getProductCategoriesClient();
+    setProductCategories(cats);
+  }, []);
 
   useEffect(() => {
     if (!authLoading && user?.email !== 'grasdvirus@gmail.com') {
@@ -76,13 +92,14 @@ export default function AdminPage() {
     if (user?.email === 'grasdvirus@gmail.com') {
         async function loadData() {
             setLoading(true);
-            const [prods, slds, bento, colls, info, marq] = await Promise.all([
+            const [prods, slds, bento, colls, info, marq, cats] = await Promise.all([
                 getProductsClient(), 
                 getSlidesClient(),
                 getBentoClient(),
                 getCollectionsClient(),
                 getInfoFeaturesClient(),
                 getMarqueeClient(),
+                getProductCategoriesClient()
             ]);
             setProducts(prods.map(p => ({ ...p, images: p.images.length > 0 ? p.images : ['', ''] })));
             setSlides(slds);
@@ -90,6 +107,7 @@ export default function AdminPage() {
             setCollections(colls);
             setInfoFeatures(info);
             setMarquee(marq);
+            setProductCategories(cats);
             setLoading(false);
             setSaveStatus('idle');
         }
@@ -161,7 +179,7 @@ export default function AdminPage() {
       name: 'Nouveau Produit',
       description: '',
       price: 0,
-      category: 'Vêtements',
+      category: productCategories[0] || '',
       rating: 0,
       stock: 0,
       reviews: 0,
@@ -189,6 +207,42 @@ export default function AdminPage() {
     }
   };
 
+  const handleAddCategory = () => {
+    if (newCategory && !productCategories.includes(newCategory)) {
+        const updatedCategories = [...productCategories, newCategory];
+        setProductCategories(updatedCategories);
+        setNewCategory('');
+        setIsAddCategoryDialogOpen(false);
+        toast({
+            title: "Catégorie ajoutée",
+            description: `La catégorie "${newCategory}" a été ajoutée. N'oubliez pas de sauvegarder.`,
+        });
+        markAsDirty();
+    } else {
+        toast({
+            title: "Erreur",
+            description: "Le nom de la catégorie ne peut pas être vide ou exister déjà.",
+            variant: "destructive"
+        });
+    }
+  };
+
+  const handleAddBentoItem = () => {
+    const newId = bentoItems.length > 0 ? Math.max(...bentoItems.map(p => p.id)) + 1 : 1;
+    const newBentoItem: Bento = {
+        id: newId,
+        title: "Nouveau titre",
+        subtitle: "Nouveau sous-titre",
+        imageUrl: "https://placehold.co/600x400.png",
+        href: `/collections/${productCategories[0] || ''}`,
+        className: "md:col-span-1",
+        data_ai_hint: "item"
+    };
+    setBentoItems(prev => [...prev, newBentoItem]);
+    markAsDirty();
+  };
+
+
   const handleSaveChanges = async () => {
     setSaveStatus('saving');
     try {
@@ -205,6 +259,8 @@ export default function AdminPage() {
           updateInfoFeaturesClient(infoFeatures),
           updateMarqueeClient(marquee),
       ]);
+      // After saving, we should probably refetch categories in case they were part of products
+      await fetchCategories();
       toast({
         title: 'Succès',
         description: 'Les données ont été mises à jour.',
@@ -292,10 +348,39 @@ export default function AdminPage() {
             <Card>
                 <CardHeader className="flex flex-col md:flex-row items-center justify-between gap-4">
                     <CardTitle>Gestion des Produits</CardTitle>
-                    <Button onClick={handleAddProduct} variant="outline" className="w-full md:w-auto">
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        Ajouter un produit
-                    </Button>
+                    <div className="flex gap-2 w-full md:w-auto">
+                        <Dialog open={isAddCategoryDialogOpen} onOpenChange={setIsAddCategoryDialogOpen}>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" className="w-full">
+                                <PlusCircle className="mr-2 h-4 w-4" />
+                                Nouvelle Catégorie
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Ajouter une nouvelle catégorie</DialogTitle>
+                              <DialogDescription>
+                                Cette catégorie sera disponible pour tous les produits.
+                              </DialogDescription>
+                            </DialogHeader>
+                            <div className="grid gap-4 py-4">
+                              <Label htmlFor="new-category-name">Nom de la catégorie</Label>
+                              <Input
+                                id="new-category-name"
+                                value={newCategory}
+                                onChange={(e) => setNewCategory(e.target.value)}
+                              />
+                            </div>
+                            <DialogFooter>
+                              <Button onClick={handleAddCategory}>Ajouter la catégorie</Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                        <Button onClick={handleAddProduct} variant="outline" className="w-full">
+                            <PlusCircle className="mr-2 h-4 w-4" />
+                            Ajouter un produit
+                        </Button>
+                    </div>
                 </CardHeader>
                 <CardContent>
                     <div className="hidden md:block">
@@ -395,7 +480,13 @@ export default function AdminPage() {
 
         <TabsContent value="bento">
             <Card>
-                <CardHeader><CardTitle>Gestion de la Grille Bento</CardTitle></CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle>Gestion de la Grille Bento</CardTitle>
+                    <Button onClick={handleAddBentoItem} variant="outline">
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Ajouter un élément
+                    </Button>
+                </CardHeader>
                 <CardContent className="space-y-4">
                     {bentoItems.map(item => (
                         <Card key={item.id} className="p-4">

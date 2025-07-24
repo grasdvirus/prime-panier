@@ -4,7 +4,7 @@
     "title": "article de femme",
     "subtitle": "des perruque vietamien",
     "imageUrl": "/uploads/1753295325674-832999024-59a17410d0f3b1dee7fed83582467d45.jpg",
-    "href": "/collections/Vêtements",
+    "href": "/collections/Accessoires",
     "className": "md:col-span-2 lg:col-span-2 row-span-2",
     "data_ai_hint": "audio device"
   },
@@ -13,14 +13,14 @@
     "title": "style en plus",
     "subtitle": "des meilleur pour le quotidien",
     "imageUrl": "/uploads/1753310230704-956250685-4185c572a5a88894d7a4fd6fed451822.jpg",
-    "href": "/collections/Vêtements",
+    "href": "/collections/Accessoires",
     "className": "lg:col-span-2",
     "data_ai_hint": "security camera"
   },
   {
     "id": 3,
     "title": "info pub",
-    "subtitle": "a visitez resume IA ",
+    "subtitle": "a visitez resume IA l'application qui vous permet de faire des résumer PDF YOUTUBE etc",
     "imageUrl": "/uploads/1753327858570-544779997-Design sans titre (4).png",
     "href": "/collections/Maison",
     "className": "",
