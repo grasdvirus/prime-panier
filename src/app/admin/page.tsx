@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'next/navigation';
 import { getProductsClient, updateProductsClient } from '@/lib/products-client';
@@ -56,6 +56,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 type SaveStatus = 'idle' | 'dirty' | 'saving' | 'success';
 
@@ -81,6 +82,9 @@ export default function AdminPage() {
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
   const [isAddCategoryDialogOpen, setIsAddCategoryDialogOpen] = useState(false);
   const [newCategory, setNewCategory] = useState('');
+  
+  const notificationSoundRef = useRef<HTMLAudioElement | null>(null);
+  const lastOrderCountRef = useRef<number>(0);
 
   const { toast } = useToast();
 
@@ -89,10 +93,21 @@ export default function AdminPage() {
     setProductCategories(cats);
   }, []);
 
-  const fetchOrders = useCallback(async () => {
+  const fetchOrders = useCallback(async (isInitialLoad = false) => {
     const ords = await getOrdersClient();
     setOrders(ords);
-  }, []);
+
+    if (isInitialLoad) {
+      lastOrderCountRef.current = ords.length;
+    } else if (ords.length > lastOrderCountRef.current) {
+        toast({
+            title: "Nouvelle commande !",
+            description: `Vous avez reçu ${ords.length - lastOrderCountRef.current} nouvelle(s) commande(s).`,
+        });
+        notificationSoundRef.current?.play().catch(e => console.error("Error playing sound:", e));
+    }
+    lastOrderCountRef.current = ords.length;
+  }, [toast]);
 
   useEffect(() => {
     if (!authLoading && user?.email !== 'grasdvirus@gmail.com') {
@@ -102,6 +117,8 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (user?.email === 'grasdvirus@gmail.com') {
+        notificationSoundRef.current = new Audio('/sons/notif.wav');
+
         async function loadData() {
             setLoading(true);
             const [prods, slds, bento, colls, info, marq, cats, ords] = await Promise.all([
@@ -122,12 +139,16 @@ export default function AdminPage() {
             setMarquee(marq);
             setProductCategories(cats);
             setOrders(ords);
+            lastOrderCountRef.current = ords.length;
             setLoading(false);
             setSaveStatus('idle');
         }
         loadData();
+
+        const intervalId = setInterval(() => fetchOrders(false), 30000); // Check for new orders every 30 seconds
+        return () => clearInterval(intervalId);
     }
-  }, [user]);
+  }, [user, fetchOrders]);
 
   const markAsDirty = () => {
     if (saveStatus === 'idle' || saveStatus === 'success') {
@@ -315,9 +336,8 @@ export default function AdminPage() {
           updateMarqueeClient(marquee),
           updateOrdersClient(orders),
       ]);
-      // After saving, we should probably refetch categories in case they were part of products
       await fetchCategories();
-      await fetchOrders();
+      await fetchOrders(true); // Treat as initial load to reset counter
       toast({
         title: 'Succès',
         description: 'Les données ont été mises à jour.',
@@ -388,16 +408,18 @@ export default function AdminPage() {
     <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
       <Tabs defaultValue="orders" className="w-full">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
-            <TabsList className="grid grid-cols-3 sm:flex">
-                <TabsTrigger value="orders">Commandes ({orders.length})</TabsTrigger>
-                <TabsTrigger value="products">Produits</TabsTrigger>
-                <TabsTrigger value="slides">Diaporama</TabsTrigger>
-                <TabsTrigger value="bento">Bento</TabsTrigger>
-                <TabsTrigger value="collections">Collections</TabsTrigger>
-                <TabsTrigger value="info">Info</TabsTrigger>
-                <TabsTrigger value="marquee">Bandeau</TabsTrigger>
-            </TabsList>
-             <Button onClick={handleSaveChanges} disabled={saveStatus === 'saving' || saveStatus === 'idle'} className="w-full sm:w-auto">
+            <ScrollArea className="w-full sm:w-auto">
+                <TabsList className="grid-cols-none">
+                    <TabsTrigger value="orders">Commandes ({orders.length})</TabsTrigger>
+                    <TabsTrigger value="products">Produits</TabsTrigger>
+                    <TabsTrigger value="slides">Diaporama</TabsTrigger>
+                    <TabsTrigger value="bento">Bento</TabsTrigger>
+                    <TabsTrigger value="collections">Collections</TabsTrigger>
+                    <TabsTrigger value="info">Info</TabsTrigger>
+                    <TabsTrigger value="marquee">Bandeau</TabsTrigger>
+                </TabsList>
+            </ScrollArea>
+             <Button onClick={handleSaveChanges} disabled={saveStatus === 'saving' || saveStatus === 'idle'} className="w-full sm:w-auto flex-shrink-0">
                 <SaveButtonContent />
             </Button>
         </div>
@@ -406,14 +428,14 @@ export default function AdminPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Gestion des Commandes</CardTitle>
-              <Button onClick={() => fetchOrders()} variant="outline" size="icon"><RefreshCw className="h-4 w-4" /></Button>
+              <Button onClick={() => fetchOrders(true)} variant="outline" size="icon"><RefreshCw className="h-4 w-4" /></Button>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {orders.map(order => (
                   <Collapsible key={order.id} className="border rounded-lg p-4">
-                    <CollapsibleTrigger className="w-full flex justify-between items-center">
-                      <div className='text-left'>
+                    <CollapsibleTrigger className="w-full flex justify-between items-center text-left">
+                      <div>
                         <p className="font-bold">{order.customer.name}</p>
                         <p className="text-sm text-muted-foreground">{new Date(order.createdAt).toLocaleString('fr-FR')}</p>
                       </div>
