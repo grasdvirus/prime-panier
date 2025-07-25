@@ -5,7 +5,8 @@ import { OrderSummary } from '@/components/checkout/order-summary';
 import { CheckoutForm } from '@/components/checkout/checkout-form';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowLeft, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, ShoppingCart, Wallet } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function CheckoutPage() {
   const { getCartItemCount } = useCart();
@@ -27,10 +28,44 @@ export default function CheckoutPage() {
     );
   }
 
+  const ManualPaymentInfo = () => (
+     <Card className="bg-card/80 border-border/60">
+        <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+                <Wallet size={24}/> Paiement Manuel
+            </CardTitle>
+            <CardDescription>
+                Pour finaliser votre commande, veuillez effectuer un transfert via l'un des services ci-dessous.
+            </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4 text-sm">
+            <p className='font-semibold'>Veuillez envoyer le montant total de votre commande à l'un des contacts suivants :</p>
+            <div className='space-y-2 pl-4 border-l-2 border-primary'>
+                <div>
+                    <p className="font-bold">🔸 Orange Money :</p>
+                    <p className='text-muted-foreground'>+225 07 08 22 56 82 (Nom : N'guia Achi Nadege)</p>
+                </div>
+                 <div>
+                    <p className="font-bold">🔸 WAVE :</p>
+                    <p className='text-muted-foreground'>+225 05 03 65 48 86</p>
+                </div>
+                 <div>
+                    <p className="font-bold">🔸 WAVE :</p>
+                    <p className='text-muted-foreground'>+225 07 08 22 56 82</p>
+                </div>
+            </div>
+             <p className='text-xs text-muted-foreground pt-2'>
+                Après le paiement, veuillez remplir et soumettre le formulaire avec vos informations de livraison. Nous vous contacterons pour confirmer.
+            </p>
+        </CardContent>
+    </Card>
+  );
+
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-8 md:py-12">
       <div className="grid grid-cols-1 gap-x-12 gap-y-8 lg:grid-cols-2 max-w-7xl mx-auto">
-        <div className="order-2 lg:order-1">
+        <div className="order-2 lg:order-1 space-y-8">
+          <ManualPaymentInfo />
           <CheckoutForm />
         </div>
         <div className="order-1 lg:order-2">

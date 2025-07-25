@@ -10,12 +10,14 @@ import { getCollectionsClient, updateCollectionsClient } from '@/lib/collections
 import { getInfoFeaturesClient, updateInfoFeaturesClient } from '@/lib/info-features-client';
 import { getMarqueeClient, updateMarqueeClient } from '@/lib/marquee-client';
 import { getProductCategoriesClient } from '@/lib/products-client';
+import { getOrdersClient, updateOrdersClient } from '@/lib/orders-client';
 import { type Product } from '@/lib/products';
 import { type Slide } from '@/lib/slides';
 import { type Bento } from '@/lib/bento';
 import { type Collection } from '@/lib/collections';
 import { type InfoFeature } from '@/lib/info-features';
 import { type Marquee } from '@/lib/marquee';
+import { type Order } from '@/lib/orders';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -23,7 +25,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, PlusCircle, Trash2 } from 'lucide-react';
+import { Loader2, PlusCircle, Trash2, Package, RefreshCw } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ImageUpload } from '@/components/admin/image-upload';
 import {
@@ -52,6 +54,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Badge } from '@/components/ui/badge';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 type SaveStatus = 'idle' | 'dirty' | 'saving' | 'success';
 
@@ -67,6 +71,7 @@ export default function AdminPage() {
   const [infoFeatures, setInfoFeatures] = useState<InfoFeature[]>([]);
   const [marquee, setMarquee] = useState<Marquee>({ messages: [] });
   const [productCategories, setProductCategories] = useState<string[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
   
   // UI states
   const [loading, setLoading] = useState(true);
@@ -83,6 +88,11 @@ export default function AdminPage() {
     setProductCategories(cats);
   }, []);
 
+  const fetchOrders = useCallback(async () => {
+    const ords = await getOrdersClient();
+    setOrders(ords);
+  }, []);
+
   useEffect(() => {
     if (!authLoading && user?.email !== 'grasdvirus@gmail.com') {
       router.push('/');
@@ -93,14 +103,15 @@ export default function AdminPage() {
     if (user?.email === 'grasdvirus@gmail.com') {
         async function loadData() {
             setLoading(true);
-            const [prods, slds, bento, colls, info, marq, cats] = await Promise.all([
+            const [prods, slds, bento, colls, info, marq, cats, ords] = await Promise.all([
                 getProductsClient(), 
                 getSlidesClient(),
                 getBentoClient(),
                 getCollectionsClient(),
                 getInfoFeaturesClient(),
                 getMarqueeClient(),
-                getProductCategoriesClient()
+                getProductCategoriesClient(),
+                getOrdersClient()
             ]);
             setProducts(prods.map(p => ({ ...p, images: p.images.length > 0 ? p.images : ['', ''] })));
             setSlides(slds);
@@ -109,12 +120,13 @@ export default function AdminPage() {
             setInfoFeatures(info);
             setMarquee(marq);
             setProductCategories(cats);
+            setOrders(ords);
             setLoading(false);
             setSaveStatus('idle');
         }
         loadData();
     }
-  }, [user]);
+  }, [user, fetchOrders]);
 
   const markAsDirty = () => {
     if (saveStatus === 'idle' || saveStatus === 'success') {
@@ -135,6 +147,15 @@ export default function AdminPage() {
     );
     markAsDirty();
   }, []);
+  
+  const handleOrderStatusChange = (orderId: number, status: Order['status']) => {
+    setOrders(prevOrders =>
+      prevOrders.map(order =>
+        order.id === orderId ? { ...order, status } : order
+      )
+    );
+    markAsDirty();
+  };
 
   const handleProductImageChange = useCallback((productId: number, imageIndex: number, url: string) => {
     setProducts(prevProducts =>
@@ -275,9 +296,11 @@ export default function AdminPage() {
           updateCollectionsClient(collections),
           updateInfoFeaturesClient(infoFeatures),
           updateMarqueeClient(marquee),
+          updateOrdersClient(orders),
       ]);
       // After saving, we should probably refetch categories in case they were part of products
       await fetchCategories();
+      await fetchOrders();
       toast({
         title: 'Succès',
         description: 'Les données ont été mises à jour.',
@@ -346,9 +369,10 @@ export default function AdminPage() {
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
-      <Tabs defaultValue="products" className="w-full">
+      <Tabs defaultValue="orders" className="w-full">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
             <TabsList className="grid grid-cols-3 sm:flex">
+                <TabsTrigger value="orders">Commandes ({orders.length})</TabsTrigger>
                 <TabsTrigger value="products">Produits</TabsTrigger>
                 <TabsTrigger value="slides">Diaporama</TabsTrigger>
                 <TabsTrigger value="bento">Bento</TabsTrigger>
@@ -360,6 +384,67 @@ export default function AdminPage() {
                 <SaveButtonContent />
             </Button>
         </div>
+        
+        <TabsContent value="orders">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle>Gestion des Commandes</CardTitle>
+              <Button onClick={() => fetchOrders()} variant="outline" size="icon"><RefreshCw className="h-4 w-4" /></Button>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {orders.map(order => (
+                  <Collapsible key={order.id} className="border rounded-lg p-4">
+                    <CollapsibleTrigger className="w-full flex justify-between items-center">
+                      <div className='text-left'>
+                        <p className="font-bold">{order.customer.name}</p>
+                        <p className="text-sm text-muted-foreground">{new Date(order.createdAt).toLocaleString('fr-FR')}</p>
+                      </div>
+                      <div className='text-right'>
+                        <Badge variant={order.status === 'confirmed' ? 'default' : order.status === 'shipped' ? 'secondary' : 'destructive'}>{order.status}</Badge>
+                        <p className="font-bold">{order.total.toLocaleString('fr-FR')} FCFA</p>
+                      </div>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="pt-4 mt-4 border-t">
+                      <div className='grid md:grid-cols-2 gap-4'>
+                        <div>
+                          <h4 className='font-semibold mb-2'>Client</h4>
+                          <p><strong>Nom:</strong> {order.customer.name}</p>
+                          <p><strong>Téléphone:</strong> {order.customer.phone}</p>
+                          <p><strong>Email:</strong> {order.customer.email || 'N/A'}</p>
+                          <p><strong>Adresse:</strong> {order.customer.address}</p>
+                           {order.customer.notes && <p><strong>Notes:</strong> {order.customer.notes}</p>}
+                        </div>
+                        <div>
+                          <h4 className='font-semibold mb-2'>Produits</h4>
+                          <ul className='list-disc pl-5'>
+                            {order.items.map(item => (
+                              <li key={item.product.id}>{item.quantity} x {item.product.name}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                      <div className='mt-4'>
+                         <h4 className='font-semibold mb-2'>Changer le statut</h4>
+                          <Select value={order.status} onValueChange={(value: Order['status']) => handleOrderStatusChange(order.id, value)}>
+                            <SelectTrigger className='w-[180px]'>
+                              <SelectValue placeholder="Statut" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="pending">En attente</SelectItem>
+                              <SelectItem value="confirmed">Confirmée</SelectItem>
+                              <SelectItem value="shipped">Expédiée</SelectItem>
+                              <SelectItem value="cancelled">Annulée</SelectItem>
+                            </SelectContent>
+                          </Select>
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="products">
             <Card>
