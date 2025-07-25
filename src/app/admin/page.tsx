@@ -78,6 +78,7 @@ export default function AdminPage() {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [bentoItemToDelete, setBentoItemToDelete] = useState<Bento | null>(null);
+  const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
   const [isAddCategoryDialogOpen, setIsAddCategoryDialogOpen] = useState(false);
   const [newCategory, setNewCategory] = useState('');
 
@@ -126,7 +127,7 @@ export default function AdminPage() {
         }
         loadData();
     }
-  }, [user, fetchOrders]);
+  }, [user]);
 
   const markAsDirty = () => {
     if (saveStatus === 'idle' || saveStatus === 'success') {
@@ -146,7 +147,7 @@ export default function AdminPage() {
       )
     );
     markAsDirty();
-  }, []);
+  }, [saveStatus]);
   
   const handleOrderStatusChange = (orderId: number, status: Order['status']) => {
     setOrders(prevOrders =>
@@ -169,7 +170,7 @@ export default function AdminPage() {
         })
     );
     markAsDirty();
-  }, []);
+  }, [saveStatus]);
 
   const handleProductFeatureChange = useCallback((productId: number, featureIndex: number, value: string) => {
      setProducts(prevProducts =>
@@ -183,7 +184,7 @@ export default function AdminPage() {
       })
     );
     markAsDirty();
-  }, []);
+  }, [saveStatus]);
 
   const handleMarqueeChange = useCallback((index: number, value: string) => {
     setMarquee(prev => {
@@ -192,7 +193,7 @@ export default function AdminPage() {
         return { ...prev, messages: newMessages };
     });
     markAsDirty();
-  }, []);
+  }, [saveStatus]);
 
   const handleAddProduct = () => {
     const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
@@ -241,6 +242,22 @@ export default function AdminPage() {
       toast({
         title: "Élément Bento supprimé",
         description: `L'élément "${bentoItemToDelete.title}" a été supprimé.`,
+      });
+    }
+  };
+
+  const handleDeleteOrder = (order: Order) => {
+    setOrderToDelete(order);
+  };
+  
+  const confirmDeleteOrder = () => {
+    if (orderToDelete) {
+      setOrders(prev => prev.filter(order => order.id !== orderToDelete.id));
+      markAsDirty();
+      setOrderToDelete(null);
+      toast({
+        title: "Commande supprimée",
+        description: `La commande de ${orderToDelete.customer.name} a été supprimée.`,
       });
     }
   };
@@ -424,19 +441,25 @@ export default function AdminPage() {
                           </ul>
                         </div>
                       </div>
-                      <div className='mt-4'>
-                         <h4 className='font-semibold mb-2'>Changer le statut</h4>
-                          <Select value={order.status} onValueChange={(value: Order['status']) => handleOrderStatusChange(order.id, value)}>
-                            <SelectTrigger className='w-[180px]'>
-                              <SelectValue placeholder="Statut" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="pending">En attente</SelectItem>
-                              <SelectItem value="confirmed">Confirmée</SelectItem>
-                              <SelectItem value="shipped">Expédiée</SelectItem>
-                              <SelectItem value="cancelled">Annulée</SelectItem>
-                            </SelectContent>
-                          </Select>
+                      <div className='mt-4 flex flex-col sm:flex-row gap-4 items-start sm:items-end justify-between'>
+                         <div>
+                            <h4 className='font-semibold mb-2'>Changer le statut</h4>
+                            <Select value={order.status} onValueChange={(value: Order['status']) => handleOrderStatusChange(order.id, value)}>
+                                <SelectTrigger className='w-[180px]'>
+                                <SelectValue placeholder="Statut" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                <SelectItem value="pending">En attente</SelectItem>
+                                <SelectItem value="confirmed">Confirmée</SelectItem>
+                                <SelectItem value="shipped">Expédiée</SelectItem>
+                                <SelectItem value="cancelled">Annulée</SelectItem>
+                                </SelectContent>
+                            </Select>
+                         </div>
+                         <Button variant="destructive" onClick={() => handleDeleteOrder(order)}>
+                            <Trash2 className='mr-2 h-4 w-4' />
+                            Supprimer la commande
+                        </Button>
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
@@ -716,6 +739,21 @@ export default function AdminPage() {
             <AlertDialogFooter>
                 <AlertDialogCancel onClick={() => setBentoItemToDelete(null)}>Annuler</AlertDialogCancel>
                 <AlertDialogAction onClick={confirmDeleteBentoItem}>Supprimer</AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={!!orderToDelete} onOpenChange={(open) => !open && setOrderToDelete(null)}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
+                <AlertDialogDescription>
+                    Cette action est irréversible. La commande de "{orderToDelete?.customer.name}" sera définitivement supprimée.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setOrderToDelete(null)}>Annuler</AlertDialogCancel>
+                <AlertDialogAction onClick={confirmDeleteOrder}>Supprimer</AlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
