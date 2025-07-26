@@ -94,19 +94,24 @@ export default function AdminPage() {
   }, []);
 
   const fetchOrders = useCallback(async (isInitialLoad = false) => {
-    const ords = await getOrdersClient();
-    setOrders(ords);
+    try {
+        const ords = await getOrdersClient();
+        setOrders(ords);
 
-    if (isInitialLoad) {
-      lastOrderCountRef.current = ords.length;
-    } else if (ords.length > lastOrderCountRef.current) {
-        toast({
-            title: "Nouvelle commande !",
-            description: `Vous avez reçu ${ords.length - lastOrderCountRef.current} nouvelle(s) commande(s).`,
-        });
-        notificationSoundRef.current?.play().catch(e => console.error("Error playing sound:", e));
+        if (isInitialLoad) {
+          lastOrderCountRef.current = ords.length;
+        } else if (ords.length > lastOrderCountRef.current) {
+            toast({
+                title: "Nouvelle commande !",
+                description: `Vous avez reçu ${ords.length - lastOrderCountRef.current} nouvelle(s) commande(s).`,
+            });
+            notificationSoundRef.current?.play().catch(e => console.error("Error playing sound:", e));
+        }
+        lastOrderCountRef.current = ords.length;
+    } catch (error) {
+        console.error("Failed to fetch orders:", error);
+        toast({ title: "Erreur", description: "Impossible de charger les commandes.", variant: "destructive" });
     }
-    lastOrderCountRef.current = ords.length;
   }, [toast]);
 
   useEffect(() => {
@@ -121,34 +126,40 @@ export default function AdminPage() {
 
         async function loadData() {
             setLoading(true);
-            const [prods, slds, bento, colls, info, marq, cats, ords] = await Promise.all([
-                getProductsClient(), 
-                getSlidesClient(),
-                getBentoClient(),
-                getCollectionsClient(),
-                getInfoFeaturesClient(),
-                getMarqueeClient(),
-                getProductCategoriesClient(),
-                getOrdersClient()
-            ]);
-            setProducts(prods.map(p => ({ ...p, images: p.images.length > 0 ? p.images : ['', ''] })));
-            setSlides(slds);
-            setBentoItems(bento);
-            setCollections(colls);
-            setInfoFeatures(info);
-            setMarquee(marq);
-            setProductCategories(cats);
-            setOrders(ords);
-            lastOrderCountRef.current = ords.length;
-            setLoading(false);
-            setSaveStatus('idle');
+            try {
+                const [prods, slds, bento, colls, info, marq, cats, ords] = await Promise.all([
+                    getProductsClient(), 
+                    getSlidesClient(),
+                    getBentoClient(),
+                    getCollectionsClient(),
+                    getInfoFeaturesClient(),
+                    getMarqueeClient(),
+                    getProductCategoriesClient(),
+                    getOrdersClient()
+                ]);
+                setProducts(prods.map(p => ({ ...p, images: p.images.length > 0 ? p.images : ['', ''] })));
+                setSlides(slds);
+                setBentoItems(bento);
+                setCollections(colls);
+                setInfoFeatures(info);
+                setMarquee(marq);
+                setProductCategories(cats);
+                setOrders(ords);
+                lastOrderCountRef.current = ords.length;
+                setSaveStatus('idle');
+            } catch (error) {
+                console.error("Failed to load admin data:", error);
+                toast({ title: "Erreur", description: "Impossible de charger les données de l'administration.", variant: "destructive" });
+            } finally {
+                setLoading(false);
+            }
         }
         loadData();
 
         const intervalId = setInterval(() => fetchOrders(false), 30000); // Check for new orders every 30 seconds
         return () => clearInterval(intervalId);
     }
-  }, [user, fetchOrders]);
+  }, [user, fetchOrders, toast]);
 
   const markAsDirty = () => {
     if (saveStatus === 'idle' || saveStatus === 'success') {

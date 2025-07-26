@@ -1,5 +1,6 @@
 
-import 'server-only';
+'use server';
+
 import { adminDb } from '@/lib/firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 
@@ -55,7 +56,6 @@ export async function getOrders(): Promise<Order[]> {
         return ordersList;
     } catch (error) {
         console.error('Failed to get orders from Firestore:', error);
-        // Throwing the error is better for API routes to handle the response
         throw new Error('Failed to retrieve orders from Firestore.');
     }
 }
@@ -109,10 +109,9 @@ export async function updateOrders(orders: Order[]): Promise<void> {
                 console.warn("Skipping order with no ID:", order);
                 return;
             }
-            const { id, ...orderData } = order;
-            // Note: We don't update createdAt to preserve the original order date
+            const { id, createdAt, ...orderData } = order; // Exclude id and createdAt from the update data
             const orderRef = adminDb.collection('orders').doc(id);
-            // Only update fields that are meant to be changed from admin, like status
+            // Only update fields that are meant to be changed from admin
             batch.update(orderRef, { status: orderData.status });
         });
         await batch.commit();
