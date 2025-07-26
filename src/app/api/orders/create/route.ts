@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
-import { createOrder, type Order } from '@/lib/orders';
+import { createOrder, type OrderRequest } from '@/lib/orders';
 
 export async function POST(request: Request) {
   try {
-    const orderData: Omit<Order, 'total'> = await request.json();
+    const orderData: OrderRequest = await request.json();
     
     // Basic validation
     if (!orderData.customer || !orderData.items || orderData.items.length === 0) {

@@ -15,7 +15,7 @@ export default async function Home() {
 
   return (
     <div className="w-full space-y-2">
-      <section className="px-4 sm:px-6 lg:px-8 pt-2">
+      <section className="w-full pt-2">
         <Carousel
           opts={{
             align: 'start',
@@ -23,7 +23,7 @@ export default async function Home() {
           }}
           className="w-full"
         >
-          <CarouselContent className="-ml-0">
+          <CarouselContent>
             <HomepageCarousel slides={slides} />
           </CarouselContent>
         </Carousel>

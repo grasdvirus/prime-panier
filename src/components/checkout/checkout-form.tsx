@@ -61,7 +61,6 @@ export function CheckoutForm() {
             id: new Date().getTime(),
             customer: values,
             items: orderItems,
-            total: getCartTotal(),
             status: 'pending',
             createdAt: new Date().toISOString()
         });

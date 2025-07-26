@@ -26,6 +26,10 @@ export type Order = {
     createdAt: string;
 }
 
+// This is the type that comes from the client form
+export type OrderRequest = Omit<Order, 'total'>;
+
+
 const ordersFilePath = path.join(process.cwd(), 'public', 'orders.json');
 
 // Ensure the file exists
@@ -48,15 +52,17 @@ export async function getOrders(): Promise<Order[]> {
     }
 }
 
-export async function createOrder(order: Omit<Order, 'total'>): Promise<void> {
+export async function createOrder(orderData: OrderRequest): Promise<void> {
     const orders = await getOrders();
     
     // Calculate total server-side for security
-    const total = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const subtotal = orderData.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const shipping = subtotal > 0 ? 5000 : 0;
+    const total = subtotal + shipping;
 
     const newOrder: Order = {
-        ...order,
-        total: total + 5000, // Add shipping cost
+        ...orderData,
+        total: total,
     }
 
     orders.unshift(newOrder); // Add to the beginning of the array
