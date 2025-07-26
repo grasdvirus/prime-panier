@@ -1,5 +1,7 @@
 'use client';
 
+import React, { useState } from 'react';
+import Confetti from 'react-confetti';
 import { useCart } from '@/contexts/cart-context';
 import { OrderSummary } from '@/components/checkout/order-summary';
 import { CheckoutForm } from '@/components/checkout/checkout-form';
@@ -10,7 +12,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 
 export default function CheckoutPage() {
   const { getCartItemCount } = useCart();
+  const [showConfetti, setShowConfetti] = useState(false);
   const itemCount = getCartItemCount();
+
+  const handleOrderSuccess = () => {
+    setShowConfetti(true);
+  };
 
   if (itemCount === 0) {
     return (
@@ -62,16 +69,19 @@ export default function CheckoutPage() {
   );
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-      <div className="grid grid-cols-1 gap-x-12 gap-y-8 lg:grid-cols-2 max-w-7xl mx-auto">
-        <div className="order-2 lg:order-1 space-y-8">
-          <ManualPaymentInfo />
-          <CheckoutForm />
-        </div>
-        <div className="order-1 lg:order-2">
-          <OrderSummary />
+    <>
+      {showConfetti && <Confetti recycle={false} onConfettiComplete={() => setShowConfetti(false)} />}
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <div className="grid grid-cols-1 gap-x-12 gap-y-8 lg:grid-cols-2 max-w-7xl mx-auto">
+          <div className="order-2 lg:order-1 space-y-8">
+            <ManualPaymentInfo />
+            <CheckoutForm onOrderSuccess={handleOrderSuccess} />
+          </div>
+          <div className="order-1 lg:order-2">
+            <OrderSummary />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

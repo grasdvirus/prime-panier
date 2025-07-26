@@ -30,7 +30,11 @@ const formSchema = z.object({
   notes: z.string().optional(),
 });
 
-export function CheckoutForm() {
+interface CheckoutFormProps {
+    onOrderSuccess: () => void;
+}
+
+export function CheckoutForm({ onOrderSuccess }: CheckoutFormProps) {
   const { items, getCartTotal, clearCart } = useCart();
   const { toast } = useToast();
   const router = useRouter();
@@ -65,12 +69,20 @@ export function CheckoutForm() {
             createdAt: new Date().toISOString()
         });
 
+        onOrderSuccess(); // Trigger confetti!
+
         toast({
             title: "Commande envoyée !",
             description: "Nous avons bien reçu votre commande et nous vous contacterons bientôt pour la confirmation.",
         });
+        
         clearCart();
-        router.push('/');
+        
+        // Wait for confetti to be visible before redirecting
+        setTimeout(() => {
+          router.push('/');
+        }, 4000); 
+
     } catch (error) {
         toast({
             title: "Erreur",
@@ -78,7 +90,6 @@ export function CheckoutForm() {
             variant: "destructive"
         })
         console.error(error);
-    } finally {
         setIsLoading(false);
     }
   }
