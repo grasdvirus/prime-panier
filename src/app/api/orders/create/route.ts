@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     
     // Here you could add email sending logic to notify the admin
     // e.g. using Nodemailer, Resend, etc.
-    // console.log('New order received:', orderData.id);
+    // console.log('New order received for:', orderData.customer.name);
 
     return NextResponse.json({ message: 'Order created successfully' });
 

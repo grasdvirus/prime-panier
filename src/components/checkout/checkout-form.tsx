@@ -15,7 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { useCart } from '@/contexts/cart-context';
-import { createOrderClient } from '@/lib/orders-client';
+import { createOrderClient, type OrderRequest } from '@/lib/orders-client';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -54,20 +54,20 @@ export function CheckoutForm({ onOrderSuccess }: CheckoutFormProps) {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-        const orderItems = items.map(item => ({
-            id: item.product.id,
-            name: item.product.name,
-            quantity: item.quantity,
-            price: item.product.price,
-        }));
-
-        await createOrderClient({
+        const orderRequest: OrderRequest = {
             id: new Date().getTime(),
             createdAt: new Date().toISOString(),
             status: 'pending',
             customer: values,
-            items: orderItems,
-        });
+            items: items.map(item => ({
+                id: item.product.id,
+                name: item.product.name,
+                quantity: item.quantity,
+                price: item.product.price,
+            })),
+        };
+
+        await createOrderClient(orderRequest);
 
         onOrderSuccess(); 
 
@@ -119,7 +119,7 @@ export function CheckoutForm({ onOrderSuccess }: CheckoutFormProps) {
 
         <Separator />
 
-        <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
+        <Button type="submit" size="lg" className="w-full" disabled={isLoading || items.length === 0}>
             {isLoading ? <Loader2 className='animate-spin mr-2' /> : <Send className='mr-2' />}
             Confirmer et envoyer ma commande
         </Button>

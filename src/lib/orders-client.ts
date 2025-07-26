@@ -2,6 +2,8 @@
 
 import { type Order, type OrderRequest } from './orders';
 
+export { type OrderRequest };
+
 export async function createOrderClient(order: OrderRequest): Promise<void> {
   const response = await fetch('/api/orders/create', {
     method: 'POST',
