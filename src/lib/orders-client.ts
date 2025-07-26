@@ -1,10 +1,10 @@
 // Client-side functions for orders
-import { type Order, type OrderItem } from './orders';
+import { type Order } from './orders';
 
-export type { Order, OrderItem };
+export type { Order };
 
 export async function createOrderClient(order: Order): Promise<void> {
-  const response = await fetch('/api/create-order', {
+  const response = await fetch('/api/orders/create', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(order),
