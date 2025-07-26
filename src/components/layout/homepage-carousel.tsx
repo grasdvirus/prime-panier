@@ -72,8 +72,8 @@ export function HomepageCarousel({ slides }: HomepageCarouselProps) {
         </div>
       </div>
 
-      <CarouselPrevious />
-      <CarouselNext />
+      <CarouselPrevious className="left-2" />
+      <CarouselNext className="right-2" />
       
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
         {scrollSnaps.map((_, index) => (

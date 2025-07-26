@@ -1,1 +1,23 @@
-[]
+[
+  {
+    "id": 1753519818042,
+    "customer": {
+      "name": "christian ange gbadi",
+      "phone": "0704542909",
+      "email": "grasdvirus@gmail.com",
+      "address": "cocody 7e tranche\nimmeuble cgk",
+      "notes": ""
+    },
+    "items": [
+      {
+        "id": 3,
+        "name": "Perruque courte bouclée en cheveux humains, coupe au carré, avec dentelle",
+        "quantity": 1,
+        "price": 270000
+      }
+    ],
+    "total": 275000,
+    "status": "confirmed",
+    "createdAt": "2025-07-26T08:50:18.042Z"
+  }
+]

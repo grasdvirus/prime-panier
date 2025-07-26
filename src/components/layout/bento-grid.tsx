@@ -82,7 +82,7 @@ export function BentoGrid() {
         </div>
 
         {/* Mobile Vertical Scroll Container */}
-        <div className="md:hidden max-h-[400px] overflow-y-auto space-y-4 pr-2">
+        <div className="md:hidden max-h-[400px] overflow-y-auto space-y-4">
             {bentoItems.map((item) => (
                 <div key={item.id} className={'h-[250px]'}>
                     <BentoItem>
