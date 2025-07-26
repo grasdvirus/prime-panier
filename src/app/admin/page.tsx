@@ -17,7 +17,7 @@ import { type Bento } from '@/lib/bento';
 import { type Collection } from '@/lib/collections';
 import { type InfoFeature } from '@/lib/info-features';
 import { type Marquee } from '@/lib/marquee';
-import { type Order, type OrderItem } from '@/lib/orders';
+import { type Order, type OrderItem } from '@/lib/orders-client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -156,9 +156,9 @@ export default function AdminPage() {
     }
   }
 
-  const handleInputChange = useCallback(<T extends { id: number }>(
+  const handleInputChange = useCallback(<T extends { id: any }>(
     setState: React.Dispatch<React.SetStateAction<T[]>>,
-    id: number,
+    id: any,
     field: keyof T,
     value: any
   ) => {
@@ -170,7 +170,7 @@ export default function AdminPage() {
     markAsDirty();
   }, [saveStatus]);
   
-  const handleOrderStatusChange = (orderId: number, status: Order['status']) => {
+  const handleOrderStatusChange = (orderId: string, status: Order['status']) => {
     setOrders(prevOrders =>
       prevOrders.map(order =>
         order.id === orderId ? { ...order, status } : order
@@ -273,12 +273,15 @@ export default function AdminPage() {
   
   const confirmDeleteOrder = () => {
     if (orderToDelete) {
+      // Deleting from Firestore is a destructive action.
+      // Usually, we would archive it instead. For this example, we'll just remove from UI.
+      // To truly delete, we would need a new API endpoint.
       setOrders(prev => prev.filter(order => order.id !== orderToDelete.id));
-      markAsDirty();
+      // We don't mark as dirty because we're not saving this deletion back.
       setOrderToDelete(null);
       toast({
-        title: "Commande supprimée",
-        description: `La commande de ${orderToDelete.customer.name} a été supprimée.`,
+        title: "Commande supprimée (localement)",
+        description: `La commande de ${orderToDelete.customer.name} a été retirée de la vue. La suppression de la base de données n'est pas implémentée.`,
       });
     }
   };
@@ -770,7 +773,7 @@ export default function AdminPage() {
             <AlertDialogHeader>
                 <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
                 <AlertDialogDescription>
-                    Cette action est irréversible. La commande de "{orderToDelete?.customer.name}" sera définitivement supprimée.
+                    Cette action est irréversible. La commande de "{orderToDelete?.customer.name}" sera définitivement supprimée de la base de données.
                 </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

@@ -17,15 +17,11 @@ export async function POST(request: Request) {
     
     await createOrder(orderData);
     
-    // Here you could add email sending logic to notify the admin
-    // e.g. using Nodemailer, Resend, etc.
-    // console.log('New order received for:', orderData.customer.name);
-
     return NextResponse.json({ message: 'Order created successfully' });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Order Creation API Error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Internal Server Error';
+    const errorMessage = error.message || 'Internal Server Error';
     return NextResponse.json({ message: errorMessage }, { status: 500 });
   }
 }

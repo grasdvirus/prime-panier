@@ -1,6 +1,6 @@
 import 'server-only';
-import fs from 'fs/promises';
-import path from 'path';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, getDocs, doc, updateDoc, orderBy, query, serverTimestamp, writeBatch } from 'firebase/firestore';
 
 export type OrderItem = {
     id: number;
@@ -18,12 +18,12 @@ export type OrderCustomer = {
 }
 
 export type Order = {
-    id: number;
+    id: string; // Firestore ID is a string
     customer: OrderCustomer;
     items: OrderItem[];
     total: number;
     status: 'pending' | 'confirmed' | 'shipped' | 'cancelled';
-    createdAt: string;
+    createdAt: any; // Firestore timestamp
 }
 
 // This is the type that comes from the client form and the API
@@ -32,60 +32,67 @@ export type OrderRequest = {
     items: OrderItem[];
 };
 
-
-const ordersFilePath = path.join(process.cwd(), 'public', 'orders.json');
-
-// Ensure the file exists, creating it if it doesn't.
-async function ensureFileExists() {
-    try {
-        await fs.access(ordersFilePath);
-    } catch {
-        // If the file doesn't exist, create it with an empty array.
-        await fs.writeFile(ordersFilePath, JSON.stringify([]), 'utf-8');
-    }
-}
-
 export async function getOrders(): Promise<Order[]> {
-    await ensureFileExists();
     try {
-        const fileContent = await fs.readFile(ordersFilePath, 'utf-8');
-        const orders = JSON.parse(fileContent);
-        // Sort orders by creation date, descending
-        return orders.sort((a: Order, b: Order) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        const ordersCollection = collection(db, 'orders');
+        const q = query(ordersCollection, orderBy('createdAt', 'desc'));
+        const orderSnapshot = await getDocs(q);
+        const ordersList = orderSnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                ...data,
+                // Convert Firestore Timestamp to a serializable format (ISO string)
+                createdAt: data.createdAt?.toDate().toISOString() || new Date().toISOString(),
+            } as Order;
+        });
+        return ordersList;
     } catch (error) {
-        console.error('Failed to read orders.json:', error);
+        console.error('Failed to get orders from Firestore:', error);
         return [];
     }
 }
 
 export async function createOrder(orderRequest: OrderRequest): Promise<void> {
-    const orders = await getOrders();
-    
-    // Calculate total server-side for security, based *only* on submitted cart data.
-    const subtotal = orderRequest.items.reduce((sum, item) => {
-        const price = typeof item.price === 'number' ? item.price : 0;
-        const quantity = typeof item.quantity === 'number' ? item.quantity : 0;
-        return sum + price * quantity;
-    }, 0);
-    
-    const shipping = subtotal > 0 ? 5000 : 0;
-    const total = subtotal + shipping;
+    try {
+        const subtotal = orderRequest.items.reduce((sum, item) => {
+            const price = typeof item.price === 'number' ? item.price : 0;
+            const quantity = typeof item.quantity === 'number' ? item.quantity : 0;
+            return sum + price * quantity;
+        }, 0);
+        
+        const shipping = subtotal > 0 ? 5000 : 0;
+        const total = subtotal + shipping;
 
-    const newOrder: Order = {
-        id: new Date().getTime(),
-        createdAt: new Date().toISOString(),
-        status: 'pending',
-        customer: orderRequest.customer,
-        items: orderRequest.items,
-        total: total,
-    };
+        const newOrder = {
+            customer: orderRequest.customer,
+            items: orderRequest.items,
+            total: total,
+            status: 'pending',
+            createdAt: serverTimestamp(),
+        };
 
-    orders.unshift(newOrder); // Add to the beginning of the array
-    await updateOrders(orders); // Use updateOrders to write the file
+        await addDoc(collection(db, 'orders'), newOrder);
+
+    } catch (error) {
+        console.error('Failed to create order in Firestore:', error);
+        // Re-throw the error to be caught by the API route
+        throw new Error('Failed to create order.');
+    }
 }
 
 export async function updateOrders(orders: Order[]): Promise<void> {
-    await ensureFileExists();
-    const sortedOrders = orders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    await fs.writeFile(ordersFilePath, JSON.stringify(sortedOrders, null, 2), 'utf-8');
+    try {
+        const batch = writeBatch(db);
+        orders.forEach(order => {
+            const { id, ...orderData } = order;
+            // Note: We don't update createdAt to preserve the original order date
+            const orderRef = doc(db, 'orders', id);
+            batch.update(orderRef, { status: orderData.status });
+        });
+        await batch.commit();
+    } catch (error) {
+        console.error("Failed to batch update orders in Firestore:", error);
+        throw new Error('Failed to update orders.');
+    }
 }
