@@ -41,11 +41,11 @@ export function HomepageCarousel({ slides }: HomepageCarouselProps) {
   }, [emblaApi, onInit, onSelect]);
 
   return (
-    <div className="relative w-full px-4 sm:px-6 lg:px-8">
+    <div className="relative w-full">
       <div className="embla" ref={emblaRef}>
-        <div className="embla__container -ml-4">
+        <div className="embla__container">
           {slides.map((slide, index) => (
-            <div className={cn("embla__slide pl-4", index === selectedIndex ? "is-selected" : "")} key={slide.id}>
+            <div className={cn("embla__slide", index === selectedIndex ? "is-selected" : "")} key={slide.id}>
               <Card className="border-0 rounded-lg overflow-hidden">
                 <CardContent className="relative flex aspect-video items-center justify-center p-0">
                   <Image
@@ -72,8 +72,8 @@ export function HomepageCarousel({ slides }: HomepageCarouselProps) {
         </div>
       </div>
 
-      <CarouselPrevious className="left-6 sm:left-8 lg:left-10" />
-      <CarouselNext className="right-6 sm:right-8 lg:right-10" />
+      <CarouselPrevious className="left-2 top-1/2 -translate-y-1/2" />
+      <CarouselNext className="right-2 top-1/2 -translate-y-1/2" />
       
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
         {scrollSnaps.map((_, index) => (
