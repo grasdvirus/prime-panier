@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { type User, onAuthStateChanged, signOut as firebaseSignOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { Loader2 } from 'lucide-react';
+import { CustomLoader } from '@/components/layout/custom-loader';
 
 type AuthContextType = {
   user: User | null;
@@ -34,7 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   if (loading) {
     return (
         <div className="flex justify-center items-center min-h-screen">
-            <Loader2 className="h-16 w-16 animate-spin" />
+            <CustomLoader />
         </div>
     );
   }
