@@ -1,0 +1,19 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Allow anyone to create an order, but not to read, update or delete them.
+    // Reading and updating should only happen from the server with admin privileges.
+    match /orders/{orderId} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
+
+    // Lock down all other collections by default.
+    // Add specific rules for other collections if needed.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
