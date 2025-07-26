@@ -50,14 +50,22 @@ export function CheckoutForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
+        const orderItems = items.map(item => ({
+            id: item.product.id,
+            name: item.product.name,
+            quantity: item.quantity,
+            price: item.product.price,
+        }));
+
         await createOrderClient({
             id: new Date().getTime(),
             customer: values,
-            items: items,
+            items: orderItems,
             total: getCartTotal(),
             status: 'pending',
             createdAt: new Date().toISOString()
         });
+
         toast({
             title: "Commande envoyée !",
             description: "Nous avons bien reçu votre commande et nous vous contacterons bientôt pour la confirmation.",

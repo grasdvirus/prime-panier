@@ -1,7 +1,13 @@
 import 'server-only';
 import fs from 'fs/promises';
 import path from 'path';
-import { type CartItem } from '@/contexts/cart-context';
+
+export type OrderItem = {
+    id: number;
+    name: string;
+    quantity: number;
+    price: number;
+}
 
 export type OrderCustomer = {
     name: string;
@@ -14,7 +20,7 @@ export type OrderCustomer = {
 export type Order = {
     id: number;
     customer: OrderCustomer;
-    items: CartItem[];
+    items: OrderItem[];
     total: number;
     status: 'pending' | 'confirmed' | 'shipped' | 'cancelled';
     createdAt: string;
@@ -42,9 +48,18 @@ export async function getOrders(): Promise<Order[]> {
     }
 }
 
-export async function createOrder(order: Order): Promise<void> {
+export async function createOrder(order: Omit<Order, 'total'>): Promise<void> {
     const orders = await getOrders();
-    orders.unshift(order); // Add to the beginning of the array
+    
+    // Calculate total server-side for security
+    const total = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+    const newOrder: Order = {
+        ...order,
+        total: total + 5000, // Add shipping cost
+    }
+
+    orders.unshift(newOrder); // Add to the beginning of the array
     await fs.writeFile(ordersFilePath, JSON.stringify(orders, null, 2), 'utf-8');
 }
 

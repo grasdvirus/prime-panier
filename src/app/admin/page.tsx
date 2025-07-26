@@ -17,7 +17,7 @@ import { type Bento } from '@/lib/bento';
 import { type Collection } from '@/lib/collections';
 import { type InfoFeature } from '@/lib/info-features';
 import { type Marquee } from '@/lib/marquee';
-import { type Order } from '@/lib/orders';
+import { type Order, type OrderItem } from '@/lib/orders';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -458,7 +458,7 @@ export default function AdminPage() {
                           <h4 className='font-semibold mb-2'>Produits</h4>
                           <ul className='list-disc pl-5'>
                             {order.items.map(item => (
-                              <li key={item.product.id}>{item.quantity} x {item.product.name}</li>
+                              <li key={item.id}>{item.quantity} x {item.name}</li>
                             ))}
                           </ul>
                         </div>
