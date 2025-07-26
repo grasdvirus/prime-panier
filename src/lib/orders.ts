@@ -28,9 +28,6 @@ export type Order = {
 
 // This is the type that comes from the client form and the API
 export type OrderRequest = {
-    id: number;
-    createdAt: string;
-    status: 'pending' | 'confirmed' | 'shipped' | 'cancelled';
     customer: OrderCustomer;
     items: OrderItem[];
 };
@@ -43,6 +40,7 @@ async function ensureFileExists() {
     try {
         await fs.access(ordersFilePath);
     } catch {
+        // If the file doesn't exist, create it with an empty array.
         await fs.writeFile(ordersFilePath, JSON.stringify([]), 'utf-8');
     }
 }
@@ -63,20 +61,22 @@ export async function getOrders(): Promise<Order[]> {
 export async function createOrder(orderRequest: OrderRequest): Promise<void> {
     const orders = await getOrders();
     
-    // Calculate total server-side for security
+    // Calculate total server-side for security, based *only* on submitted cart data.
     const subtotal = orderRequest.items.reduce((sum, item) => {
-        // Ensure price and quantity are numbers before calculation
         const price = typeof item.price === 'number' ? item.price : 0;
         const quantity = typeof item.quantity === 'number' ? item.quantity : 0;
         return sum + price * quantity;
     }, 0);
     
-    // Add shipping costs (e.g., 5000 FCFA if there are items)
     const shipping = subtotal > 0 ? 5000 : 0;
     const total = subtotal + shipping;
 
     const newOrder: Order = {
-        ...orderRequest,
+        id: new Date().getTime(),
+        createdAt: new Date().toISOString(),
+        status: 'pending',
+        customer: orderRequest.customer,
+        items: orderRequest.items,
         total: total,
     };
 

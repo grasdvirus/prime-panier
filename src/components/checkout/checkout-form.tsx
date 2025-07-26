@@ -55,9 +55,6 @@ export function CheckoutForm({ onOrderSuccess }: CheckoutFormProps) {
     setIsLoading(true);
     try {
         const orderRequest: OrderRequest = {
-            id: new Date().getTime(),
-            createdAt: new Date().toISOString(),
-            status: 'pending',
             customer: values,
             items: items.map(item => ({
                 id: item.product.id,
@@ -82,13 +79,13 @@ export function CheckoutForm({ onOrderSuccess }: CheckoutFormProps) {
           router.push('/');
         }, 5000); 
 
-    } catch (error) {
+    } catch (error: any) {
         toast({
             title: "Erreur",
-            description: "Une erreur s'est produite lors de l'envoi de votre commande.",
+            description: error.message || "Une erreur s'est produite lors de l'envoi de votre commande.",
             variant: "destructive"
         })
-        console.error(error);
+        console.error("Order submission error:", error);
         setIsLoading(false);
     }
   }
