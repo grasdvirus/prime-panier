@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -13,7 +14,7 @@ interface HomepageCarouselProps {
 }
 
 export function HomepageCarousel({ slides }: HomepageCarouselProps) {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'center' }, []);
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'center' });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
 
@@ -40,40 +41,44 @@ export function HomepageCarousel({ slides }: HomepageCarouselProps) {
 
   }, [emblaApi, onInit, onSelect]);
 
+  if (!slides || slides.length === 0) {
+    return null;
+  }
+
   return (
     <div className="relative w-full">
-      <div className="embla" ref={emblaRef}>
-        <div className="embla__container">
+      <div className="overflow-hidden" ref={emblaRef}>
+        <div className="flex">
           {slides.map((slide, index) => (
-            <div className={cn("embla__slide", index === selectedIndex ? "is-selected" : "")} key={slide.id}>
-              <Card className="border-0 rounded-lg overflow-hidden">
-                <CardContent className="relative flex aspect-video items-center justify-center p-0">
-                  <Image
-                    src={slide.imageUrl}
-                    alt={slide.title}
-                    fill
-                    className="object-cover"
-                    data-ai-hint={slide.data_ai_hint}
-                    priority={slide.id === 1}
-                  />
-                  <div className="absolute inset-0 bg-black/40" />
-                  <div className="relative text-center text-white p-4">
-                    <h2 className="text-3xl md:text-5xl font-bold tracking-tighter mb-2 font-headline">
-                      {slide.title}
-                    </h2>
-                    <p className="text-md md:text-lg max-w-2xl mx-auto">
-                      {slide.description}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
+            <div className="relative flex-[0_0_100%]" key={slide.id}>
+                <Card className="border-0 rounded-none overflow-hidden">
+                  <CardContent className="relative flex aspect-[16/10] md:aspect-video items-center justify-center p-0">
+                    <Image
+                      src={slide.imageUrl}
+                      alt={slide.title}
+                      fill
+                      className="object-cover"
+                      data-ai-hint={slide.data_ai_hint}
+                      priority={slide.id === 1}
+                    />
+                    <div className="absolute inset-0 bg-black/40" />
+                    <div className="relative text-center text-white p-4">
+                      <h2 className="text-3xl md:text-5xl font-bold tracking-tighter mb-2 font-headline">
+                        {slide.title}
+                      </h2>
+                      <p className="text-md md:text-lg max-w-2xl mx-auto">
+                        {slide.description}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
             </div>
           ))}
         </div>
       </div>
 
-      <CarouselPrevious className="left-2 top-1/2 -translate-y-1/2" />
-      <CarouselNext className="right-2 top-1/2 -translate-y-1/2" />
+      <CarouselPrevious className="left-2 sm:left-4" />
+      <CarouselNext className="right-2 sm:right-4" />
       
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
         {scrollSnaps.map((_, index) => (

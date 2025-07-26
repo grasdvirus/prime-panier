@@ -1,8 +1,8 @@
+
 import { ProductGrid } from '@/components/products/product-grid';
 import { getProducts } from '@/lib/products';
 import { HomepageCarousel } from '@/components/layout/homepage-carousel';
 import { getSlides } from '@/lib/slides';
-import { Carousel, CarouselContent } from '@/components/ui/carousel';
 import { BentoGrid } from '@/components/layout/bento-grid';
 import { CollectionCarousel } from '@/components/products/collection-carousel';
 import { InfoSection } from '@/components/layout/info-section';
@@ -15,18 +15,8 @@ export default async function Home() {
 
   return (
     <div className="w-full space-y-2">
-      <section className="w-full pt-2">
-        <Carousel
-          opts={{
-            align: 'start',
-            loop: true,
-          }}
-          className="w-full"
-        >
-          <CarouselContent>
-            <HomepageCarousel slides={slides} />
-          </CarouselContent>
-        </Carousel>
+      <section className="w-full">
+        <HomepageCarousel slides={slides} />
       </section>
 
       <section className="px-4 sm:px-6 lg:px-8 py-2">
