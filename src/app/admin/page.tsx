@@ -10,14 +10,14 @@ import { getCollectionsClient, updateCollectionsClient } from '@/lib/collections
 import { getInfoFeaturesClient, updateInfoFeaturesClient } from '@/lib/info-features-client';
 import { getMarqueeClient, updateMarqueeClient } from '@/lib/marquee-client';
 import { getProductCategoriesClient } from '@/lib/products-client';
-import { getOrdersClient, updateOrdersClient, deleteOrderClient } from '@/lib/orders-client';
+import { getOrdersClient, updateOrderClient, deleteOrderClient } from '@/lib/orders-client';
 import { type Product } from '@/lib/products';
 import { type Slide } from '@/lib/slides';
 import { type Bento } from '@/lib/bento';
 import { type Collection } from '@/lib/collections';
 import { type InfoFeature } from '@/lib/info-features';
 import { type Marquee } from '@/lib/marquee';
-import { type Order, type OrderItem } from '@/lib/orders-client';
+import { type Order } from '@/lib/orders';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -181,13 +181,31 @@ export default function AdminPage() {
     markAsDirty();
   }, [saveStatus]);
   
-  const handleOrderStatusChange = (orderId: string, status: Order['status']) => {
-    setOrders(prevOrders =>
-      prevOrders.map(order =>
-        order.id === orderId ? { ...order, status } : order
-      )
+  const handleOrderStatusChange = async (orderId: string, status: Order['status']) => {
+    const originalOrders = orders;
+    const updatedOrders = originalOrders.map(order =>
+      order.id === orderId ? { ...order, status } : order
     );
-    markAsDirty();
+    setOrders(updatedOrders);
+
+    const orderToUpdate = updatedOrders.find(o => o.id === orderId);
+
+    if (orderToUpdate) {
+        try {
+            await updateOrderClient(orderToUpdate);
+            toast({
+                title: "Statut mis à jour",
+                description: `Le statut de la commande a été changé en "${status}".`,
+            });
+        } catch (error) {
+            setOrders(originalOrders);
+            toast({
+                title: "Erreur de mise à jour",
+                description: "Le statut de la commande n'a pas pu être mis à jour.",
+                variant: "destructive",
+            });
+        }
+    }
   };
 
   const handleProductImageChange = useCallback((productId: number, imageIndex: number, url: string) => {
@@ -202,7 +220,7 @@ export default function AdminPage() {
         })
     );
     markAsDirty();
-  }, [saveStatus]);
+  }, []);
 
   const handleProductFeatureChange = useCallback((productId: number, featureIndex: number, value: string) => {
      setProducts(prevProducts =>
@@ -216,7 +234,7 @@ export default function AdminPage() {
       })
     );
     markAsDirty();
-  }, [saveStatus]);
+  }, []);
 
   const handleMarqueeChange = useCallback((index: number, value: string) => {
     setMarquee(prev => {
@@ -225,7 +243,7 @@ export default function AdminPage() {
         return { ...prev, messages: newMessages };
     });
     markAsDirty();
-  }, [saveStatus]);
+  }, []);
 
   const handleAddProduct = () => {
     const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
@@ -355,7 +373,6 @@ export default function AdminPage() {
           updateCollectionsClient(collections),
           updateInfoFeaturesClient(infoFeatures),
           updateMarqueeClient(marquee),
-          updateOrdersClient(orders),
       ]);
       await fetchCategories();
       await fetchOrders(true); // Treat as initial load to reset counter
