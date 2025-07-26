@@ -35,7 +35,6 @@ export const OrderRequestSchema = z.object({
 
 export type OrderRequest = z.infer<typeof OrderRequestSchema>;
 
-
 export const createOrderFlow = ai.defineFlow(
   {
     name: 'createOrderFlow',

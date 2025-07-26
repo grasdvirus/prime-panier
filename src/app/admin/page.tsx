@@ -100,7 +100,7 @@ export default function AdminPage() {
 
         if (isInitialLoad) {
           lastOrderCountRef.current = ords.length;
-        } else if (ords.length > lastOrderCountRef.current) {
+        } else if (ords.length > lastOrderCountRef.current && ords.length > 0) {
             toast({
                 title: "Nouvelle commande !",
                 description: `Vous avez reçu ${ords.length - lastOrderCountRef.current} nouvelle(s) commande(s).`,
