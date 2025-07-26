@@ -86,6 +86,7 @@ export function CheckoutForm({ onOrderSuccess }: CheckoutFormProps) {
             variant: "destructive"
         })
         console.error("Order submission error:", error);
+    } finally {
         setIsLoading(false);
     }
   }
