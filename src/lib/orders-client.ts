@@ -1,7 +1,10 @@
 // Client-side functions for orders
-import { getOrders as getOrdersFromServer, updateOrders as updateOrdersOnServer, type Order, type OrderRequest } from './orders';
+import { type Order, type OrderItem } from './orders';
+import { type OrderRequest as CreateOrderRequest } from '@/ai/flows/order-flow';
 
-export { type OrderRequest, type Order };
+export type OrderRequest = CreateOrderRequest;
+export type { Order, OrderItem };
+
 
 export async function createOrderClient(order: OrderRequest): Promise<void> {
   const response = await fetch('/api/orders/create', {
@@ -16,17 +19,9 @@ export async function createOrderClient(order: OrderRequest): Promise<void> {
   }
 }
 
-// Note: These client functions now wrap server functions.
-// This might not be the final architecture, but it adapts the existing admin panel
-// to the new Firestore backend without a full rewrite of the admin panel's client-side logic.
-
 export async function getOrdersClient(): Promise<Order[]> {
-    // This is not ideal as it calls the serverless function from the client.
-    // A better approach would be to fetch directly from Firestore on the client with security rules.
-    // But for now, we'll proxy through a dedicated API route if needed, or call server function directly if in same context.
-    // For now, let's assume we need an API route for this.
     try {
-        const res = await fetch('/api/orders/get');
+        const res = await fetch('/api/orders/get', { cache: 'no-store' });
         if (!res.ok) {
             throw new Error('Failed to fetch orders');
         }

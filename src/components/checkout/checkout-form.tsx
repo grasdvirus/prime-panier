@@ -15,7 +15,8 @@ import {
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { useCart } from '@/contexts/cart-context';
-import { createOrderClient, type OrderRequest } from '@/lib/orders-client';
+import { createOrderClient } from '@/lib/orders-client';
+import { type OrderRequest } from '@/ai/flows/order-flow';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -55,7 +56,13 @@ export function CheckoutForm({ onOrderSuccess }: CheckoutFormProps) {
     setIsLoading(true);
     try {
         const orderRequest: OrderRequest = {
-            customer: values,
+            customer: {
+              name: values.name,
+              phone: values.phone,
+              email: values.email || '',
+              address: values.address,
+              notes: values.notes || '',
+            },
             items: items.map(item => ({
                 id: item.product.id,
                 name: item.product.name,
