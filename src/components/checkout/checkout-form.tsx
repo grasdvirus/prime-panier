@@ -35,7 +35,7 @@ interface CheckoutFormProps {
 }
 
 export function CheckoutForm({ onOrderSuccess }: CheckoutFormProps) {
-  const { items, getCartTotal, clearCart } = useCart();
+  const { items, clearCart } = useCart();
   const { toast } = useToast();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -63,13 +63,13 @@ export function CheckoutForm({ onOrderSuccess }: CheckoutFormProps) {
 
         await createOrderClient({
             id: new Date().getTime(),
+            createdAt: new Date().toISOString(),
+            status: 'pending',
             customer: values,
             items: orderItems,
-            status: 'pending',
-            createdAt: new Date().toISOString()
         });
 
-        onOrderSuccess(); // Trigger confetti!
+        onOrderSuccess(); 
 
         toast({
             title: "Commande envoyée !",
@@ -78,10 +78,9 @@ export function CheckoutForm({ onOrderSuccess }: CheckoutFormProps) {
         
         clearCart();
         
-        // Wait for confetti to be visible before redirecting
         setTimeout(() => {
           router.push('/');
-        }, 4000); 
+        }, 5000); 
 
     } catch (error) {
         toast({

@@ -70,7 +70,7 @@ export default function CheckoutPage() {
 
   return (
     <>
-      {showConfetti && <Confetti recycle={false} onConfettiComplete={() => setShowConfetti(false)} />}
+      {showConfetti && <Confetti recycle={false} onConfettiComplete={() => setShowConfetti(false)} numberOfPieces={400} />}
       <div className="w-full px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         <div className="grid grid-cols-1 gap-x-12 gap-y-8 lg:grid-cols-2 max-w-7xl mx-auto">
           <div className="order-2 lg:order-1 space-y-8">
