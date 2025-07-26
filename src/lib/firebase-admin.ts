@@ -31,5 +31,7 @@ if (!admin.apps.length) {
 
 // Export the admin services.
 // If initialization failed, these will throw an error when used.
-export const adminDb = admin.firestore();
-export const adminAuth = admin.auth();
+const adminDb = admin.firestore();
+const adminAuth = admin.auth();
+
+export { adminDb, adminAuth };
