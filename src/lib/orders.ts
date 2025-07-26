@@ -27,7 +27,13 @@ export type Order = {
 }
 
 // This is the type that comes from the client form and the API
-export type OrderRequest = Omit<Order, 'total'>;
+export type OrderRequest = {
+    id: number;
+    createdAt: string;
+    status: 'pending' | 'confirmed' | 'shipped' | 'cancelled';
+    customer: OrderCustomer;
+    items: OrderItem[];
+};
 
 
 const ordersFilePath = path.join(process.cwd(), 'public', 'orders.json');
