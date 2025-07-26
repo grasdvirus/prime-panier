@@ -57,7 +57,7 @@ export function HomepageCarousel({ slides }: HomepageCarouselProps) {
         <CarouselContent>
             {slides.map((slide, index) => (
                 <CarouselItem key={index}>
-                    <Card className="border-0 rounded-none overflow-hidden">
+                    <Card className="border-0 rounded-lg overflow-hidden">
                       <CardContent className="relative flex aspect-[16/10] md:aspect-video items-center justify-center p-0">
                         <Image
                           src={slide.imageUrl}

@@ -15,7 +15,7 @@ export default async function Home() {
 
   return (
     <div className="w-full space-y-2">
-      <section className="w-full">
+      <section className="w-full px-4 sm:px-6 lg:px-8 py-2">
         <HomepageCarousel slides={slides} />
       </section>
 
