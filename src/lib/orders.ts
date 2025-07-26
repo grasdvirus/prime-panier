@@ -57,41 +57,6 @@ export async function getOrders(): Promise<Order[]> {
     }
 }
 
-export async function createOrder(orderRequest: OrderRequest): Promise<void> {
-    try {
-        if (!orderRequest.customer || 
-            !orderRequest.customer.name ||
-            !orderRequest.customer.phone ||
-            !orderRequest.customer.address ||
-            !orderRequest.items || 
-            orderRequest.items.length === 0) {
-          throw new Error('Invalid or incomplete order data.');
-        }
-
-        const subtotal = orderRequest.items.reduce((sum, item) => {
-            const price = typeof item.price === 'number' && !isNaN(item.price) ? item.price : 0;
-            const quantity = typeof item.quantity === 'number' && !isNaN(item.quantity) ? item.quantity : 0;
-            return sum + price * quantity;
-        }, 0);
-        
-        const shipping = subtotal > 0 ? 5000 : 0;
-        const total = subtotal + shipping;
-
-        const newOrder = {
-            customer: orderRequest.customer,
-            items: orderRequest.items,
-            total: total,
-            status: 'pending' as const,
-            createdAt: FieldValue.serverTimestamp(),
-        };
-
-        await adminDb.collection('orders').add(newOrder);
-
-    } catch (error) {
-        console.error('Failed to create order in Firestore:', error);
-        throw new Error('Failed to create order in Firestore.');
-    }
-}
 
 export async function updateOrders(orders: Order[]): Promise<void> {
     try {
