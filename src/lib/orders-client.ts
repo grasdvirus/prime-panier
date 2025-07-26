@@ -1,13 +1,10 @@
 // Client-side functions for orders
 import { type Order, type OrderItem } from './orders';
-import { type OrderRequest as CreateOrderRequest } from '@/ai/flows/order-flow';
 
-export type OrderRequest = CreateOrderRequest;
 export type { Order, OrderItem };
 
-
-export async function createOrderClient(order: OrderRequest): Promise<void> {
-  const response = await fetch('/api/orders/create', {
+export async function createOrderClient(order: Order): Promise<void> {
+  const response = await fetch('/api/create-order', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(order),
@@ -21,11 +18,13 @@ export async function createOrderClient(order: OrderRequest): Promise<void> {
 
 export async function getOrdersClient(): Promise<Order[]> {
     try {
-        const res = await fetch('/api/orders/get', { cache: 'no-store' });
+        const res = await fetch(`/orders.json?v=${new Date().getTime()}`, { cache: 'no-store' });
         if (!res.ok) {
             throw new Error('Failed to fetch orders');
         }
-        return res.json();
+        const orders = await res.json();
+        // Sort orders from newest to oldest
+        return orders.sort((a: Order, b: Order) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
     } catch (error) {
         console.error('Error in getOrdersClient:', error);
         return [];

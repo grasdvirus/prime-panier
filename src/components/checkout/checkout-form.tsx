@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { useCart } from '@/contexts/cart-context';
 import { createOrderClient } from '@/lib/orders-client';
-import { type OrderRequest } from '@/ai/flows/order-flow';
+import { type OrderRequest } from '@/lib/orders';
 import { useToast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -36,7 +36,7 @@ interface CheckoutFormProps {
 }
 
 export function CheckoutForm({ onOrderSuccess }: CheckoutFormProps) {
-  const { items, clearCart } = useCart();
+  const { items, clearCart, getCartTotal } = useCart();
   const { toast } = useToast();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -55,7 +55,12 @@ export function CheckoutForm({ onOrderSuccess }: CheckoutFormProps) {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
+        const subtotal = getCartTotal();
+        const shipping = subtotal > 0 ? 5000 : 0;
+        const total = subtotal + shipping;
+
         const orderRequest: OrderRequest = {
+            id: new Date().getTime().toString(), // Simple unique ID
             customer: {
               name: values.name,
               phone: values.phone,
@@ -69,6 +74,9 @@ export function CheckoutForm({ onOrderSuccess }: CheckoutFormProps) {
                 quantity: item.quantity,
                 price: item.product.price,
             })),
+            total: total,
+            status: 'pending',
+            createdAt: new Date().toISOString(),
         };
 
         await createOrderClient(orderRequest);
