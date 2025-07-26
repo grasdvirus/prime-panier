@@ -21,16 +21,16 @@ const OrderItemSchema = z.object({
 });
 
 const OrderCustomerSchema = z.object({
-    name: z.string().min(1),
-    phone: z.string().min(1),
+    name: z.string().min(1, "Le nom est requis."),
+    phone: z.string().min(1, "Le téléphone est requis."),
     email: z.string().optional(),
-    address: z.string().min(1),
+    address: z.string().min(1, "L'adresse est requise."),
     notes: z.string().optional(),
 });
 
 export const OrderRequestSchema = z.object({
   customer: OrderCustomerSchema,
-  items: z.array(OrderItemSchema).min(1),
+  items: z.array(OrderItemSchema).min(1, "Le panier ne peut pas être vide."),
 });
 
 export type OrderRequest = z.infer<typeof OrderRequestSchema>;
@@ -39,7 +39,7 @@ export const createOrderFlow = ai.defineFlow(
   {
     name: 'createOrderFlow',
     inputSchema: OrderRequestSchema,
-    outputSchema: z.void(),
+    outputSchema: z.object({ orderId: z.string() }),
   },
   async (orderRequest) => {
     try {
@@ -60,12 +60,14 @@ export const createOrderFlow = ai.defineFlow(
             createdAt: FieldValue.serverTimestamp(),
         };
 
-        await adminDb.collection('orders').add(newOrder);
+        const docRef = await adminDb.collection('orders').add(newOrder);
+        
+        return { orderId: docRef.id };
 
     } catch (error) {
         console.error('Failed to create order in Firestore from flow:', error);
         // Throw a new error to be caught by the API route
-        throw new Error('Failed to create order in Firestore.');
+        throw new Error('Flow Error: Failed to create order in Firestore.');
     }
   }
 );

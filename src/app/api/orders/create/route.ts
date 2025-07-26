@@ -1,25 +1,28 @@
 import { NextResponse } from 'next/server';
-import { type OrderRequest } from '@/lib/orders';
-import { createOrderFlow } from '@/ai/flows/order-flow';
+import { createOrderFlow, OrderRequestSchema } from '@/ai/flows/order-flow';
+import { ZodError } from 'zod';
 
 export async function POST(request: Request) {
   try {
-    const orderData: OrderRequest = await request.json();
+    const orderData = await request.json();
     
-    // Basic validation
-    if (!orderData || !orderData.customer || !orderData.items || orderData.items.length === 0) {
-      return NextResponse.json({ message: 'Données de commande invalides ou incomplètes.' }, { status: 400 });
-    }
+    // Validate the incoming data using our Zod schema
+    const parsedOrderData = OrderRequestSchema.parse(orderData);
     
     // Call the Genkit flow to handle order creation
-    await createOrderFlow(orderData);
+    const result = await createOrderFlow(parsedOrderData);
     
-    return NextResponse.json({ message: 'Order created successfully' }, { status: 201 });
+    return NextResponse.json({ message: 'Order created successfully', orderId: result.orderId }, { status: 201 });
 
   } catch (error: any) {
     console.error('Order Creation API Error:', error);
-    // Provide a more specific error message if available from the flow
-    const errorMessage = error.message || 'Erreur interne du serveur.';
+    
+    if (error instanceof ZodError) {
+      return NextResponse.json({ message: 'Invalid order data.', details: error.errors }, { status: 400 });
+    }
+
+    // Provide a more specific error message if available from the flow or other sources
+    const errorMessage = error.message || 'An internal server error occurred.';
     return NextResponse.json({ message: errorMessage }, { status: 500 });
   }
 }
