@@ -10,7 +10,7 @@ import { getCollectionsClient, updateCollectionsClient } from '@/lib/collections
 import { getInfoFeaturesClient, updateInfoFeaturesClient } from '@/lib/info-features-client';
 import { getMarqueeClient, updateMarqueeClient } from '@/lib/marquee-client';
 import { getProductCategoriesClient } from '@/lib/products-client';
-import { getOrdersClient, updateOrdersClient } from '@/lib/orders-client';
+import { getOrdersClient, updateOrdersClient, deleteOrderClient } from '@/lib/orders-client';
 import { type Product } from '@/lib/products';
 import { type Slide } from '@/lib/slides';
 import { type Bento } from '@/lib/bento';
@@ -282,20 +282,27 @@ export default function AdminPage() {
     setOrderToDelete(order);
   };
   
-  const confirmDeleteOrder = () => {
+  const confirmDeleteOrder = async () => {
     if (orderToDelete) {
-      // Deleting from Firestore is a destructive action.
-      // Usually, we would archive it instead. For this example, we'll just remove from UI.
-      // To truly delete, we would need a new API endpoint.
-      setOrders(prev => prev.filter(order => order.id !== orderToDelete.id));
-      // We don't mark as dirty because we're not saving this deletion back.
-      setOrderToDelete(null);
-      toast({
-        title: "Commande supprimée (localement)",
-        description: `La commande de ${orderToDelete.customer.name} a été retirée de la vue. La suppression de la base de données n'est pas implémentée.`,
-      });
+      try {
+        await deleteOrderClient(orderToDelete.id);
+        setOrders(prev => prev.filter(order => order.id !== orderToDelete.id));
+        toast({
+          title: "Commande supprimée",
+          description: `La commande de ${orderToDelete.customer.name} a été supprimée avec succès.`,
+        });
+      } catch (error) {
+        toast({
+          title: "Erreur de suppression",
+          description: "La commande n'a pas pu être supprimée.",
+          variant: "destructive",
+        });
+      } finally {
+        setOrderToDelete(null);
+      }
     }
   };
+
 
   const handleAddCategory = () => {
     if (newCategory && !productCategories.includes(newCategory)) {
@@ -784,7 +791,7 @@ export default function AdminPage() {
             <AlertDialogHeader>
                 <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
                 <AlertDialogDescription>
-                    Cette action est irréversible. La commande de "{orderToDelete?.customer.name}" sera définitivement supprimée de la base de données.
+                    Cette action est irréversible. La commande de "{orderToDelete?.customer.name}" sera définitivement supprimée.
                 </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

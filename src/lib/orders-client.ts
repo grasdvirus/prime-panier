@@ -16,6 +16,20 @@ export async function createOrderClient(order: Order): Promise<void> {
   }
 }
 
+export async function deleteOrderClient(orderId: string): Promise<void> {
+  const response = await fetch('/api/orders/delete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: orderId }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({ message: 'Failed to delete order' }));
+    throw new Error(errorData.message);
+  }
+}
+
+
 export async function getOrdersClient(): Promise<Order[]> {
     try {
         const res = await fetch(`/orders.json?v=${new Date().getTime()}`, { cache: 'no-store' });
