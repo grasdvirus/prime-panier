@@ -1,7 +1,7 @@
 
 import 'server-only';
-import { db } from '@/lib/firebase';
-import { collection, addDoc, getDocs, doc, updateDoc, orderBy, query, serverTimestamp, writeBatch } from 'firebase/firestore';
+import { adminDb } from '@/lib/firebase-admin';
+import { FieldValue } from 'firebase-admin/firestore';
 
 export type OrderItem = {
     id: number;
@@ -35,9 +35,14 @@ export type OrderRequest = {
 
 export async function getOrders(): Promise<Order[]> {
     try {
-        const ordersCollection = collection(db, 'orders');
-        const q = query(ordersCollection, orderBy('createdAt', 'desc'));
-        const orderSnapshot = await getDocs(q);
+        const ordersCollection = adminDb.collection('orders');
+        const q = ordersCollection.orderBy('createdAt', 'desc');
+        const orderSnapshot = await q.get();
+
+        if (orderSnapshot.empty) {
+            return [];
+        }
+
         const ordersList = orderSnapshot.docs.map(doc => {
             const data = doc.data();
             return {
@@ -50,12 +55,18 @@ export async function getOrders(): Promise<Order[]> {
         return ordersList;
     } catch (error) {
         console.error('Failed to get orders from Firestore:', error);
-        return [];
+        // Throwing the error is better for API routes to handle the response
+        throw new Error('Failed to retrieve orders from Firestore.');
     }
 }
 
 export async function createOrder(orderRequest: OrderRequest): Promise<void> {
     try {
+        // Basic validation
+        if (!orderRequest.items || orderRequest.items.length === 0) {
+            throw new Error("Cannot create an order with no items.");
+        }
+
         const subtotal = orderRequest.items.reduce((sum, item) => {
             const price = typeof item.price === 'number' ? item.price : 0;
             const quantity = typeof item.quantity === 'number' ? item.quantity : 0;
@@ -70,25 +81,33 @@ export async function createOrder(orderRequest: OrderRequest): Promise<void> {
             items: orderRequest.items,
             total: total,
             status: 'pending',
-            createdAt: serverTimestamp(),
+            createdAt: FieldValue.serverTimestamp(), // Use Admin SDK server timestamp
         };
 
-        await addDoc(collection(db, 'orders'), newOrder);
+        await adminDb.collection('orders').add(newOrder);
 
     } catch (error) {
         console.error('Failed to create order in Firestore:', error);
         // Re-throw the error to be caught by the API route
-        throw new Error('Failed to create order.');
+        throw new Error('Failed to create order in Firestore.');
     }
 }
 
 export async function updateOrders(orders: Order[]): Promise<void> {
     try {
-        const batch = writeBatch(db);
+        if (!orders || orders.length === 0) {
+            return;
+        }
+        const batch = adminDb.batch();
         orders.forEach(order => {
+            if (!order.id) {
+                console.warn("Skipping order with no ID:", order);
+                return;
+            }
             const { id, ...orderData } = order;
             // Note: We don't update createdAt to preserve the original order date
-            const orderRef = doc(db, 'orders', id);
+            const orderRef = adminDb.collection('orders').doc(id);
+            // Only update fields that are meant to be changed from admin, like status
             batch.update(orderRef, { status: orderData.status });
         });
         await batch.commit();
@@ -97,4 +116,3 @@ export async function updateOrders(orders: Order[]): Promise<void> {
         throw new Error('Failed to update orders.');
     }
 }
-
