@@ -62,14 +62,19 @@ export async function getOrders(): Promise<Order[]> {
 
 export async function createOrder(orderRequest: OrderRequest): Promise<void> {
     try {
-        // Basic validation
-        if (!orderRequest.items || orderRequest.items.length === 0) {
-            throw new Error("Cannot create an order with no items.");
+        // Stricter validation
+        if (!orderRequest.customer || 
+            !orderRequest.customer.name ||
+            !orderRequest.customer.phone ||
+            !orderRequest.customer.address ||
+            !orderRequest.items || 
+            orderRequest.items.length === 0) {
+          throw new Error('Invalid or incomplete order data.');
         }
 
         const subtotal = orderRequest.items.reduce((sum, item) => {
-            const price = typeof item.price === 'number' ? item.price : 0;
-            const quantity = typeof item.quantity === 'number' ? item.quantity : 0;
+            const price = typeof item.price === 'number' && !isNaN(item.price) ? item.price : 0;
+            const quantity = typeof item.quantity === 'number' && !isNaN(item.quantity) ? item.quantity : 0;
             return sum + price * quantity;
         }, 0);
         
