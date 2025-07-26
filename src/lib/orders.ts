@@ -32,7 +32,7 @@ export type OrderRequest = Omit<Order, 'total'>;
 
 const ordersFilePath = path.join(process.cwd(), 'public', 'orders.json');
 
-// Ensure the file exists
+// Ensure the file exists, creating it if it doesn't.
 async function ensureFileExists() {
     try {
         await fs.access(ordersFilePath);
@@ -75,7 +75,7 @@ export async function createOrder(orderRequest: OrderRequest): Promise<void> {
     };
 
     orders.unshift(newOrder); // Add to the beginning of the array
-    await fs.writeFile(ordersFilePath, JSON.stringify(orders, null, 2), 'utf-8');
+    await updateOrders(orders); // Use updateOrders to write the file
 }
 
 export async function updateOrders(orders: Order[]): Promise<void> {
