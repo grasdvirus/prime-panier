@@ -1,26 +1,5 @@
 [
   {
-    "id": 1753520681097,
-    "customer": {
-      "name": "christian ange gbadi",
-      "phone": "0704542909",
-      "email": "grasdvirus@gmail.com",
-      "address": "cocody 7e tranche\nimmeuble cgk",
-      "notes": ""
-    },
-    "items": [
-      {
-        "id": 2,
-        "name": "Perruque courte Bob en cheveux humains vietnamiens",
-        "quantity": 1,
-        "price": 140000
-      }
-    ],
-    "total": 145000,
-    "status": "pending",
-    "createdAt": "2025-07-26T09:04:41.097Z"
-  },
-  {
     "id": 1753519818042,
     "customer": {
       "name": "christian ange gbadi",
