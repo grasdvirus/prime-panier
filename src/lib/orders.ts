@@ -27,7 +27,6 @@ export type Order = {
     createdAt: any; // Firestore timestamp
 }
 
-// This is the type that comes from the client form and the API
 export type OrderRequest = {
     customer: OrderCustomer;
     items: OrderItem[];
@@ -48,7 +47,6 @@ export async function getOrders(): Promise<Order[]> {
             return {
                 id: doc.id,
                 ...data,
-                // Convert Firestore Timestamp to a serializable format (ISO string)
                 createdAt: data.createdAt?.toDate().toISOString() || new Date().toISOString(),
             } as Order;
         });
@@ -61,7 +59,6 @@ export async function getOrders(): Promise<Order[]> {
 
 export async function createOrder(orderRequest: OrderRequest): Promise<void> {
     try {
-        // Stricter validation
         if (!orderRequest.customer || 
             !orderRequest.customer.name ||
             !orderRequest.customer.phone ||
@@ -84,15 +81,14 @@ export async function createOrder(orderRequest: OrderRequest): Promise<void> {
             customer: orderRequest.customer,
             items: orderRequest.items,
             total: total,
-            status: 'pending',
-            createdAt: FieldValue.serverTimestamp(), // Use Admin SDK server timestamp
+            status: 'pending' as const,
+            createdAt: FieldValue.serverTimestamp(),
         };
 
         await adminDb.collection('orders').add(newOrder);
 
     } catch (error) {
         console.error('Failed to create order in Firestore:', error);
-        // Re-throw the error to be caught by the API route
         throw new Error('Failed to create order in Firestore.');
     }
 }
@@ -108,9 +104,8 @@ export async function updateOrders(orders: Order[]): Promise<void> {
                 console.warn("Skipping order with no ID:", order);
                 return;
             }
-            const { id, createdAt, ...orderData } = order; // Exclude id and createdAt from the update data
+            const { id, ...orderData } = order;
             const orderRef = adminDb.collection('orders').doc(id);
-            // Only update fields that are meant to be changed from admin
             batch.update(orderRef, { status: orderData.status });
         });
         await batch.commit();
