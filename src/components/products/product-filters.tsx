@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { getProductsClient } from '@/lib/products-client';
 import { cn } from '@/lib/utils';
-import { LayoutGrid, Shirt, Headphones, Home } from 'lucide-react';
+import { LayoutGrid, Shirt, Headphones, Home, Package } from 'lucide-react';
 
 interface ProductFiltersProps {
   filters: { category: string; };
@@ -20,14 +20,19 @@ async function getCategoriesClient(): Promise<string[]> {
     }
 }
 
+// TODO: This should be read from a config file or similar
 const categoryIcons: { [key: string]: React.ReactNode } = {
   all: <LayoutGrid />,
   'Vêtements': <Shirt />,
   'Accessoires': <Headphones />,
   'Tech': <Headphones />,
   'Maison': <Home />,
+  'Package': <Package />, // Generic icon
 };
 
+const getIconForCategory = (category: string) => {
+    return categoryIcons[category] || <Package />;
+};
 
 export function ProductFilters({ filters, setFilters }: ProductFiltersProps) {
     const [categories, setCategories] = useState<string[]>(['all']);
@@ -57,7 +62,7 @@ export function ProductFilters({ filters, setFilters }: ProductFiltersProps) {
             )}
            >
               <span className="filter-link-icon">
-                {categoryIcons[category] || <LayoutGrid />}
+                {getIconForCategory(category)}
               </span>
               <span className="filter-link-title">{category === 'all' ? 'Tous' : category}</span>
             </a>

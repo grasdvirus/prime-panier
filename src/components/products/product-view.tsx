@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { type Product } from '@/lib/products';
+import { type Product, type ProductReview } from '@/lib/products';
 import { Button } from '@/components/ui/button';
 import {
   Carousel,
@@ -14,17 +14,48 @@ import {
 } from '@/components/ui/carousel';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Star, ShoppingCart, ArrowLeft } from 'lucide-react';
+import { CheckCircle, Star, ShoppingCart, ArrowLeft, MessageSquare, UserCircle } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useCart } from '@/contexts/cart-context';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { formatDistanceToNow } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 interface ProductViewProps {
   product: Product;
 }
 
+const ReviewCard = ({ review }: { review: ProductReview }) => (
+  <div className="flex gap-4">
+    <Avatar>
+      <AvatarFallback>
+        <UserCircle />
+      </AvatarFallback>
+    </Avatar>
+    <div className="flex-1">
+      <div className="flex items-center justify-between">
+        <p className="font-semibold">{review.author}</p>
+        <p className="text-xs text-muted-foreground">
+          {formatDistanceToNow(new Date(review.date), { addSuffix: true, locale: fr })}
+        </p>
+      </div>
+      <div className="flex items-center gap-1 mt-1">
+        {[...Array(5)].map((_, i) => (
+          <Star
+            key={i}
+            className={`w-4 h-4 ${i < review.rating ? 'text-primary fill-primary' : 'text-muted-foreground/50'}`}
+          />
+        ))}
+      </div>
+      <p className="text-muted-foreground mt-2 text-sm">{review.comment}</p>
+    </div>
+  </div>
+);
+
 export function ProductView({ product }: ProductViewProps) {
   const { addItem } = useCart();
   const router = useRouter();
+  const reviews = product.reviews || [];
 
   const handleAddToCart = () => {
     addItem(product);
@@ -76,7 +107,7 @@ export function ProductView({ product }: ProductViewProps) {
                         <Star key={i} className={`w-5 h-5 ${i < Math.round(product.rating) ? 'text-primary fill-primary' : 'text-muted-foreground'}`} />
                     ))}
                 </div>
-                <span>({product.reviews} avis)</span>
+                <span>({reviews.length} avis)</span>
             </div>
           </div>
           <p className="text-muted-foreground leading-relaxed">{product.description}</p>
@@ -101,6 +132,22 @@ export function ProductView({ product }: ProductViewProps) {
           </div>
         </div>
       </div>
+      <Separator className="my-12" />
+        <div>
+            <h2 className="text-2xl font-bold tracking-tight mb-6 flex items-center gap-2">
+                <MessageSquare />
+                Avis des clients ({reviews.length})
+            </h2>
+            {reviews.length > 0 ? (
+                <div className="space-y-6">
+                {reviews.map((review) => (
+                    <ReviewCard key={review.id} review={review} />
+                ))}
+                </div>
+            ) : (
+                <p className="text-muted-foreground">Il n'y a pas encore d'avis pour ce produit.</p>
+            )}
+        </div>
     </div>
   );
 }

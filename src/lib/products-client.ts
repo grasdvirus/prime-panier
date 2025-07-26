@@ -10,7 +10,10 @@ export async function getProductsClient(): Promise<Product[]> {
             console.error('Failed to fetch products.json:', response.statusText);
             return [];
         }
-        return await response.json();
+        const products: Product[] = await response.json();
+         // Ensure reviews is always an array
+        return products.map(p => ({ ...p, reviews: p.reviews || [] }));
+
     } catch (error) {
         console.error('Failed to read or parse products.json:', error);
         return [];

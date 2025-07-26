@@ -11,13 +11,14 @@ import { getInfoFeaturesClient, updateInfoFeaturesClient } from '@/lib/info-feat
 import { getMarqueeClient, updateMarqueeClient } from '@/lib/marquee-client';
 import { getProductCategoriesClient } from '@/lib/products-client';
 import { getOrdersClient, updateOrderClient, deleteOrderClient } from '@/lib/orders-client';
-import { type Product } from '@/lib/products';
+import { type Product, type ProductReview } from '@/lib/products';
 import { type Slide } from '@/lib/slides';
 import { type Bento } from '@/lib/bento';
 import { type Collection } from '@/lib/collections';
 import { type InfoFeature } from '@/lib/info-features';
 import { type Marquee } from '@/lib/marquee';
 import { type Order } from '@/lib/orders';
+import { type Message } from '@/app/api/contact/route';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -25,7 +26,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, PlusCircle, Trash2, Package, RefreshCw } from 'lucide-react';
+import { Loader2, PlusCircle, Trash2, Package, RefreshCw, Shirt, Headphones, Home, Star, Edit, MessageSquare, Check, X, Mail } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ImageUpload } from '@/components/admin/image-upload';
 import {
@@ -57,14 +58,34 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 type SaveStatus = 'idle' | 'dirty' | 'saving' | 'success';
+
+async function getMessagesClient(): Promise<Message[]> {
+    try {
+        const res = await fetch(`/messages.json?v=${new Date().getTime()}`, { cache: 'no-store' });
+        if (!res.ok && res.status === 404) return [];
+        return await res.json();
+    } catch {
+        return [];
+    }
+}
+async function updateMessagesClient(messages: Message[]): Promise<void> {
+  await fetch('/api/messages/update', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(messages),
+  });
+}
+
+const emptyReview: ProductReview = { id: 0, author: '', rating: 5, comment: '', date: '' };
 
 export default function AdminPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   
-  // Data states
   const [products, setProducts] = useState<Product[]>([]);
   const [slides, setSlides] = useState<Slide[]>([]);
   const [bentoItems, setBentoItems] = useState<Bento[]>([]);
@@ -73,15 +94,16 @@ export default function AdminPage() {
   const [marquee, setMarquee] = useState<Marquee>({ messages: [] });
   const [productCategories, setProductCategories] = useState<string[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   
-  // UI states
   const [loading, setLoading] = useState(true);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [bentoItemToDelete, setBentoItemToDelete] = useState<Bento | null>(null);
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
   const [isAddCategoryDialogOpen, setIsAddCategoryDialogOpen] = useState(false);
-  const [newCategory, setNewCategory] = useState('');
+  const [newCategory, setNewCategory] = useState({ name: '', icon: 'Package' });
+  const [editingReview, setEditingReview] = useState<{ product: Product, review: ProductReview } | null>(null);
   
   const notificationSoundRef = useRef<HTMLAudioElement | null>(null);
   const lastOrderCountRef = useRef<number>(0);
@@ -113,6 +135,15 @@ export default function AdminPage() {
         toast({ title: "Erreur", description: "Impossible de charger les commandes.", variant: "destructive" });
     }
   }, [toast]);
+  
+  const fetchMessages = useCallback(async () => {
+    try {
+        const msgs = await getMessagesClient();
+        setMessages(msgs);
+    } catch (error) {
+        console.error("Failed to fetch messages:", error);
+    }
+  }, []);
 
   useEffect(() => {
     if (!authLoading && user?.email !== 'grasdvirus@gmail.com') {
@@ -127,7 +158,7 @@ export default function AdminPage() {
         async function loadData() {
             setLoading(true);
             try {
-                const [prods, slds, bento, colls, info, marq, cats, ords] = await Promise.all([
+                const [prods, slds, bento, colls, info, marq, cats, ords, msgs] = await Promise.all([
                     getProductsClient(), 
                     getSlidesClient(),
                     getBentoClient(),
@@ -135,7 +166,8 @@ export default function AdminPage() {
                     getInfoFeaturesClient(),
                     getMarqueeClient(),
                     getProductCategoriesClient(),
-                    getOrdersClient()
+                    getOrdersClient(),
+                    getMessagesClient()
                 ]);
                 setProducts(prods.map(p => ({ ...p, images: p.images.length > 0 ? p.images : ['', ''] })));
                 setSlides(slds);
@@ -145,6 +177,7 @@ export default function AdminPage() {
                 setMarquee(marq);
                 setProductCategories(cats);
                 setOrders(ords);
+                setMessages(msgs);
                 lastOrderCountRef.current = ords.length;
                 setSaveStatus('idle');
             } catch (error) {
@@ -156,10 +189,13 @@ export default function AdminPage() {
         }
         loadData();
 
-        const intervalId = setInterval(() => fetchOrders(false), 30000); // Check for new orders every 30 seconds
+        const intervalId = setInterval(() => {
+          fetchOrders(false);
+          fetchMessages();
+        }, 30000); 
         return () => clearInterval(intervalId);
     }
-  }, [user, fetchOrders, toast]);
+  }, [user, fetchOrders, toast, fetchMessages]);
 
   const markAsDirty = () => {
     if (saveStatus === 'idle' || saveStatus === 'success') {
@@ -206,6 +242,19 @@ export default function AdminPage() {
             });
         }
     }
+  };
+  
+  const handleMessageStatusChange = async (messageId: string, read: boolean) => {
+    const updatedMessages = messages.map(msg => msg.id === messageId ? { ...msg, read } : msg);
+    setMessages(updatedMessages);
+    await updateMessagesClient(updatedMessages);
+  };
+  
+  const handleDeleteMessage = async (messageId: string) => {
+    const updatedMessages = messages.filter(msg => msg.id !== messageId);
+    setMessages(updatedMessages);
+    await updateMessagesClient(updatedMessages);
+    toast({ title: "Message supprimé" });
   };
 
   const handleProductImageChange = useCallback((productId: number, imageIndex: number, url: string) => {
@@ -255,7 +304,7 @@ export default function AdminPage() {
       category: productCategories[0] || '',
       rating: 0,
       stock: 0,
-      reviews: 0,
+      reviews: [],
       images: ['', ''],
       features: ['', '', ''],
       data_ai_hint: ''
@@ -323,14 +372,24 @@ export default function AdminPage() {
 
 
   const handleAddCategory = () => {
-    if (newCategory && !productCategories.includes(newCategory)) {
-        const updatedCategories = [...productCategories, newCategory];
+    if (newCategory.name && !productCategories.includes(newCategory.name)) {
+        const updatedCategories = [...productCategories, newCategory.name];
         setProductCategories(updatedCategories);
-        setNewCategory('');
+        
+        const newCollection: Collection = {
+            id: collections.length > 0 ? Math.max(...collections.map(c => c.id)) + 1 : 1,
+            name: newCategory.name,
+            href: `/collections/${newCategory.name}`,
+            image: "https://placehold.co/400x500.png",
+            data_ai_hint: "fashion"
+        }
+        setCollections(prev => [...prev, newCollection]);
+
+        setNewCategory({ name: '', icon: 'Package' });
         setIsAddCategoryDialogOpen(false);
         toast({
             title: "Catégorie ajoutée",
-            description: `La catégorie "${newCategory}" a été ajoutée. N'oubliez pas de sauvegarder.`,
+            description: `La catégorie "${newCategory.name}" a été ajoutée. N'oubliez pas de sauvegarder.`,
         });
         markAsDirty();
     } else {
@@ -357,6 +416,42 @@ export default function AdminPage() {
     markAsDirty();
   };
 
+  const handleSaveReview = () => {
+    if (!editingReview) return;
+    const { product, review } = editingReview;
+    const updatedReview = { ...review, date: review.date || new Date().toISOString() };
+
+    setProducts(prevProducts =>
+      prevProducts.map(p => {
+        if (p.id === product.id) {
+          const existingReviews = p.reviews || [];
+          const isExisting = existingReviews.some(r => r.id === updatedReview.id);
+          const newReviews = isExisting
+            ? existingReviews.map(r => r.id === updatedReview.id ? updatedReview : r)
+            : [...existingReviews, { ...updatedReview, id: Date.now() }];
+          return { ...p, reviews: newReviews };
+        }
+        return p;
+      })
+    );
+    markAsDirty();
+    setEditingReview(null);
+    toast({ title: "Avis enregistré" });
+  };
+  
+  const handleDeleteReview = (productId: number, reviewId: number) => {
+    setProducts(prevProducts =>
+        prevProducts.map(p => {
+            if (p.id === productId) {
+                return { ...p, reviews: (p.reviews || []).filter(r => r.id !== reviewId) };
+            }
+            return p;
+        })
+    );
+    markAsDirty();
+    toast({ title: "Avis supprimé" });
+  };
+
 
   const handleSaveChanges = async () => {
     setSaveStatus('saving');
@@ -375,7 +470,8 @@ export default function AdminPage() {
           updateMarqueeClient(marquee),
       ]);
       await fetchCategories();
-      await fetchOrders(true); // Treat as initial load to reset counter
+      await fetchOrders(true);
+      await fetchMessages();
       toast({
         title: 'Succès',
         description: 'Les données ont été mises à jour.',
@@ -389,7 +485,7 @@ export default function AdminPage() {
         description: 'Impossible de sauvegarder les modifications.',
         variant: 'destructive',
       });
-      setSaveStatus('dirty'); // Revert to dirty if save fails
+      setSaveStatus('dirty'); 
     }
   };
   
@@ -442,6 +538,8 @@ export default function AdminPage() {
     </Select>
   );
 
+  const unreadMessagesCount = messages.filter(m => !m.read).length;
+
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
       <Tabs defaultValue="orders" className="w-full">
@@ -449,7 +547,12 @@ export default function AdminPage() {
             <ScrollArea className="w-full sm:w-auto">
                 <TabsList className="grid-cols-none">
                     <TabsTrigger value="orders">Commandes ({orders.length})</TabsTrigger>
+                     <TabsTrigger value="messages" className="relative">
+                        Messages ({messages.length})
+                        {unreadMessagesCount > 0 && <Badge variant="destructive" className="absolute -right-2 -top-2 h-5 w-5 justify-center rounded-full p-0 text-xs">{unreadMessagesCount}</Badge>}
+                    </TabsTrigger>
                     <TabsTrigger value="products">Produits</TabsTrigger>
+                    <TabsTrigger value="reviews">Avis Produits</TabsTrigger>
                     <TabsTrigger value="slides">Diaporama</TabsTrigger>
                     <TabsTrigger value="bento">Bento</TabsTrigger>
                     <TabsTrigger value="collections">Collections</TabsTrigger>
@@ -528,6 +631,49 @@ export default function AdminPage() {
             </CardContent>
           </Card>
         </TabsContent>
+        
+        <TabsContent value="messages">
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle>Gestion des Messages</CardTitle>
+                    <Button onClick={fetchMessages} variant="outline" size="icon"><RefreshCw className="h-4 w-4" /></Button>
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-4">
+                        {messages.map(msg => (
+                            <Collapsible key={msg.id} className="border rounded-lg p-4" data-state={msg.read ? 'closed' : 'open'}>
+                                <CollapsibleTrigger className="w-full flex justify-between items-center text-left gap-4">
+                                    <div className="flex items-center gap-3">
+                                       <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-7 w-7"
+                                            onClick={(e) => { e.stopPropagation(); handleMessageStatusChange(msg.id, !msg.read); }}
+                                        >
+                                            {msg.read ? <Mail className="text-muted-foreground" /> : <Mail className="text-primary" />}
+                                        </Button>
+                                        <div>
+                                            <p className="font-bold">{msg.name}</p>
+                                            <p className="text-sm text-muted-foreground">{format(new Date(msg.createdAt), "'le' dd/MM/yyyy 'à' HH:mm", { locale: fr })}</p>
+                                        </div>
+                                    </div>
+                                    <Badge variant={msg.read ? "secondary" : "default"}>{msg.read ? "Lu" : "Non lu"}</Badge>
+                                </CollapsibleTrigger>
+                                <CollapsibleContent className="pt-4 mt-4 border-t">
+                                    <p><strong>Email:</strong> {msg.email}</p>
+                                    <p className="mt-2 whitespace-pre-wrap bg-muted/50 p-3 rounded-md">{msg.message}</p>
+                                    <div className="mt-4 flex justify-end">
+                                        <Button variant="destructive" size="sm" onClick={() => handleDeleteMessage(msg.id)}>
+                                            <Trash2 className="mr-2 h-4 w-4" /> Supprimer
+                                        </Button>
+                                    </div>
+                                </CollapsibleContent>
+                            </Collapsible>
+                        ))}
+                    </div>
+                </CardContent>
+            </Card>
+        </TabsContent>
 
         <TabsContent value="products">
             <Card>
@@ -544,17 +690,25 @@ export default function AdminPage() {
                           <DialogContent>
                             <DialogHeader>
                               <DialogTitle>Ajouter une nouvelle catégorie</DialogTitle>
-                              <DialogDescription>
-                                Cette catégorie sera disponible pour tous les produits.
-                              </DialogDescription>
+                              <DialogDescription>Cette catégorie sera disponible pour tous les produits et collections.</DialogDescription>
                             </DialogHeader>
                             <div className="grid gap-4 py-4">
-                              <Label htmlFor="new-category-name">Nom de la catégorie</Label>
-                              <Input
-                                id="new-category-name"
-                                value={newCategory}
-                                onChange={(e) => setNewCategory(e.target.value)}
-                              />
+                                <div>
+                                    <Label htmlFor="new-category-name">Nom de la catégorie</Label>
+                                    <Input id="new-category-name" value={newCategory.name} onChange={(e) => setNewCategory(c => ({...c, name: e.target.value}))} />
+                                </div>
+                                <div>
+                                    <Label>Icône</Label>
+                                    <Select value={newCategory.icon} onValueChange={(v) => setNewCategory(c => ({...c, icon: v}))}>
+                                        <SelectTrigger><SelectValue /></SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="Package"><Package className="inline-block mr-2" />Général</SelectItem>
+                                            <SelectItem value="Shirt"><Shirt className="inline-block mr-2" />Vêtements</SelectItem>
+                                            <SelectItem value="Headphones"><Headphones className="inline-block mr-2" />Accessoires</SelectItem>
+                                            <SelectItem value="Home"><Home className="inline-block mr-2" />Maison</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             </div>
                             <DialogFooter>
                               <Button onClick={handleAddCategory}>Ajouter la catégorie</Button>
@@ -637,6 +791,48 @@ export default function AdminPage() {
                             </Card>
                         ))}
                     </div>
+                </CardContent>
+            </Card>
+        </TabsContent>
+        
+        <TabsContent value="reviews">
+            <Card>
+                <CardHeader><CardTitle>Gestion des Avis</CardTitle></CardHeader>
+                <CardContent className="space-y-6">
+                    {products.map(product => (
+                        <Card key={product.id}>
+                            <CardHeader className="flex flex-row justify-between items-start">
+                                <div>
+                                    <CardTitle className="text-lg">{product.name}</CardTitle>
+                                    <p className="text-sm text-muted-foreground">{product.category}</p>
+                                </div>
+                                <Button variant="outline" size="sm" onClick={() => setEditingReview({ product, review: { ...emptyReview, id: Date.now() } })}>
+                                    <PlusCircle className="mr-2 h-4 w-4" /> Ajouter un avis
+                                </Button>
+                            </CardHeader>
+                            <CardContent>
+                                {(product.reviews && product.reviews.length > 0) ? (
+                                <Table>
+                                    <TableHeader><TableRow><TableHead>Auteur</TableHead><TableHead>Note</TableHead><TableHead>Commentaire</TableHead><TableHead>Date</TableHead><TableHead className="text-right">Actions</TableHead></TableRow></TableHeader>
+                                    <TableBody>
+                                        {product.reviews.map(review => (
+                                            <TableRow key={review.id}>
+                                                <TableCell>{review.author}</TableCell>
+                                                <TableCell><div className="flex items-center">{[...Array(5)].map((_, i) => <Star key={i} className={`h-4 w-4 ${i < review.rating ? 'text-primary fill-primary' : 'text-muted-foreground'}`}/>)}</div></TableCell>
+                                                <TableCell className="max-w-xs truncate">{review.comment}</TableCell>
+                                                <TableCell>{format(new Date(review.date), 'dd/MM/yyyy')}</TableCell>
+                                                <TableCell className="text-right">
+                                                    <Button variant="ghost" size="icon" onClick={() => setEditingReview({ product, review })}><Edit className="h-4 w-4" /></Button>
+                                                    <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDeleteReview(product.id, review.id)}><Trash2 className="h-4 w-4" /></Button>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                                ) : <p className="text-sm text-muted-foreground">Aucun avis pour ce produit.</p>}
+                            </CardContent>
+                        </Card>
+                    ))}
                 </CardContent>
             </Card>
         </TabsContent>
@@ -817,6 +1013,40 @@ export default function AdminPage() {
             </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      
+       <Dialog open={!!editingReview} onOpenChange={(open) => !open && setEditingReview(null)}>
+          <DialogContent>
+            <DialogHeader>
+                <DialogTitle>Modifier l'avis</DialogTitle>
+                <DialogDescription>
+                    Modification de l'avis pour le produit : {editingReview?.product.name}
+                </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+                <div className="space-y-2">
+                    <Label htmlFor="review-author">Auteur</Label>
+                    <Input id="review-author" value={editingReview?.review.author || ''} onChange={(e) => setEditingReview(r => r ? { ...r, review: { ...r.review, author: e.target.value } } : null)} />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="review-rating">Note</Label>
+                    <Select value={editingReview?.review.rating.toString() || '5'} onValueChange={(val) => setEditingReview(r => r ? { ...r, review: { ...r.review, rating: Number(val) } } : null)}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                            {[1, 2, 3, 4, 5].map(n => <SelectItem key={n} value={n.toString()}>{n} étoile{n > 1 ? 's' : ''}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="review-comment">Commentaire</Label>
+                    <Textarea id="review-comment" value={editingReview?.review.comment || ''} onChange={(e) => setEditingReview(r => r ? { ...r, review: { ...r.review, comment: e.target.value } } : null)} />
+                </div>
+            </div>
+            <DialogFooter>
+                <Button variant="outline" onClick={() => setEditingReview(null)}>Annuler</Button>
+                <Button onClick={handleSaveReview}>Enregistrer</Button>
+            </DialogFooter>
+          </DialogContent>
+       </Dialog>
 
     </div>
   );

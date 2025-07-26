@@ -159,5 +159,25 @@
       "Boucles légères et naturelles"
     ],
     "data_ai_hint": "black mug"
+  },
+  {
+    "id": 9,
+    "name": "jupe courte, ensemble",
+    "description": "Ensemble 2 pièces sexy d'été pour femmes-Vêtements décontractés-Top et jupe à rayures-Ensemble jupe skinny avec gilet et hanche ",
+    "price": 5500,
+    "category": "Vêtements",
+    "rating": 0,
+    "stock": 200,
+    "reviews": 0,
+    "images": [
+      "/uploads/1753572582535-760940458-H3c39907329e8424f9bd247a169a1141eg.avif",
+      "/uploads/1753572676150-389909311-H2484780e3b4045c4a6204111ea8a7deea.avif"
+    ],
+    "features": [
+      "blanc & noir",
+      "vêtements décontractés",
+      ""
+    ],
+    "data_ai_hint": ""
   }
 ]

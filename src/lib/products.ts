@@ -2,15 +2,23 @@ import 'server-only';
 import fs from 'fs/promises';
 import path from 'path';
 
+export type ProductReview = {
+  id: number;
+  author: string;
+  rating: number;
+  comment: string;
+  date: string; // ISO date string
+}
+
 export type Product = {
   id: number;
   name: string;
   description: string;
   price: number;
-  category: string; // Changed from enum to string to support dynamic categories
+  category: string;
   rating: number;
   stock: number;
-  reviews: number;
+  reviews: ProductReview[];
   images: string[];
   features: string[];
   data_ai_hint: string;
@@ -22,7 +30,8 @@ async function fetchProductsOnServer(): Promise<Product[]> {
     try {
         const fileContent = await fs.readFile(productsFilePath, 'utf-8');
         const products: Product[] = JSON.parse(fileContent);
-        return products;
+        // Ensure reviews is always an array
+        return products.map(p => ({ ...p, reviews: p.reviews || [] }));
     } catch (error) {
         console.error('Failed to read or parse products.json:', error);
         return [];

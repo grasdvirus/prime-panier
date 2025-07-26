@@ -8,6 +8,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { CartProvider } from '@/contexts/cart-context';
 import { AuthProvider } from '@/contexts/auth-context';
 import { Marquee } from '@/components/layout/marquee';
+import { ScrollToTopButton } from '@/components/layout/scroll-to-top-button';
 
 const fontInter = Inter({
   subsets: ['latin'],
@@ -54,6 +55,7 @@ export default function RootLayout({
               <Footer />
             </div>
             <Toaster />
+            <ScrollToTopButton />
           </CartProvider>
         </AuthProvider>
       </body>
