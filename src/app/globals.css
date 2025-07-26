@@ -91,9 +91,10 @@
   ::-webkit-scrollbar-thumb {
     background: hsl(var(--border));
     border-radius: 4px;
+    transition: background-color 0.2s ease-in-out;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: hsl(var(--accent));
+    background: hsl(var(--primary));
   }
 }
 
