@@ -5,7 +5,7 @@ import { z } from 'zod';
  * Utilisable aussi bien côté serveur (route handler) que dans les tests / UI.
  */
 export const OrderItemSchema = z.object({
-  id: z.string(),
+  id: z.union([z.string(), z.number()]).transform(val => val.toString()),
   name: z.string(),
   quantity: z.number().int().positive(),
   price: z.number().positive(),
