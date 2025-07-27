@@ -2,7 +2,7 @@ import admin from 'firebase-admin';
 import 'server-only';
 import dotenv from 'dotenv';
 
-dotenv.config({ path: '.env' });
+dotenv.config({ path: '.env.local' });
 
 let adminApp: admin.app.App;
 
