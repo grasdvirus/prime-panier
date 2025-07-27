@@ -7,15 +7,19 @@ export async function POST(request: Request) {
   try {
     const products: Product[] = await request.json();
     const filePath = path.join(process.cwd(), 'public', 'products.json');
+    
     // Calculate average rating from reviews for each product
     const productsWithRating = products.map(product => {
       const reviews = product.reviews || [];
-      if (reviews.length === 0) {
-        return { ...product, rating: 0 };
-      }
-      const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
-      const averageRating = totalRating / reviews.length;
-      return { ...product, rating: parseFloat(averageRating.toFixed(1)) };
+      const averageRating = reviews.length > 0
+        ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
+        : 0;
+      
+      return { 
+        ...product, 
+        rating: parseFloat(averageRating.toFixed(1)),
+        likes: product.likes || 0 // Ensure likes is initialized
+      };
     });
 
     await fs.writeFile(filePath, JSON.stringify(productsWithRating, null, 2), 'utf-8');

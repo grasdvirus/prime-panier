@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -17,9 +18,11 @@ import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Star, ShoppingCart, ArrowLeft, MessageSquare, UserCircle, Heart } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useCart } from '@/contexts/cart-context';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Avatar, AvatarFallback } from '../ui/avatar';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { useToast } from '@/hooks/use-toast';
+import { cn } from '@/lib/utils';
 
 interface ProductViewProps {
   product: Product;
@@ -55,7 +58,49 @@ const ReviewCard = ({ review }: { review: ProductReview }) => (
 export function ProductView({ product }: ProductViewProps) {
   const { addItem } = useCart();
   const router = useRouter();
+  const { toast } = useToast();
   const reviews = product.reviews || [];
+
+  const [likes, setLikes] = useState(product.likes || 0);
+  const [hasLiked, setHasLiked] = useState(false);
+
+  useEffect(() => {
+    // Check localStorage to see if the user has already liked this product
+    const likedProducts = JSON.parse(localStorage.getItem('likedProducts') || '[]');
+    if (likedProducts.includes(product.id)) {
+      setHasLiked(true);
+    }
+  }, [product.id]);
+
+  const handleLike = async () => {
+    if (hasLiked) {
+      toast({ title: "Déjà fait !", description: "Vous avez déjà aimé ce produit." });
+      return;
+    }
+
+    // Optimistically update UI
+    setLikes(prev => prev + 1);
+    setHasLiked(true);
+
+    // Update localStorage
+    const likedProducts = JSON.parse(localStorage.getItem('likedProducts') || '[]');
+    likedProducts.push(product.id);
+    localStorage.setItem('likedProducts', JSON.stringify(likedProducts));
+
+    // Send request to server
+    try {
+      await fetch(`/api/products/${product.id}/like`, { method: 'POST' });
+    } catch (error) {
+      // Revert optimistic update on failure
+      setLikes(prev => prev - 1);
+      setHasLiked(false);
+      const updatedLiked = JSON.parse(localStorage.getItem('likedProducts') || '[]').filter((id: number) => id !== product.id);
+      localStorage.setItem('likedProducts', JSON.stringify(updatedLiked));
+      
+      toast({ title: "Erreur", description: "Impossible de sauvegarder le 'J'aime'.", variant: "destructive" });
+    }
+  };
+
 
   const handleAddToCart = () => {
     addItem(product);
@@ -101,14 +146,17 @@ export function ProductView({ product }: ProductViewProps) {
             </Link>
             <h1 className="text-3xl md:text-4xl font-bold tracking-tighter font-headline">{product.name}</h1>
             <p className="text-2xl font-semibold text-primary mt-2">{product.price.toLocaleString('fr-FR')} FCFA</p>
-            <div className="flex items-center gap-2 text-muted-foreground mt-2">
-                <div className="flex items-center">
+            <div className="flex items-center gap-4 text-muted-foreground mt-2">
+                <div className="flex items-center gap-2">
                     {[...Array(5)].map((_, i) => (
                         <Star key={i} className={`w-5 h-5 ${i < Math.round(product.rating) ? 'text-primary fill-primary' : 'text-muted-foreground'}`} />
                     ))}
+                    <span>({reviews.length} avis)</span>
                 </div>
-                <span>({reviews.length} avis)</span>
-                <Heart className="w-5 h-5 text-destructive/80" />
+                 <button onClick={handleLike} className={cn("flex items-center gap-1.5 group transition-colors", hasLiked && "text-destructive cursor-not-allowed")}>
+                    <Heart className={cn("w-5 h-5 group-hover:text-destructive/80 transition-colors", hasLiked && "fill-destructive")} />
+                    <span className="font-medium text-sm">{likes}</span>
+                </button>
             </div>
           </div>
           <p className="text-muted-foreground leading-relaxed">{product.description}</p>

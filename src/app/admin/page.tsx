@@ -26,7 +26,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, PlusCircle, Trash2, Package, RefreshCw, Shirt, Headphones, Home, Star, Edit, MessageSquare, Check, X, Mail, Sparkles, ToyBrick, Car, Gamepad2 } from 'lucide-react';
+import { Loader2, PlusCircle, Trash2, Package, RefreshCw, Shirt, Headphones, Home, Star, Edit, MessageSquare, Check, X, Mail, Sparkles, ToyBrick, Car, Gamepad2, Heart } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ImageUpload } from '@/components/admin/image-upload';
 import {
@@ -169,7 +169,7 @@ export default function AdminPage() {
                     getOrdersClient(),
                     getMessagesClient()
                 ]);
-                setProducts(prods.map(p => ({ ...p, images: p.images.length > 0 ? p.images : ['', ''] })));
+                setProducts(prods.map(p => ({ ...p, images: p.images.length > 0 ? p.images : ['', ''], likes: p.likes || 0 })));
                 setSlides(slds);
                 setBentoItems(bento);
                 setCollections(colls);
@@ -307,7 +307,8 @@ export default function AdminPage() {
       reviews: [],
       images: ['', ''],
       features: ['', '', ''],
-      data_ai_hint: ''
+      data_ai_hint: '',
+      likes: 0,
     };
     setProducts(prev => [...prev, newProduct]);
     markAsDirty();
@@ -751,6 +752,10 @@ export default function AdminPage() {
                                     <Input type="number" placeholder="Prix" value={product.price} onChange={e => handleInputChange(setProducts, product.id, 'price', Number(e.target.value))} />
                                     <Input type="number" placeholder="Stock" value={product.stock} onChange={e => handleInputChange(setProducts, product.id, 'stock', Number(e.target.value))} />
                                     <CategorySelector value={product.category} onChange={value => handleInputChange(setProducts, product.id, 'category', value)} />
+                                    <div className="flex items-center gap-2 pt-2">
+                                        <Heart className="h-4 w-4 text-destructive" />
+                                        <Input type="number" placeholder="Likes" value={product.likes} onChange={e => handleInputChange(setProducts, product.id, 'likes', Number(e.target.value))} />
+                                    </div>
                                 </TableCell>
                                 <TableCell><div className="space-y-2">{product.features.map((feature, fIndex) => (<Input key={fIndex} value={feature} placeholder={`Caractéristique ${fIndex + 1}`} onChange={e => handleProductFeatureChange(product.id, fIndex, e.target.value)} />))}</div></TableCell>
                                 <TableCell>
@@ -782,6 +787,13 @@ export default function AdminPage() {
                                         <div><Label>Prix</Label><Input type="number" placeholder="Prix" value={product.price} onChange={e => handleInputChange(setProducts, product.id, 'price', Number(e.target.value))} /></div>
                                         <div><Label>Stock</Label><Input type="number" placeholder="Stock" value={product.stock} onChange={e => handleInputChange(setProducts, product.id, 'stock', Number(e.target.value))} /></div>
                                         <div><Label>Catégorie</Label><CategorySelector value={product.category} onChange={value => handleInputChange(setProducts, product.id, 'category', value)} /></div>
+                                     </div>
+                                      <div>
+                                        <Label>Likes</Label>
+                                        <div className="flex items-center gap-2">
+                                            <Heart className="h-4 w-4 text-destructive" />
+                                            <Input type="number" placeholder="Likes" value={product.likes} onChange={e => handleInputChange(setProducts, product.id, 'likes', Number(e.target.value))} />
+                                        </div>
                                      </div>
                                       <div>
                                         <Label>Caractéristiques</Label>
@@ -825,7 +837,7 @@ export default function AdminPage() {
                                                 <TableCell>{review.author}</TableCell>
                                                 <TableCell><div className="flex items-center">{[...Array(5)].map((_, i) => <Star key={i} className={`h-4 w-4 ${i < review.rating ? 'text-primary fill-primary' : 'text-muted-foreground'}`}/>)}</div></TableCell>
                                                 <TableCell className="max-w-xs truncate">{review.comment}</TableCell>
-                                                <TableCell>{format(new Date(review.date), 'dd/MM/yyyy')}</TableCell>
+                                                <TableCell>{review.date ? format(new Date(review.date), 'dd/MM/yyyy') : 'N/A'}</TableCell>
                                                 <TableCell className="text-right">
                                                     <Button variant="ghost" size="icon" onClick={() => setEditingReview({ product, review })}><Edit className="h-4 w-4" /></Button>
                                                     <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDeleteReview(product.id, review.id)}><Trash2 className="h-4 w-4" /></Button>

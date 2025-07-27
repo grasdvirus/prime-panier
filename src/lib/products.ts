@@ -22,6 +22,7 @@ export type Product = {
   images: string[];
   features: string[];
   data_ai_hint: string;
+  likes: number;
 };
 
 const productsFilePath = path.join(process.cwd(), 'public', 'products.json');
@@ -30,8 +31,8 @@ async function fetchProductsOnServer(): Promise<Product[]> {
     try {
         const fileContent = await fs.readFile(productsFilePath, 'utf-8');
         const products: Product[] = JSON.parse(fileContent);
-        // Ensure reviews is always an array
-        return products.map(p => ({ ...p, reviews: p.reviews || [] }));
+        // Ensure reviews and likes are always present
+        return products.map(p => ({ ...p, reviews: p.reviews || [], likes: p.likes || 0 }));
     } catch (error) {
         console.error('Failed to read or parse products.json:', error);
         return [];
