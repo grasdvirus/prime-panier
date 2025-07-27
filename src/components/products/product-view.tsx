@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/carousel';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Star, ShoppingCart, ArrowLeft, MessageSquare, UserCircle } from 'lucide-react';
+import { CheckCircle, Star, ShoppingCart, ArrowLeft, MessageSquare, UserCircle, Heart } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useCart } from '@/contexts/cart-context';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
@@ -36,7 +36,7 @@ const ReviewCard = ({ review }: { review: ProductReview }) => (
       <div className="flex items-center justify-between">
         <p className="font-semibold">{review.author}</p>
         <p className="text-xs text-muted-foreground">
-          {formatDistanceToNow(new Date(review.date), { addSuffix: true, locale: fr })}
+          {review.date ? formatDistanceToNow(new Date(review.date), { addSuffix: true, locale: fr }) : ''}
         </p>
       </div>
       <div className="flex items-center gap-1 mt-1">
@@ -108,6 +108,7 @@ export function ProductView({ product }: ProductViewProps) {
                     ))}
                 </div>
                 <span>({reviews.length} avis)</span>
+                <Heart className="w-5 h-5 text-destructive/80" />
             </div>
           </div>
           <p className="text-muted-foreground leading-relaxed">{product.description}</p>

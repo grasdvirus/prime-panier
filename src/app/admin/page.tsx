@@ -57,7 +57,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -545,21 +545,21 @@ export default function AdminPage() {
       <Tabs defaultValue="orders" className="w-full">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
             <ScrollArea className="w-full sm:w-auto pb-4">
-                <TabsList className="grid-cols-none">
-                    <TabsTrigger value="orders">Commandes ({orders.length})</TabsTrigger>
-                     <TabsTrigger value="messages" className="relative">
-                        Messages ({messages.length})
-                        {unreadMessagesCount > 0 && <Badge variant="destructive" className="absolute -right-2 -top-2 h-5 w-5 justify-center rounded-full p-0 text-xs">{unreadMessagesCount}</Badge>}
-                    </TabsTrigger>
-                    <TabsTrigger value="products">Produits</TabsTrigger>
-                    <TabsTrigger value="reviews">Avis Produits</TabsTrigger>
-                    <TabsTrigger value="slides">Diaporama</TabsTrigger>
-                    <TabsTrigger value="bento">Bento</TabsTrigger>
-                    <TabsTrigger value="collections">Collections</TabsTrigger>
-                    <TabsTrigger value="info">Info</TabsTrigger>
-                    <TabsTrigger value="marquee">Bandeau</TabsTrigger>
-                </TabsList>
-                 <div className="h-px w-full" />
+              <TabsList className="grid-cols-none">
+                  <TabsTrigger value="orders">Commandes ({orders.length})</TabsTrigger>
+                    <TabsTrigger value="messages" className="relative">
+                      Messages ({messages.length})
+                      {unreadMessagesCount > 0 && <Badge variant="destructive" className="absolute -right-2 -top-2 h-5 w-5 justify-center rounded-full p-0 text-xs">{unreadMessagesCount}</Badge>}
+                  </TabsTrigger>
+                  <TabsTrigger value="products">Produits</TabsTrigger>
+                  <TabsTrigger value="reviews">Avis Produits</TabsTrigger>
+                  <TabsTrigger value="slides">Diaporama</TabsTrigger>
+                  <TabsTrigger value="bento">Bento</TabsTrigger>
+                  <TabsTrigger value="collections">Collections</TabsTrigger>
+                  <TabsTrigger value="info">Info</TabsTrigger>
+                  <TabsTrigger value="marquee">Bandeau</TabsTrigger>
+              </TabsList>
+              <ScrollBar orientation="horizontal" />
             </ScrollArea>
              <Button onClick={handleSaveChanges} disabled={saveStatus === 'saving' || saveStatus === 'idle'} className="w-full sm:w-auto flex-shrink-0">
                 <SaveButtonContent />
