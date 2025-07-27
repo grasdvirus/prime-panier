@@ -5,9 +5,9 @@ import { z } from 'zod';
  * Utilisable aussi bien côté serveur (route handler) que dans les tests / UI.
  */
 export const OrderItemSchema = z.object({
-  productId: z.string(),
-  title: z.string(),
-  qty: z.number().int().positive(),
+  id: z.string(),
+  name: z.string(),
+  quantity: z.number().int().positive(),
   price: z.number().positive(),
 });
 
@@ -27,4 +27,5 @@ export const OrderSchema = z.object({
   createdAt: z.string().optional(), // ISO date
 });
 
+export type OrderItem = z.infer<typeof OrderItemSchema>;
 export type Order = z.infer<typeof OrderSchema>;
