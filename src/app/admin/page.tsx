@@ -26,7 +26,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, PlusCircle, Trash2, Package, RefreshCw, Shirt, Headphones, Home, Star, Edit, MessageSquare, Check, X, Mail, Sparkles, ToyBrick, Car, Gamepad2, Heart } from 'lucide-react';
+import { Loader2, PlusCircle, Trash2, Package, RefreshCw, Shirt, Headphones, Home, Star, Edit, MessageSquare, Mail, Sparkles, ToyBrick, Car, Gamepad2, Heart } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ImageUpload } from '@/components/admin/image-upload';
 import {
@@ -225,7 +225,7 @@ export default function AdminPage() {
       )
     );
     markAsDirty();
-  }, [saveStatus]);
+  }, []);
   
   const handleOrderStatusChange = async (orderId: string, status: Order['status']) => {
     const originalOrders = orders;

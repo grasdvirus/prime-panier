@@ -11,8 +11,8 @@ export async function getProductsClient(): Promise<Product[]> {
             return [];
         }
         const products: Product[] = await response.json();
-         // Ensure reviews is always an array
-        return products.map(p => ({ ...p, reviews: p.reviews || [] }));
+         // Ensure reviews and likes is always an array
+        return products.map(p => ({ ...p, reviews: p.reviews || [], likes: p.likes || 0 }));
 
     } catch (error) {
         console.error('Failed to read or parse products.json:', error);

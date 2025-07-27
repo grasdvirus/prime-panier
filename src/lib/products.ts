@@ -34,6 +34,9 @@ async function fetchProductsOnServer(): Promise<Product[]> {
         // Ensure reviews and likes are always present
         return products.map(p => ({ ...p, reviews: p.reviews || [], likes: p.likes || 0 }));
     } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+            return []; // File doesn't exist, return empty array
+        }
         console.error('Failed to read or parse products.json:', error);
         return [];
     }
