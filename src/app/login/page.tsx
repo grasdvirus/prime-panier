@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,6 +35,20 @@ export default function LoginPage() {
         description: error.message,
         variant: 'destructive',
       });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      router.push('/');
+      toast({ title: 'Connexion Google réussie', description: 'Bienvenue !' });
+    } catch (error: any) {
+      toast({ title: 'Erreur Google', description: error.message, variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -78,6 +92,10 @@ export default function LoginPage() {
             <Button type="submit" className="w-full" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Se connecter
+            </Button>
+            <Button type="button" variant="outline" className="w-full" onClick={handleGoogleLogin} disabled={loading}>
+              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Se connecter avec Google
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">
