@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'next/navigation';
 import { getProductsClient, updateProductsClient } from '@/lib/products-client';
@@ -10,7 +10,7 @@ import { getCollectionsClient, updateCollectionsClient } from '@/lib/collections
 import { getInfoFeaturesClient, updateInfoFeaturesClient } from '@/lib/info-features-client';
 import { getMarqueeClient, updateMarqueeClient } from '@/lib/marquee-client';
 import { getProductCategoriesClient } from '@/lib/products-client';
-import { getOrdersAdmin, updateOrderClient, deleteOrderClient } from '@/lib/orders-client';
+import { updateOrderClient, deleteOrderClient } from '@/lib/orders-client';
 import { type Product, type ProductReview } from '@/lib/products';
 import { type Slide } from '@/lib/slides';
 import { type Bento } from '@/lib/bento';
@@ -26,7 +26,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, PlusCircle, Trash2, Package, RefreshCw, Shirt, Headphones, Home, Star, Edit, MessageSquare, Mail, Sparkles, ToyBrick, Car, Gamepad2, Heart, LogOut } from 'lucide-react';
+import { Loader2, PlusCircle, Trash2, Package, RefreshCw, Shirt, Headphones, Home, Star, Edit, MessageSquare, Mail, Sparkles, ToyBrick, Car, Gamepad2, Heart, LogOut, Image as ImageIcon, LayoutGrid, Layers, ScrollText } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ImageUpload } from '@/components/admin/image-upload';
 import {
@@ -159,6 +159,7 @@ export default function AdminPage() {
   // États principaux
   const [activeTab, setActiveTab] = useState<ActiveTab>('products');
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   
@@ -174,7 +175,6 @@ export default function AdminPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   
   const [loading, setLoading] = useState(true);
-  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [bentoItemToDelete, setBentoItemToDelete] = useState<Bento | null>(null);
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
@@ -184,8 +184,6 @@ export default function AdminPage() {
   
   const notificationSoundRef = useRef<HTMLAudioElement | null>(null);
   const lastOrderCountRef = useRef<number>(0);
-
-  const { toast } = useToast();
 
   const fetchCategories = useCallback(async () => {
     const cats = await getProductCategoriesClient();
@@ -204,7 +202,7 @@ export default function AdminPage() {
                 title: "Nouvelle commande !",
                 description: `Vous avez reçu ${ords.length - lastOrderCountRef.current} nouvelle(s) commande(s).`,
             });
-            notificationSoundRef.current?.play().catch(e => console.error("Error playing sound:", e));
+            notificationSoundRef.current?.play().catch((e: unknown) => console.error("Error playing sound:", e));
         }
         lastOrderCountRef.current = ords.length;
     } catch (error) {

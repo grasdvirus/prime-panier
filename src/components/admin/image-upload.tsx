@@ -164,7 +164,7 @@ export const ImageUpload = ({
     }
   };
 
-  const aspectRatioClasses = {
+  const aspectRatioClass = {
     square: 'aspect-square',
     video: 'aspect-video',
     banner: 'aspect-[16/9]',
@@ -191,7 +191,7 @@ export const ImageUpload = ({
       )}
       
       {isLoading ? (
-        <div className={`${aspectRatioClasses} flex items-center justify-center bg-muted/50 rounded-md`}>
+        <div className={`${aspectRatioClass} flex items-center justify-center bg-muted/50 rounded-md`}>
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       ) : preview ? (
@@ -201,7 +201,7 @@ export const ImageUpload = ({
           onMouseLeave={() => setIsHovered(false)}
           onClick={handleButtonClick}
         >
-          <div className={`${aspectRatioClasses} rounded-md overflow-hidden border bg-muted/25`}>
+          <div className={`${aspectRatioClass} rounded-md overflow-hidden border bg-muted/25`}>
             <img 
               src={preview} 
               alt="Aperçu" 
@@ -293,7 +293,6 @@ export const ImageUpload = ({
               'absolute right-0 top-0 h-full px-3',
               'text-muted-foreground hover:text-destructive',
               'transition-colors',
-              'opacity-0 group-hover:opacity-100',
               'focus-visible:ring-2 focus-visible:ring-offset-2',
               'disabled:opacity-50 disabled:cursor-not-allowed'
             )}
@@ -302,32 +301,19 @@ export const ImageUpload = ({
           >
             <X className="h-4 w-4" />
           </Button>
-          {value && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              onClick={() => !disabled && onChange('')}
-              disabled={disabled || isLoading}
-              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-            >
-              <X className="h-4 w-4" />
-              <span className="sr-only">Supprimer</span>
-            </Button>
-          )}
-        </div>
+        )}
       </div>
 
       {/* Preview */}
       <div
         className={cn(
           'relative w-full rounded-lg border bg-muted/50 overflow-hidden flex items-center justify-center transition-all',
-          aspectRatioClasses[aspectRatio],
+          aspectRatioClass,
           value ? 'min-h-[200px]' : 'min-h-[150px]',
           disabled && 'opacity-50 cursor-not-allowed'
         )}
-        onMouseEnter={() => !disabled && setIsHovering(true)}
-        onMouseLeave={() => setIsHovering(false)}
+        onMouseEnter={() => !disabled && setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
         {value ? (
           <>
@@ -340,7 +326,7 @@ export const ImageUpload = ({
               priority={false}
             />
 
-            {(isHovering || isLoading) && (
+            {(isHovered || isLoading) && (
               <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center gap-2 p-4 text-center">
                 {isLoading ? (
                   <div className="flex flex-col items-center">
