@@ -2,8 +2,7 @@ import admin from 'firebase-admin';
 import 'server-only';
 import dotenv from 'dotenv';
 
-// Load environment variables from .env file
-dotenv.config();
+dotenv.config({ path: '.env' });
 
 let adminApp: admin.app.App;
 
@@ -34,4 +33,6 @@ if (!admin.apps.length) {
   adminApp = admin.app();
 }
 
-const adminDb = admin
+const adminDb = admin.firestore();
+
+export { adminDb };
