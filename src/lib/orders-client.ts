@@ -1,5 +1,7 @@
 // Client-side functions for orders
 import { type Order } from './orders';
+import { adminDb } from './firebase-admin';
+
 export type { Order };
 
 export async function createOrderClient(order: Order): Promise<void> {

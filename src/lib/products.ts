@@ -27,10 +27,6 @@ export type Product = {
 
 async function fetchProductsOnServer(): Promise<Product[]> {
     try {
-        if (!adminDb) {
-            console.error("Firestore is not initialized.");
-            return [];
-        }
         const productsSnapshot = await adminDb.collection('products').orderBy('id', 'asc').get();
         if (productsSnapshot.empty) {
             return [];

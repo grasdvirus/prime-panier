@@ -2,7 +2,6 @@
 import admin from 'firebase-admin';
 import 'server-only';
 
-// This forces the server to load the .env file before doing anything else.
 require('dotenv').config({ path: '.env' });
 
 let adminApp: admin.app.App;

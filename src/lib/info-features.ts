@@ -10,10 +10,6 @@ export type InfoFeature = {
 
 async function fetchInfoFeaturesOnServer(): Promise<InfoFeature[]> {
     try {
-        if (!adminDb) {
-            console.error("Firestore is not initialized.");
-            return [];
-        }
         const featuresSnapshot = await adminDb.collection('infoFeatures').orderBy('id', 'asc').get();
         if (featuresSnapshot.empty) {
             return [];
