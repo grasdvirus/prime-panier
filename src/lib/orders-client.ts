@@ -1,5 +1,6 @@
 // Client-side functions for orders
 import { type Order } from './orders';
+import { adminDb } from './firebase-admin';
 
 export type { Order };
 
@@ -42,21 +43,18 @@ export async function updateOrderClient(order: Order): Promise<void> {
   }
 }
 
-export async function getOrdersClient(): Promise<Order[]> {
+// This function now fetches from Firestore on the server-side for the admin page.
+// The client-side fetch from a JSON file is no longer needed.
+// We will call this from a server component or a route handler.
+export async function getOrdersAdmin(): Promise<Order[]> {
     try {
-        const res = await fetch(`/orders.json?v=${new Date().getTime()}`, { cache: 'no-store' });
-        if (!res.ok) {
-            // If the file doesn't exist (e.g., no orders yet), return an empty array.
-            if (res.status === 404) {
-                return [];
-            }
-            throw new Error('Failed to fetch orders');
+        const ordersSnapshot = await adminDb.collection('orders').orderBy('createdAt', 'desc').get();
+        if (ordersSnapshot.empty) {
+            return [];
         }
-        const orders = await res.json();
-        // Sort orders from newest to oldest
-        return orders.sort((a: Order, b: Order) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        return ordersSnapshot.docs.map(doc => doc.data() as Order);
     } catch (error) {
-        console.error('Error in getOrdersClient:', error);
+        console.error('Error getting orders from Firestore:', error);
         return [];
     }
 }

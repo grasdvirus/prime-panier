@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
-import { type Order } from '@/lib/orders';
+import { adminDb } from '@/lib/firebase-admin';
 
 export async function POST(request: Request) {
   try {
@@ -11,27 +9,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'Order ID is required' }, { status: 400 });
     }
 
-    const filePath = path.join(process.cwd(), 'public', 'orders.json');
-    
-    let orders: Order[] = [];
-    try {
-      const fileContent = await fs.readFile(filePath, 'utf-8');
-      orders = JSON.parse(fileContent);
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-        // File doesn't exist, so nothing to delete.
-        return NextResponse.json({ message: 'Order not found' }, { status: 404 });
-      }
-      throw error;
-    }
+    const orderRef = adminDb.collection('orders').doc(orderIdToDelete);
+    const doc = await orderRef.get();
 
-    const updatedOrders = orders.filter(order => order.id !== orderIdToDelete);
-
-    if (orders.length === updatedOrders.length) {
+    if (!doc.exists) {
         return NextResponse.json({ message: 'Order not found' }, { status: 404 });
     }
 
-    await fs.writeFile(filePath, JSON.stringify(updatedOrders, null, 2), 'utf-8');
+    await orderRef.delete();
 
     return NextResponse.json({ message: 'Order deleted successfully' });
   } catch (error: any) {

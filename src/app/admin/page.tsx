@@ -10,7 +10,7 @@ import { getCollectionsClient, updateCollectionsClient } from '@/lib/collections
 import { getInfoFeaturesClient, updateInfoFeaturesClient } from '@/lib/info-features-client';
 import { getMarqueeClient, updateMarqueeClient } from '@/lib/marquee-client';
 import { getProductCategoriesClient } from '@/lib/products-client';
-import { getOrdersClient, updateOrderClient, deleteOrderClient } from '@/lib/orders-client';
+import { getOrdersAdmin, updateOrderClient, deleteOrderClient } from '@/lib/orders-client';
 import { type Product, type ProductReview } from '@/lib/products';
 import { type Slide } from '@/lib/slides';
 import { type Bento } from '@/lib/bento';
@@ -80,6 +80,16 @@ async function updateMessagesClient(messages: Message[]): Promise<void> {
   });
 }
 
+// New function to fetch orders from a dedicated API route
+async function fetchOrdersFromApi(): Promise<Order[]> {
+    const res = await fetch('/api/orders/get', { cache: 'no-store' });
+    if (!res.ok) {
+        console.error("Failed to fetch orders");
+        return [];
+    }
+    return await res.json();
+}
+
 const emptyReview: ProductReview = { id: 0, author: '', rating: 5, comment: '', date: '' };
 
 export default function AdminPage() {
@@ -117,7 +127,7 @@ export default function AdminPage() {
 
   const fetchOrders = useCallback(async (isInitialLoad = false) => {
     try {
-        const ords = await getOrdersClient();
+        const ords = await fetchOrdersFromApi();
         setOrders(ords);
 
         if (isInitialLoad) {
@@ -166,7 +176,7 @@ export default function AdminPage() {
                     getInfoFeaturesClient(),
                     getMarqueeClient(),
                     getProductCategoriesClient(),
-                    getOrdersClient(),
+                    fetchOrdersFromApi(),
                     getMessagesClient()
                 ]);
                 setProducts(prods.map(p => ({ ...p, images: p.images.length > 0 ? p.images : ['', ''], likes: p.likes || 0 })));
