@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'next/navigation';
 import { getProductsClient, updateProductsClient } from '@/lib/products-client';
@@ -24,9 +24,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, PlusCircle, Trash2, Package, RefreshCw, Shirt, Headphones, Home, Star, Edit, MessageSquare, Mail, Sparkles, ToyBrick, Car, Gamepad2, Heart } from 'lucide-react';
+import { Loader2, PlusCircle, Trash2, Package, RefreshCw, Shirt, Headphones, Home, Star, Edit, MessageSquare, Mail, Sparkles, ToyBrick, Car, Gamepad2, Heart, LogOut } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ImageUpload } from '@/components/admin/image-upload';
 import {
@@ -38,7 +38,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
+} from "@/components/ui/alert-dialog";
 import {
   Dialog,
   DialogContent,
@@ -47,7 +47,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -60,8 +60,12 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
+import { cn } from '@/lib/utils';
 
-type SaveStatus = 'idle' | 'dirty' | 'saving' | 'success';
+type SaveStatus = 'idle' | 'dirty' | 'saving' | 'success' | 'error';
+type ActiveTab = 'products' | 'orders' | 'slides' | 'bento' | 'collections' | 'features' | 'marquee' | 'messages';
 
 async function getMessagesClient(): Promise<Message[]> {
     try {
@@ -92,10 +96,73 @@ async function fetchOrdersFromApi(): Promise<Order[]> {
 
 const emptyReview: ProductReview = { id: 0, author: '', rating: 5, comment: '', date: '' };
 
+// Composant pour afficher un indicateur de chargement
+const LoadingState = ({ message = 'Chargement...' }) => (
+  <div className="flex flex-col items-center justify-center p-8 text-center">
+    <Loader2 className="h-8 w-8 animate-spin mb-4" />
+    <p className="text-muted-foreground">{message}</p>
+  </div>
+);
+
+// Composant pour afficher un message d'erreur
+const ErrorState = ({ message, onRetry }: { message: string; onRetry: () => void }) => (
+  <div className="p-4 bg-destructive/10 border border-destructive/30 rounded-md">
+    <p className="text-destructive mb-4">{message}</p>
+    <Button variant="outline" size="sm" onClick={onRetry}>
+      <RefreshCw className="h-4 w-4 mr-2" />
+      Réessayer
+    </Button>
+  </div>
+);
+
+// Composant pour le bouton d'enregistrement
+const SaveButton = ({ status, onSave }: { status: SaveStatus; onSave: () => void }) => (
+  <Button 
+    onClick={onSave}
+    disabled={status === 'saving' || status === 'idle'}
+    className="min-w-[120px]"
+  >
+    {status === 'saving' ? (
+      <>
+        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+        Enregistrement...
+      </>
+    ) : (
+      'Enregistrer les modifications'
+    )}
+  </Button>
+);
+
+// Composant pour les champs de formulaire avec label
+const FormField = ({ 
+  label, 
+  children, 
+  className = '' 
+}: { 
+  label: string; 
+  children: React.ReactNode; 
+  className?: string;
+}) => (
+  <div className={cn('grid gap-2', className)}>
+    <Label className="text-sm font-medium">{label}</Label>
+    <div dir="rtl" className="[&>*]:w-full">
+      {children}
+    </div>
+  </div>
+);
+
 export default function AdminPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const { toast } = useToast();
   
+  // États principaux
+  const [activeTab, setActiveTab] = useState<ActiveTab>('products');
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Données
   const [products, setProducts] = useState<Product[]>([]);
   const [slides, setSlides] = useState<Slide[]>([]);
   const [bentoItems, setBentoItems] = useState<Bento[]>([]);
@@ -553,29 +620,49 @@ export default function AdminPage() {
 
   return (
     <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
-      <Tabs defaultValue="orders" className="w-full">
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
-            <ScrollArea className="w-full sm:w-auto pb-4">
-              <TabsList className="grid-cols-none">
-                  <TabsTrigger value="orders">Commandes ({orders.length})</TabsTrigger>
-                    <TabsTrigger value="messages" className="relative">
-                      Messages ({messages.length})
-                      {unreadMessagesCount > 0 && <Badge variant="destructive" className="absolute -right-2 -top-2 h-5 w-5 justify-center rounded-full p-0 text-xs">{unreadMessagesCount}</Badge>}
-                  </TabsTrigger>
-                  <TabsTrigger value="products">Produits</TabsTrigger>
-                  <TabsTrigger value="reviews">Avis Produits</TabsTrigger>
-                  <TabsTrigger value="slides">Diaporama</TabsTrigger>
-                  <TabsTrigger value="bento">Bento</TabsTrigger>
-                  <TabsTrigger value="collections">Collections</TabsTrigger>
-                  <TabsTrigger value="info">Info</TabsTrigger>
-                  <TabsTrigger value="marquee">Bandeau</TabsTrigger>
-              </TabsList>
-              <ScrollBar orientation="horizontal" />
-            </ScrollArea>
-             <Button onClick={handleSaveChanges} disabled={saveStatus === 'saving' || saveStatus === 'idle'} className="w-full sm:w-auto flex-shrink-0">
-                <SaveButtonContent />
-            </Button>
-        </div>
+      <Tabs 
+        value={activeTab} 
+        onValueChange={(value) => {
+          setActiveTab(value as ActiveTab);
+          // Réinitialiser l'état de sauvegarde lors du changement d'onglet
+          setSaveStatus('idle');
+        }} 
+        className="space-y-4"
+      >
+        <TabsList className="w-full justify-start overflow-x-auto">
+          <TabsTrigger value="products" className="flex items-center gap-2">
+            <Package className="h-4 w-4" />
+            Produits
+          </TabsTrigger>
+          <TabsTrigger value="orders" className="flex items-center gap-2">
+            <Shirt className="h-4 w-4" />
+            Commandes
+          </TabsTrigger>
+          <TabsTrigger value="slides" className="flex items-center gap-2">
+            <ImageIcon className="h-4 w-4" />
+            Diapositives
+          </TabsTrigger>
+          <TabsTrigger value="bento" className="flex items-center gap-2">
+            <LayoutGrid className="h-4 w-4" />
+            Bento Grid
+          </TabsTrigger>
+          <TabsTrigger value="collections" className="flex items-center gap-2">
+            <Layers className="h-4 w-4" />
+            Collections
+          </TabsTrigger>
+          <TabsTrigger value="features" className="flex items-center gap-2">
+            <Star className="h-4 w-4" />
+            Fonctionnalités
+          </TabsTrigger>
+          <TabsTrigger value="marquee" className="flex items-center gap-2">
+            <ScrollText className="h-4 w-4" />
+            Bandeau
+          </TabsTrigger>
+          <TabsTrigger value="messages" className="flex items-center gap-2">
+            <MessageSquare className="h-4 w-4" />
+            Messages
+          </TabsTrigger>
+        </TabsList>
         
         <TabsContent value="orders">
           <Card>
