@@ -3,17 +3,12 @@
 import { type Slide } from './slides';
 
 export async function getSlidesClient(): Promise<Slide[]> {
-    try {
-        const response = await fetch(`/slides.json?v=${new Date().getTime()}`);
-        if (!response.ok) {
-            console.error('Failed to fetch slides.json:', response.statusText);
-            return [];
-        }
-        return await response.json();
-    } catch (error) {
-        console.error('Failed to read or parse slides.json:', error);
+    const res = await fetch('/api/slides/get', { cache: 'no-store' });
+    if (!res.ok) {
+        console.error('Failed to fetch slides from API:', res.statusText);
         return [];
     }
+    return res.json();
 }
 
 export async function updateSlidesClient(slides: Slide[]): Promise<void> {

@@ -1,6 +1,5 @@
 import 'server-only';
-import fs from 'fs/promises';
-import path from 'path';
+import { adminDb } from './firebase-admin';
 
 export type Collection = {
   id: number;
@@ -12,12 +11,13 @@ export type Collection = {
 
 async function fetchCollectionsOnServer(): Promise<Collection[]> {
     try {
-        const filePath = path.join(process.cwd(), 'public', 'collections.json');
-        const fileContent = await fs.readFile(filePath, 'utf-8');
-        const collections: Collection[] = JSON.parse(fileContent);
-        return collections;
+        const collectionsSnapshot = await adminDb.collection('collections').orderBy('id', 'asc').get();
+        if (collectionsSnapshot.empty) {
+            return [];
+        }
+        return collectionsSnapshot.docs.map(doc => doc.data() as Collection);
     } catch (error) {
-        console.error('Failed to read or parse collections.json:', error);
+        console.error('Failed to fetch collections from Firestore:', error);
         return [];
     }
 }

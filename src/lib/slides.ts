@@ -1,6 +1,5 @@
 import 'server-only';
-import fs from 'fs/promises';
-import path from 'path';
+import { adminDb } from './firebase-admin';
 
 export type Slide = {
   id: number;
@@ -12,12 +11,13 @@ export type Slide = {
 
 async function fetchSlidesOnServer(): Promise<Slide[]> {
     try {
-        const filePath = path.join(process.cwd(), 'public', 'slides.json');
-        const fileContent = await fs.readFile(filePath, 'utf-8');
-        const slides: Slide[] = JSON.parse(fileContent);
-        return slides;
+        const slidesSnapshot = await adminDb.collection('slides').orderBy('id', 'asc').get();
+        if (slidesSnapshot.empty) {
+            return [];
+        }
+        return slidesSnapshot.docs.map(doc => doc.data() as Slide);
     } catch (error) {
-        console.error('Failed to read or parse slides.json:', error);
+        console.error('Failed to fetch slides from Firestore:', error);
         return [];
     }
 }

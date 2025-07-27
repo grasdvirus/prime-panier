@@ -3,17 +3,12 @@
 import { type Bento } from './bento';
 
 export async function getBentoClient(): Promise<Bento[]> {
-    try {
-        const response = await fetch(`/bento.json?v=${new Date().getTime()}`);
-        if (!response.ok) {
-            console.error('Failed to fetch bento.json:', response.statusText);
-            return [];
-        }
-        return await response.json();
-    } catch (error) {
-        console.error('Failed to read or parse bento.json:', error);
+    const res = await fetch('/api/bento/get', { cache: 'no-store' });
+    if (!res.ok) {
+        console.error('Failed to fetch bento items from API:', res.statusText);
         return [];
     }
+    return res.json();
 }
 
 export async function updateBentoClient(bentoItems: Bento[]): Promise<void> {
@@ -22,7 +17,7 @@ export async function updateBentoClient(bentoItems: Bento[]): Promise<void> {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(bentoItems, null, 2),
+    body: JSON.stringify(bentoItems),
   });
 
   if (!response.ok) {

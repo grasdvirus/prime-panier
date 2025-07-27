@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
+import { adminDb } from '@/lib/firebase-admin';
 
 export type Message = {
   id: string;
@@ -28,19 +27,8 @@ export async function POST(request: Request) {
       read: false,
     };
 
-    const filePath = path.join(process.cwd(), 'public', 'messages.json');
-    let messages: Message[] = [];
-    try {
-      const fileContent = await fs.readFile(filePath, 'utf-8');
-      messages = JSON.parse(fileContent);
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
-        throw error;
-      }
-    }
-
-    messages.unshift(newMessage);
-    await fs.writeFile(filePath, JSON.stringify(messages, null, 2), 'utf-8');
+    const messageRef = adminDb.collection('messages').doc(newMessage.id);
+    await messageRef.set(newMessage);
 
     return NextResponse.json({ message: 'Message reçu avec succès !' });
 

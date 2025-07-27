@@ -3,17 +3,12 @@
 import { type Marquee } from './marquee';
 
 export async function getMarqueeClient(): Promise<Marquee> {
-    try {
-        const response = await fetch(`/marquee.json?v=${new Date().getTime()}`);
-        if (!response.ok) {
-            console.error('Failed to fetch marquee.json:', response.statusText);
-            return { messages: [] };
-        }
-        return await response.json();
-    } catch (error) {
-        console.error('Failed to read or parse marquee.json:', error);
+    const res = await fetch('/api/marquee/get', { cache: 'no-store' });
+    if (!res.ok) {
+        console.error('Failed to fetch marquee from API:', res.statusText);
         return { messages: [] };
     }
+    return res.json();
 }
 
 export async function updateMarqueeClient(marquee: Marquee): Promise<void> {
@@ -22,7 +17,7 @@ export async function updateMarqueeClient(marquee: Marquee): Promise<void> {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(marquee, null, 2),
+    body: JSON.stringify(marquee),
   });
 
   if (!response.ok) {

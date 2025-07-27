@@ -3,17 +3,12 @@
 import { type Collection } from './collections';
 
 export async function getCollectionsClient(): Promise<Collection[]> {
-    try {
-        const response = await fetch(`/collections.json?v=${new Date().getTime()}`);
-        if (!response.ok) {
-            console.error('Failed to fetch collections.json:', response.statusText);
-            return [];
-        }
-        return await response.json();
-    } catch (error) {
-        console.error('Failed to read or parse collections.json:', error);
+    const res = await fetch('/api/collections/get', { cache: 'no-store' });
+    if (!res.ok) {
+        console.error('Failed to fetch collections from API:', res.statusText);
         return [];
     }
+    return res.json();
 }
 
 export async function updateCollectionsClient(collections: Collection[]): Promise<void> {
@@ -22,7 +17,7 @@ export async function updateCollectionsClient(collections: Collection[]): Promis
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(collections, null, 2),
+    body: JSON.stringify(collections),
   });
 
   if (!response.ok) {

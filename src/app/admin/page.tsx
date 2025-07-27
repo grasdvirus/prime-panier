@@ -68,13 +68,9 @@ type SaveStatus = 'idle' | 'dirty' | 'saving' | 'success' | 'error';
 type ActiveTab = 'products' | 'orders' | 'slides' | 'bento' | 'collections' | 'features' | 'marquee' | 'messages';
 
 async function getMessagesClient(): Promise<Message[]> {
-    try {
-        const res = await fetch(`/messages.json?v=${new Date().getTime()}`, { cache: 'no-store' });
-        if (!res.ok && res.status === 404) return [];
-        return await res.json();
-    } catch {
-        return [];
-    }
+    const res = await fetch('/api/messages/get', { cache: 'no-store' });
+    if (!res.ok) return [];
+    return await res.json();
 }
 async function updateMessagesClient(messages: Message[]): Promise<void> {
   await fetch('/api/messages/update', {

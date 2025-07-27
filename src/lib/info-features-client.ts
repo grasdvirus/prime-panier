@@ -3,17 +3,12 @@
 import { type InfoFeature } from './info-features';
 
 export async function getInfoFeaturesClient(): Promise<InfoFeature[]> {
-    try {
-        const response = await fetch(`/info-features.json?v=${new Date().getTime()}`);
-        if (!response.ok) {
-            console.error('Failed to fetch info-features.json:', response.statusText);
-            return [];
-        }
-        return await response.json();
-    } catch (error) {
-        console.error('Failed to read or parse info-features.json:', error);
+    const res = await fetch('/api/info-features/get', { cache: 'no-store' });
+    if (!res.ok) {
+        console.error('Failed to fetch info-features from API:', res.statusText);
         return [];
     }
+    return res.json();
 }
 
 export async function updateInfoFeaturesClient(features: InfoFeature[]): Promise<void> {
@@ -22,7 +17,7 @@ export async function updateInfoFeaturesClient(features: InfoFeature[]): Promise
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(features, null, 2),
+    body: JSON.stringify(features),
   });
 
   if (!response.ok) {

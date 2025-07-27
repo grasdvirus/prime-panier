@@ -1,6 +1,5 @@
 import 'server-only';
-import fs from 'fs/promises';
-import path from 'path';
+import { adminDb } from './firebase-admin';
 
 export type ProductReview = {
   id: number;
@@ -25,19 +24,17 @@ export type Product = {
   likes: number;
 };
 
-const productsFilePath = path.join(process.cwd(), 'public', 'products.json');
 
 async function fetchProductsOnServer(): Promise<Product[]> {
     try {
-        const fileContent = await fs.readFile(productsFilePath, 'utf-8');
-        const products: Product[] = JSON.parse(fileContent);
-        // Ensure reviews and likes are always present
+        const productsSnapshot = await adminDb.collection('products').orderBy('id', 'asc').get();
+        if (productsSnapshot.empty) {
+            return [];
+        }
+        const products = productsSnapshot.docs.map(doc => doc.data() as Product);
         return products.map(p => ({ ...p, reviews: p.reviews || [], likes: p.likes || 0 }));
     } catch (error) {
-        if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-            return []; // File doesn't exist, return empty array
-        }
-        console.error('Failed to read or parse products.json:', error);
+        console.error('Failed to fetch products from Firestore:', error);
         return [];
     }
 }

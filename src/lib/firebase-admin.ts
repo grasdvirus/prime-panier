@@ -1,15 +1,15 @@
-
 import admin from 'firebase-admin';
 import 'server-only';
-import 'dotenv/config';
 
+// Check if the app is already initialized
 if (!admin.apps.length) {
   try {
     const serviceAccountString = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
     if (!serviceAccountString) {
-      throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY environment variable is not set or empty.');
+      throw new Error('The FIREBASE_SERVICE_ACCOUNT_KEY environment variable was not found.');
     }
     
+    // Parse the stringified service account key
     const serviceAccount = JSON.parse(serviceAccountString);
     // Replace escaped newlines in private_key for Vercel env vars
     if (typeof serviceAccount.private_key === 'string') {
@@ -19,11 +19,10 @@ if (!admin.apps.length) {
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount)
     });
-
   } catch (error: any) {
-    console.error('Firebase admin initialization error:', error.message);
-    // Ne pas jeter d'erreur ici pour permettre au build de continuer si possible,
-    // mais loguer l'erreur est crucial.
+    console.error('Firebase Admin SDK initialization error:', error.message);
+    // You might want to throw the error in a real-world scenario
+    // or handle it gracefully depending on your application's needs.
   }
 }
 

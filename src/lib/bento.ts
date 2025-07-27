@@ -1,6 +1,5 @@
 import 'server-only';
-import fs from 'fs/promises';
-import path from 'path';
+import { adminDb } from './firebase-admin';
 
 export type Bento = {
   id: number;
@@ -14,12 +13,13 @@ export type Bento = {
 
 async function fetchBentoOnServer(): Promise<Bento[]> {
     try {
-        const filePath = path.join(process.cwd(), 'public', 'bento.json');
-        const fileContent = await fs.readFile(filePath, 'utf-8');
-        const bentoItems: Bento[] = JSON.parse(fileContent);
-        return bentoItems;
+        const bentoSnapshot = await adminDb.collection('bento').orderBy('id', 'asc').get();
+        if (bentoSnapshot.empty) {
+            return [];
+        }
+        return bentoSnapshot.docs.map(doc => doc.data() as Bento);
     } catch (error) {
-        console.error('Failed to read or parse bento.json:', error);
+        console.error('Failed to fetch bento from Firestore:', error);
         return [];
     }
 }

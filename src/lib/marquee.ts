@@ -1,6 +1,5 @@
 import 'server-only';
-import fs from 'fs/promises';
-import path from 'path';
+import { adminDb } from './firebase-admin';
 
 export type Marquee = {
   messages: string[];
@@ -8,12 +7,13 @@ export type Marquee = {
 
 async function fetchMarqueeOnServer(): Promise<Marquee> {
     try {
-        const filePath = path.join(process.cwd(), 'public', 'marquee.json');
-        const fileContent = await fs.readFile(filePath, 'utf-8');
-        const marquee: Marquee = JSON.parse(fileContent);
-        return marquee;
+        const marqueeDoc = await adminDb.collection('singletons').doc('marquee').get();
+        if (!marqueeDoc.exists) {
+            return { messages: [] };
+        }
+        return marqueeDoc.data() as Marquee;
     } catch (error) {
-        console.error('Failed to read or parse marquee.json:', error);
+        console.error('Failed to fetch marquee from Firestore:', error);
         return { messages: [] };
     }
 }

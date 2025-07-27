@@ -1,6 +1,5 @@
 import 'server-only';
-import fs from 'fs/promises';
-import path from 'path';
+import { adminDb } from './firebase-admin';
 
 export type InfoFeature = {
   id: number;
@@ -11,12 +10,13 @@ export type InfoFeature = {
 
 async function fetchInfoFeaturesOnServer(): Promise<InfoFeature[]> {
     try {
-        const filePath = path.join(process.cwd(), 'public', 'info-features.json');
-        const fileContent = await fs.readFile(filePath, 'utf-8');
-        const infoFeatures: InfoFeature[] = JSON.parse(fileContent);
-        return infoFeatures;
+        const featuresSnapshot = await adminDb.collection('infoFeatures').orderBy('id', 'asc').get();
+        if (featuresSnapshot.empty) {
+            return [];
+        }
+        return featuresSnapshot.docs.map(doc => doc.data() as InfoFeature);
     } catch (error) {
-        console.error('Failed to read or parse info-features.json:', error);
+        console.error('Failed to fetch info features from Firestore:', error);
         return [];
     }
 }

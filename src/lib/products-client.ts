@@ -3,21 +3,13 @@
 import { type Product } from './products';
 
 export async function getProductsClient(): Promise<Product[]> {
-    try {
-        // Use a random query param to prevent caching
-        const response = await fetch(`/products.json?v=${new Date().getTime()}`);
-        if (!response.ok) {
-            console.error('Failed to fetch products.json:', response.statusText);
-            return [];
-        }
-        const products: Product[] = await response.json();
-         // Ensure reviews and likes is always an array
-        return products.map(p => ({ ...p, reviews: p.reviews || [], likes: p.likes || 0 }));
-
-    } catch (error) {
-        console.error('Failed to read or parse products.json:', error);
+    const res = await fetch('/api/products/get', { cache: 'no-store' });
+    if (!res.ok) {
+        console.error('Failed to fetch products from API:', res.statusText);
         return [];
     }
+    const products: Product[] = await res.json();
+    return products.map(p => ({ ...p, reviews: p.reviews || [], likes: p.likes || 0 }));
 }
 
 export async function getProductCategoriesClient(): Promise<string[]> {
@@ -39,7 +31,7 @@ export async function updateProductsClient(products: Product[]): Promise<void> {
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(products, null, 2),
+    body: JSON.stringify(products),
   });
 
   if (!response.ok) {
