@@ -1,32 +1,37 @@
 import admin from 'firebase-admin';
 import 'server-only';
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
 
 let adminApp: admin.app.App;
 
 if (!admin.apps.length) {
-  const serviceAccount: admin.ServiceAccount = {
-    projectId: process.env.FIREBASE_PROJECT_ID!,
-    privateKey: (process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n'),
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL!,
-  };
+  const serviceAccountString = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
 
-  if (!serviceAccount.projectId || !serviceAccount.privateKey || !serviceAccount.clientEmail) {
-    throw new Error('Firebase service account environment variables are not set correctly.');
+  if (!serviceAccountString) {
+    throw new Error('The FIREBASE_SERVICE_ACCOUNT_KEY environment variable was not found. The application cannot initialize on the server.');
   }
 
   try {
+    const serviceAccountJson = JSON.parse(serviceAccountString);
+    
+    const serviceAccount: admin.ServiceAccount = {
+      projectId: serviceAccountJson.project_id,
+      privateKey: serviceAccountJson.private_key.replace(/\\n/g, '\n'),
+      clientEmail: serviceAccountJson.client_email,
+    };
+
     adminApp = admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
     });
   } catch (error: any) {
-    console.error('Firebase Admin Initialization Error:', error.message);
-    throw new Error(`Failed to initialize Firebase Admin SDK: ${error.message}`);
+    console.error('Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY or initialize Firebase Admin SDK:', error.message);
+    throw new Error(`Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY or initialize Firebase Admin SDK: ${error.message}`);
   }
 } else {
   adminApp = admin.app();
 }
 
-const adminDb = adminApp.firestore();
-const adminAuth = adminApp.auth();
-
-export { adminDb, adminAuth };
+const adminDb = admin
