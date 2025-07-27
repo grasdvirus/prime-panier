@@ -1,4 +1,4 @@
-// Import the functions you need from the SDKs you need
+// Firebase client SDK (initialised only in the browser)
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
@@ -18,14 +18,16 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
-// Initialize Firebase
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-// Conditionally initialize analytics only on the client side
+let app;
+let auth;
+let db;
 let analytics;
+
 if (typeof window !== 'undefined') {
+  // Initialize Firebase only in the browser
+  app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+  auth = getAuth(app);
+  db = getFirestore(app);
   analytics = getAnalytics(app);
 }
 
