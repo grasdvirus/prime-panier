@@ -22,7 +22,6 @@ if (!admin.apps.length) {
   }
 }
 
-// Assign only if initialization was successful
 adminDb = admin.firestore();
 adminAuth = admin.auth();
 
