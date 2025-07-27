@@ -26,7 +26,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, PlusCircle, Trash2, Package, RefreshCw, Shirt, Headphones, Home, Star, Edit, MessageSquare, Check, X, Mail } from 'lucide-react';
+import { Loader2, PlusCircle, Trash2, Package, RefreshCw, Shirt, Headphones, Home, Star, Edit, MessageSquare, Check, X, Mail, Sparkles, ToyBrick, Car, Gamepad2 } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ImageUpload } from '@/components/admin/image-upload';
 import {
@@ -544,7 +544,7 @@ export default function AdminPage() {
     <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
       <Tabs defaultValue="orders" className="w-full">
         <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
-            <ScrollArea className="w-full sm:w-auto">
+            <ScrollArea className="w-full sm:w-auto pb-4">
                 <TabsList className="grid-cols-none">
                     <TabsTrigger value="orders">Commandes ({orders.length})</TabsTrigger>
                      <TabsTrigger value="messages" className="relative">
@@ -559,6 +559,7 @@ export default function AdminPage() {
                     <TabsTrigger value="info">Info</TabsTrigger>
                     <TabsTrigger value="marquee">Bandeau</TabsTrigger>
                 </TabsList>
+                 <div className="h-px w-full" />
             </ScrollArea>
              <Button onClick={handleSaveChanges} disabled={saveStatus === 'saving' || saveStatus === 'idle'} className="w-full sm:w-auto flex-shrink-0">
                 <SaveButtonContent />
@@ -702,10 +703,14 @@ export default function AdminPage() {
                                     <Select value={newCategory.icon} onValueChange={(v) => setNewCategory(c => ({...c, icon: v}))}>
                                         <SelectTrigger><SelectValue /></SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="Package"><Package className="inline-block mr-2" />Général</SelectItem>
-                                            <SelectItem value="Shirt"><Shirt className="inline-block mr-2" />Vêtements</SelectItem>
-                                            <SelectItem value="Headphones"><Headphones className="inline-block mr-2" />Accessoires</SelectItem>
-                                            <SelectItem value="Home"><Home className="inline-block mr-2" />Maison</SelectItem>
+                                            <SelectItem value="Package"><Package className="inline-block mr-2 h-4 w-4" />Général</SelectItem>
+                                            <SelectItem value="Shirt"><Shirt className="inline-block mr-2 h-4 w-4" />Vêtements</SelectItem>
+                                            <SelectItem value="Headphones"><Headphones className="inline-block mr-2 h-4 w-4" />Accessoires</SelectItem>
+                                            <SelectItem value="Home"><Home className="inline-block mr-2 h-4 w-4" />Maison</SelectItem>
+                                            <SelectItem value="Sparkles"><Sparkles className="inline-block mr-2 h-4 w-4" />Bijoux</SelectItem>
+                                            <SelectItem value="ToyBrick"><ToyBrick className="inline-block mr-2 h-4 w-4" />Jouets</SelectItem>
+                                            <SelectItem value="Car"><Car className="inline-block mr-2 h-4 w-4" />Véhicules</SelectItem>
+                                            <SelectItem value="Gamepad2"><Gamepad2 className="inline-block mr-2 h-4 w-4" />Jeux</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>

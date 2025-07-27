@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { getProductsClient } from '@/lib/products-client';
 import { cn } from '@/lib/utils';
-import { LayoutGrid, Shirt, Headphones, Home, Package } from 'lucide-react';
+import { LayoutGrid, Shirt, Headphones, Home, Package, Sparkles, ToyBrick, Car, Gamepad2 } from 'lucide-react';
 
 interface ProductFiltersProps {
   filters: { category: string; };
@@ -25,12 +25,23 @@ const categoryIcons: { [key: string]: React.ReactNode } = {
   all: <LayoutGrid />,
   'Vêtements': <Shirt />,
   'Accessoires': <Headphones />,
-  'Tech': <Headphones />,
   'Maison': <Home />,
+  'Bijoux': <Sparkles />,
+  'Jouets': <ToyBrick />,
+  'Véhicules': <Car />,
+  'Jeux': <Gamepad2 />,
   'Package': <Package />, // Generic icon
 };
 
 const getIconForCategory = (category: string) => {
+    // This logic needs to be flexible to find icons even if the category name has slight variations
+    const iconKey = Object.keys(categoryIcons).find(key => category.toLowerCase().includes(key.toLowerCase()));
+    if (iconKey) return categoryIcons[iconKey];
+
+    // Fallback logic for keys that might not match directly
+    if (category.toLowerCase().includes('vêtement')) return categoryIcons['Vêtements'];
+    if (category.toLowerCase().includes('accessoire')) return categoryIcons['Accessoires'];
+    
     return categoryIcons[category] || <Package />;
 };
 
