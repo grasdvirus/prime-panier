@@ -11,6 +11,10 @@ export type Collection = {
 
 async function fetchCollectionsOnServer(): Promise<Collection[]> {
     try {
+        if (!adminDb) {
+            console.error("Firestore is not initialized.");
+            return [];
+        }
         const collectionsSnapshot = await adminDb.collection('collections').orderBy('id', 'asc').get();
         if (collectionsSnapshot.empty) {
             return [];

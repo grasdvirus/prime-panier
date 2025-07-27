@@ -27,6 +27,10 @@ export type Product = {
 
 async function fetchProductsOnServer(): Promise<Product[]> {
     try {
+        if (!adminDb) {
+            console.error("Firestore is not initialized.");
+            return [];
+        }
         const productsSnapshot = await adminDb.collection('products').orderBy('id', 'asc').get();
         if (productsSnapshot.empty) {
             return [];
@@ -52,7 +56,7 @@ export async function getProductCategories(): Promise<string[]> {
   const products = await fetchProductsOnServer();
   const categories = products.map(p => p.category);
   // Add default categories if they don't exist
-  const defaultCategories = ['Vêtements', 'Accessoires', 'Tech', 'Maison'];
+  const defaultCategories = ['Vêtements', 'Accessoires', 'Maison', 'Bijoux', 'Jouets', 'Véhicules', 'Jeux'];
   const allCategories = [...new Set([...defaultCategories, ...categories])];
   return allCategories;
 }

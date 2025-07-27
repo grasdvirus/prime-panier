@@ -13,6 +13,10 @@ export type Bento = {
 
 async function fetchBentoOnServer(): Promise<Bento[]> {
     try {
+        if (!adminDb) {
+            console.error("Firestore is not initialized.");
+            return [];
+        }
         const bentoSnapshot = await adminDb.collection('bento').orderBy('id', 'asc').get();
         if (bentoSnapshot.empty) {
             return [];

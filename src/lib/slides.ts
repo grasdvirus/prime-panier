@@ -11,6 +11,10 @@ export type Slide = {
 
 async function fetchSlidesOnServer(): Promise<Slide[]> {
     try {
+        if (!adminDb) {
+            console.error("Firestore is not initialized.");
+            return [];
+        }
         const slidesSnapshot = await adminDb.collection('slides').orderBy('id', 'asc').get();
         if (slidesSnapshot.empty) {
             return [];

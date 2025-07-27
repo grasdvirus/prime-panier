@@ -7,6 +7,10 @@ export type Marquee = {
 
 async function fetchMarqueeOnServer(): Promise<Marquee> {
     try {
+        if (!adminDb) {
+            console.error("Firestore is not initialized.");
+            return { messages: [] };
+        }
         const marqueeDoc = await adminDb.collection('singletons').doc('marquee').get();
         if (!marqueeDoc.exists) {
             return { messages: [] };
