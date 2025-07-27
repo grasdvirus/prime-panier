@@ -10,6 +10,10 @@ if (!admin.apps.length) {
     }
     
     const serviceAccount = JSON.parse(serviceAccountString);
+    // Replace escaped newlines in private_key for Vercel env vars
+    if (typeof serviceAccount.private_key === 'string') {
+      serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+    }
 
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
