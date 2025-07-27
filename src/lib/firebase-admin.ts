@@ -1,3 +1,4 @@
+
 import admin from 'firebase-admin';
 import 'server-only';
 import 'dotenv/config';
@@ -6,7 +7,7 @@ if (!admin.apps.length) {
   try {
     const serviceAccountString = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
     if (!serviceAccountString) {
-      throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY environment variable is not set.');
+      throw new Error('FIREBASE_SERVICE_ACCOUNT_KEY environment variable is not set or empty.');
     }
     
     const serviceAccount = JSON.parse(serviceAccountString);
@@ -16,12 +17,13 @@ if (!admin.apps.length) {
     }
 
     admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+      credential: admin.credential.cert(serviceAccount)
     });
 
   } catch (error: any) {
-    console.error('Firebase admin initialization error', error.stack);
+    console.error('Firebase admin initialization error:', error.message);
+    // Ne pas jeter d'erreur ici pour permettre au build de continuer si possible,
+    // mais loguer l'erreur est crucial.
   }
 }
 
