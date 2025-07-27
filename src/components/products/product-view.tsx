@@ -90,6 +90,7 @@ export function ProductView({ product }: ProductViewProps) {
     // Send request to server
     try {
       await fetch(`/api/products/${product.id}/like`, { method: 'POST' });
+      toast({ title: "Merci !", description: "Votre 'J'aime' a été enregistré."});
     } catch (error) {
       // Revert optimistic update on failure
       setLikes(prev => prev - 1);
