@@ -29,7 +29,7 @@ export default async function Home() {
         <BentoGrid />
       </section>
 
-      <div className="px-4 sm:px-6 lg:px-8 pt-12 md:pt-16 lg:pt-24">
+      <div className="px-4 sm:px-6 lg:px-8 pt-12">
         <ProductGrid products={products} />
       </div>
 
