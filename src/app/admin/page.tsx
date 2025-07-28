@@ -26,7 +26,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, PlusCircle, Trash2, Package, RefreshCw, Shirt, Headphones, Home, Star, Edit, MessageSquare, Mail, Sparkles, ToyBrick, Car, Gamepad2, Heart, LogOut, Image as ImageIcon, LayoutGrid, Layers, ScrollText } from 'lucide-react';
+import { Loader2, PlusCircle, Trash2, Package, RefreshCw, Shirt, Headphones, Home, Star, Edit, MessageSquare, Mail, Sparkles, ToyBrick, Car, Gamepad2, Heart } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ImageUpload } from '@/components/admin/image-upload';
 import {
@@ -178,6 +178,9 @@ export default function AdminPage() {
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [bentoItemToDelete, setBentoItemToDelete] = useState<Bento | null>(null);
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
+  const [slideToDelete, setSlideToDelete] = useState<Slide | null>(null);
+  const [infoFeatureToDelete, setInfoFeatureToDelete] = useState<InfoFeature | null>(null);
+
   const [isAddCategoryDialogOpen, setIsAddCategoryDialogOpen] = useState(false);
   const [newCategory, setNewCategory] = useState({ name: '', icon: 'Package' });
   const [editingReview, setEditingReview] = useState<{ product: Product, review: ProductReview } | null>(null);
@@ -387,7 +390,7 @@ export default function AdminPage() {
       data_ai_hint: '',
       likes: 0,
     };
-    setProducts(prev => [...prev, newProduct]);
+    setProducts(prev => [newProduct, ...prev]);
     markAsDirty();
   };
 
@@ -490,7 +493,7 @@ export default function AdminPage() {
         className: "md:col-span-1",
         data_ai_hint: "item"
     };
-    setBentoItems(prev => [...prev, newBentoItem]);
+    setBentoItems(prev => [newBentoItem, ...prev]);
     markAsDirty();
   };
 
@@ -566,6 +569,76 @@ export default function AdminPage() {
       setSaveStatus('dirty'); 
     }
   };
+
+    const handleAddSlide = () => {
+        const newId = slides.length > 0 ? Math.max(...slides.map(s => s.id)) + 1 : 1;
+        const newSlide: Slide = {
+            id: newId,
+            title: 'Nouveau Titre',
+            description: 'Nouvelle description',
+            imageUrl: 'https://placehold.co/1920x1080.png',
+            data_ai_hint: 'background'
+        };
+        setSlides(prev => [newSlide, ...prev]);
+        markAsDirty();
+    };
+
+    const handleDeleteSlide = (slide: Slide) => {
+        setSlideToDelete(slide);
+    };
+
+    const confirmDeleteSlide = () => {
+        if (slideToDelete) {
+            setSlides(prev => prev.filter(s => s.id !== slideToDelete.id));
+            markAsDirty();
+            setSlideToDelete(null);
+            toast({
+                title: "Diapositive supprimée",
+                description: `La diapositive "${slideToDelete.title}" a été supprimée.`,
+            });
+        }
+    };
+
+    const handleAddInfoFeature = () => {
+        const newId = infoFeatures.length > 0 ? Math.max(...infoFeatures.map(i => i.id)) + 1 : 1;
+        const newFeature: InfoFeature = {
+            id: newId,
+            iconName: 'Lock',
+            title: 'Nouveau Titre',
+            description: 'Nouvelle description'
+        };
+        setInfoFeatures(prev => [...prev, newFeature]);
+        markAsDirty();
+    };
+
+    const handleDeleteInfoFeature = (feature: InfoFeature) => {
+        setInfoFeatureToDelete(feature);
+    };
+
+    const confirmDeleteInfoFeature = () => {
+        if (infoFeatureToDelete) {
+            setInfoFeatures(prev => prev.filter(i => i.id !== infoFeatureToDelete.id));
+            markAsDirty();
+            setInfoFeatureToDelete(null);
+            toast({
+                title: "Élément d'info supprimé",
+                description: `L'élément "${infoFeatureToDelete.title}" a été supprimé.`,
+            });
+        }
+    };
+    
+    const handleAddMarqueeMessage = () => {
+        setMarquee(prev => ({ ...prev, messages: [...prev.messages, 'Nouveau message'] }));
+        markAsDirty();
+    };
+
+    const handleDeleteMarqueeMessage = (index: number) => {
+        setMarquee(prev => ({
+            ...prev,
+            messages: prev.messages.filter((_, i) => i !== index)
+        }));
+        markAsDirty();
+    };
   
   if (authLoading || loading) {
     return (
@@ -953,20 +1026,31 @@ export default function AdminPage() {
 
         <TabsContent value="slides">
             <Card>
-                <CardHeader><CardTitle>Gestion du Diaporama</CardTitle></CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle>Gestion du Diaporama</CardTitle>
+                    <Button onClick={handleAddSlide} variant="outline">
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Ajouter une diapositive
+                    </Button>
+                </CardHeader>
                 <CardContent>
                 <div className="overflow-x-auto">
                     <Table>
-                    <TableHeader><TableRow><TableHead>Titre</TableHead><TableHead>Description</TableHead><TableHead className="w-[350px]">Image</TableHead></TableRow></TableHeader>
-                    <TableBody>
-                        {slides.map((slide) => (
-                        <TableRow key={slide.id}>
-                            <TableCell><Input value={slide.title} onChange={e => handleInputChange(setSlides, slide.id, 'title', e.target.value)} /></TableCell>
-                            <TableCell><Textarea value={slide.description} onChange={e => handleInputChange(setSlides, slide.id, 'description', e.target.value)} /></TableCell>
-                            <TableCell><ImageUpload value={slide.imageUrl} onChange={(url) => handleInputChange(setSlides, slide.id, 'imageUrl', url)}/></TableCell>
-                        </TableRow>
-                        ))}
-                    </TableBody>
+                        <TableHeader><TableRow><TableHead className="w-[350px]">Image</TableHead><TableHead>Titre</TableHead><TableHead>Description</TableHead><TableHead>Action</TableHead></TableRow></TableHeader>
+                        <TableBody>
+                            {slides.map((slide) => (
+                            <TableRow key={slide.id}>
+                                <TableCell><ImageUpload value={slide.imageUrl} onChange={(url) => handleInputChange(setSlides, slide.id, 'imageUrl', url)}/></TableCell>
+                                <TableCell><Input value={slide.title} onChange={e => handleInputChange(setSlides, slide.id, 'title', e.target.value)} /></TableCell>
+                                <TableCell><Textarea value={slide.description} onChange={e => handleInputChange(setSlides, slide.id, 'description', e.target.value)} /></TableCell>
+                                <TableCell>
+                                    <Button variant="destructive" size="icon" onClick={() => handleDeleteSlide(slide)}>
+                                        <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                            ))}
+                        </TableBody>
                     </Table>
                 </div>
                 </CardContent>
@@ -1044,12 +1128,34 @@ export default function AdminPage() {
         
         <TabsContent value="info">
              <Card>
-                <CardHeader><CardTitle>Gestion de la Section Info</CardTitle></CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle>Gestion de la Section Info</CardTitle>
+                    <Button onClick={handleAddInfoFeature} variant="outline">
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Ajouter un élément
+                    </Button>
+                </CardHeader>
                 <CardContent className="space-y-4">
                     {infoFeatures.map(item => (
                          <Card key={item.id} className="p-4">
-                             <h3 className="font-semibold mb-2">{item.title}</h3>
+                            <div className="flex justify-between items-start mb-2">
+                                <h3 className="font-semibold">Élément {item.id}</h3>
+                                <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDeleteInfoFeature(item)}>
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </div>
                              <div className="grid gap-4">
+                                <div className="space-y-2">
+                                    <Label>Icône</Label>
+                                    <Select value={item.iconName} onValueChange={(value: 'Lock' | 'Heart' | 'Phone') => handleInputChange(setInfoFeatures, item.id, 'iconName', value)}>
+                                        <SelectTrigger><SelectValue /></SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="Lock"><Lock className="inline-block mr-2 h-4 w-4" />Paiement Sécurisé</SelectItem>
+                                            <SelectItem value="Heart"><Heart className="inline-block mr-2 h-4 w-4" />Fait avec Amour</SelectItem>
+                                            <SelectItem value="Phone"><Phone className="inline-block mr-2 h-4 w-4" />Support Client</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                                 <div className="space-y-2">
                                     <Label>Titre</Label>
                                     <Input value={item.title} onChange={e => handleInputChange(setInfoFeatures, item.id, 'title', e.target.value)} />
@@ -1067,15 +1173,24 @@ export default function AdminPage() {
         
         <TabsContent value="marquee">
             <Card>
-                <CardHeader><CardTitle>Gestion du Bandeau Défilant</CardTitle></CardHeader>
-                <CardContent className="space-y-2">
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle>Gestion du Bandeau Défilant</CardTitle>
+                    <Button onClick={handleAddMarqueeMessage} variant="outline">
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Ajouter un message
+                    </Button>
+                </CardHeader>
+                <CardContent className="space-y-4">
                     {marquee.messages.map((message, index) => (
-                        <div key={index} className="space-y-2">
-                            <Label>Message {index + 1}</Label>
+                        <div key={index} className="flex items-center gap-2">
                             <Input 
                                 value={message}
                                 onChange={e => handleMarqueeChange(index, e.target.value)}
+                                className="flex-grow"
                             />
+                            <Button variant="destructive" size="icon" onClick={() => handleDeleteMarqueeMessage(index)}>
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
                         </div>
                     ))}
                 </CardContent>
@@ -1128,6 +1243,36 @@ export default function AdminPage() {
         </AlertDialogContent>
       </AlertDialog>
       
+      <AlertDialog open={!!slideToDelete} onOpenChange={(open) => !open && setSlideToDelete(null)}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
+                <AlertDialogDescription>
+                    Cette action est irréversible. La diapositive "{slideToDelete?.title}" sera définitivement supprimée.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setSlideToDelete(null)}>Annuler</AlertDialogCancel>
+                <AlertDialogAction onClick={confirmDeleteSlide}>Supprimer</AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={!!infoFeatureToDelete} onOpenChange={(open) => !open && setInfoFeatureToDelete(null)}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
+                <AlertDialogDescription>
+                    Cette action est irréversible. L'élément d'info "{infoFeatureToDelete?.title}" sera définitivement supprimé.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setInfoFeatureToDelete(null)}>Annuler</AlertDialogCancel>
+                <AlertDialogAction onClick={confirmDeleteInfoFeature}>Supprimer</AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
        <Dialog open={!!editingReview} onOpenChange={(open) => !open && setEditingReview(null)}>
           <DialogContent>
             <DialogHeader>
@@ -1165,4 +1310,6 @@ export default function AdminPage() {
     </div>
   );
 }
+    
+
     
