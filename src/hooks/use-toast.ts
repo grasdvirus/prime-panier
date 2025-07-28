@@ -1,3 +1,4 @@
+
 "use client"
 
 // Inspired by react-hot-toast library
@@ -156,6 +157,7 @@ function toast({ ...props }: Toast) {
     type: "ADD_TOAST",
     toast: {
       ...props,
+      duration: 2000, // Ajout de la durée par défaut de 2 secondes
       id,
       open: true,
       onOpenChange: (open) => {
