@@ -19,17 +19,13 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
   const allProducts = await getProducts();
   const category = decodeURIComponent(params.category);
   
-  const products = allProducts.filter(p => p.category === category);
-
-  if (products.length === 0) {
-    // Optional: You might want to check if the category itself is valid
-    // even if there are no products, to distinguish between an empty
-    // collection and a truly non-existent one.
-    const allCategories = await getProductCategories();
-    if (!allCategories.includes(category)) {
-      notFound();
-    }
+  // First, check if the category is valid at all
+  const allCategories = await getProductCategories();
+  if (!allCategories.includes(category)) {
+    notFound();
   }
+  
+  const products = allProducts.filter(p => p.category === category);
 
   return (
     <div className="w-full space-y-8 px-4 sm:px-6 lg:px-8 py-12">
@@ -39,7 +35,13 @@ export default async function CollectionPage({ params }: CollectionPageProps) {
             Découvrez tous les articles de la collection {category}.
         </p>
       </div>
-      <ProductGrid products={products} />
+      {products.length > 0 ? (
+         <ProductGrid products={products} />
+      ) : (
+        <div className="text-center py-16">
+          <p className="text-muted-foreground">Il n'y a aucun produit dans cette collection pour le moment.</p>
+        </div>
+      )}
     </div>
   );
 }
