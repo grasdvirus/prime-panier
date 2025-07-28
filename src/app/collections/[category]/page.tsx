@@ -8,18 +8,15 @@ type CollectionPageProps = {
   };
 };
 
-export async function generateStaticParams() {
-  const categories = await getProductCategories();
-  return categories.map((category) => ({
-    category: encodeURIComponent(category),
-  }));
-}
+// Suppression de generateStaticParams pour rendre la page entièrement dynamique.
+// Cela évite les erreurs 404 en production si les catégories ne sont pas
+// correctement détectées au moment du build.
 
 export default async function CollectionPage({ params }: CollectionPageProps) {
   const allProducts = await getProducts();
   const category = decodeURIComponent(params.category);
   
-  // First, check if the category is valid at all
+  // On vérifie que la catégorie demandée est une catégorie valide
   const allCategories = await getProductCategories();
   if (!allCategories.includes(category)) {
     notFound();
