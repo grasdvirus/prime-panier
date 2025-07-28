@@ -1,25 +1,30 @@
 
 'use client';
 
-import { ChangeEvent, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import Image from 'next/image';
-import { Input } from '@/components/ui/input';
+import { useDropzone } from 'react-dropzone';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Upload, ImageIcon, X } from 'lucide-react';
+import { Loader2, Upload, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Input } from '@/components/ui/input';
 
 interface ImageUploadProps {
   value: string;
   onChange: (value: string) => void;
+  disabled?: boolean;
 }
 
-export function ImageUpload({ value, onChange }: ImageUploadProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
+export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const MAX_SIZE_MB = 5;
+  const { toast } = useToast();
+  const MAX_SIZE_MB = 10;
 
-  const handleUpload = useCallback(async (file: File) => {
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
+    const file = acceptedFiles[0];
+    if (!file) return;
+
     if (file.size > MAX_SIZE_MB * 1024 * 1024) {
       toast({
         title: 'Fichier trop volumineux',
@@ -30,35 +35,32 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
     }
 
     setIsUploading(true);
-
     try {
       const data = new FormData();
       data.set('file', file);
-
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: data,
-      });
-
-      if (!res.ok) {
-        throw new Error(await res.text());
-      }
-
+      const res = await fetch('/api/upload', { method: 'POST', body: data });
+      if (!res.ok) throw new Error(await res.text());
       const { url } = await res.json();
       onChange(url);
-      toast({
-        title: 'Succès',
-        description: 'Image téléversée avec succès.',
-      });
-    } catch (error: any) {
-      toast({
-        title: 'Erreur',
-        description: `Échec du téléversement de l'image: ${error.message}`,
-        variant: 'destructive',
-      });
+      toast({ title: 'Succès', description: 'Image téléversée.' });
+    } catch (e: any) {
+      toast({ title: 'Erreur', description: e.message, variant: 'destructive' });
     } finally {
       setIsUploading(false);
     }
+  }, [onChange, toast]);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: { 'image/*': [] },
+    multiple: false,
+    disabled: disabled || isUploading,
+  });
+
+  const handleRemoveImage = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+    onChange('');
   };
 
   return (
@@ -66,7 +68,7 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
       <div 
         {...getRootProps()}
         className={cn(
-            'relative w-full aspect-square rounded-md border-2 border-dashed bg-muted/25 flex items-center justify-center text-center p-4 transition-colors',
+            'relative group w-full aspect-square rounded-md border-2 border-dashed bg-muted/25 flex items-center justify-center text-center p-4 transition-colors cursor-pointer',
             isDragActive && 'border-primary bg-primary/10',
             (disabled || isUploading) && 'opacity-50 cursor-not-allowed'
         )}
@@ -81,15 +83,16 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
                     src={value}
                     alt="Aperçu de l'image"
                     fill
-                    className="object-contain"
+                    className="object-contain rounded-md"
                 />
                 <Button 
                     type="button" 
                     variant="destructive" 
                     size="icon" 
-                    className="absolute top-1 right-1 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute top-1 right-1 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity z-10"
                     onClick={handleRemoveImage}
                     aria-label="Supprimer l'image"
+                    disabled={disabled || isUploading}
                 >
                     <X className="h-4 w-4" />
                 </Button>
@@ -98,72 +101,29 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
             <div className="flex flex-col items-center gap-2 text-muted-foreground">
                 <Upload className="h-8 w-8" />
                 <p className="text-sm">Glissez-déposez ou cliquez</p>
-                <p className="text-xs">pour téléverser une image.</p>
+                <p className="text-xs">Taille max: {MAX_SIZE_MB}MB</p>
             </div>
         )}
-
       </div>
-       <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2">
             <Input
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                placeholder="URL de l'image ou téléverser"
+                placeholder="Ou collez une URL d'image ici"
                 className="flex-grow"
+                disabled={disabled || isUploading}
             />
-            <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                className="hidden"
-                accept="image/*"
-            />
-            <Button
+             <Button
                 type="button"
-                variant="outline"
+                variant="destructive"
                 size="icon"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isUploading}
+                onClick={handleRemoveImage}
+                disabled={!value || disabled || isUploading}
             >
-                {isUploading ? <Loader2 className="animate-spin" /> : <Upload />}
-                <span className="sr-only">Téléverser une image</span>
+                <X className="h-4 w-4" />
+                <span className="sr-only">Supprimer l'image</span>
             </Button>
-            {value && (
-                 <Button
-                    type="button"
-                    variant="destructive"
-                    size="icon"
-                    onClick={() => onChange('')}
-                >
-                    <X />
-                    <span className="sr-only">Supprimer l'image</span>
-                </Button>
-            )}
-        </div>
-        <div className="relative w-full h-40 rounded-md border bg-muted/50 overflow-hidden flex items-center justify-center">
-            {value ? (
-                <>
-                    <Image 
-                        src={value} 
-                        alt="Aperçu de l'image" 
-                        fill
-                        className="object-contain"
-                        onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"; // transparent 1x1 pixel
-                            target.srcset = "";
-                            target.parentElement?.querySelector('.fallback-icon')?.classList.remove('hidden');
-                        }}
-                    />
-                    <div className="fallback-icon hidden absolute inset-0 flex items-center justify-center -z-10">
-                        <ImageIcon className="h-10 w-10 text-muted-foreground" />
-                    </div>
-                </>
-            ) : (
-                <div className="flex items-center justify-center">
-                    <ImageIcon className="h-10 w-10 text-muted-foreground" />
-                </div>
-            )}
-        </div>
+      </div>
     </div>
   );
 }
