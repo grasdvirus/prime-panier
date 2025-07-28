@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Send } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function ContactPage() {
   const [name, setName] = useState('');
@@ -54,6 +54,7 @@ export default function ContactPage() {
   return (
     <div className="w-full flex min-h-[80vh] items-center justify-center p-4">
       <div className="bento-card-wrapper max-w-2xl w-full">
+        <form onSubmit={handleSubmit}>
          <Card className="bento-card">
           <CardHeader className="text-center">
             <CardTitle className="text-3xl font-bold tracking-tighter">Contactez-nous</CardTitle>
@@ -61,8 +62,7 @@ export default function ContactPage() {
               Une question, un avis ? N'hésitez pas à nous laisser un message.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+          <CardContent className="space-y-6">
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="name">Nom</Label>
@@ -73,6 +73,7 @@ export default function ContactPage() {
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    disabled={loading}
                   />
                 </div>
                 <div className="space-y-2">
@@ -84,6 +85,7 @@ export default function ContactPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    disabled={loading}
                   />
                 </div>
               </div>
@@ -96,8 +98,11 @@ export default function ContactPage() {
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   rows={5}
+                  disabled={loading}
                 />
               </div>
+          </CardContent>
+          <CardFooter>
               <Button type="submit" className="w-full" size="lg" disabled={loading}>
                 {loading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -106,9 +111,9 @@ export default function ContactPage() {
                 )}
                 Envoyer le message
               </Button>
-            </form>
-          </CardContent>
+          </CardFooter>
         </Card>
+        </form>
       </div>
     </div>
   );

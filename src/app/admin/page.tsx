@@ -692,14 +692,10 @@ export default function AdminPage() {
   const unreadMessagesCount = messages.filter(m => !m.read).length;
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
+    <div className="w-full px-4 sm:px-6 lg:px-8 py-8 pb-24">
       <Tabs 
         value={activeTab} 
-        onValueChange={(value) => {
-          setActiveTab(value as ActiveTab);
-          // Réinitialiser l'état de sauvegarde lors du changement d'onglet
-          setSaveStatus('idle');
-        }} 
+        onValueChange={(value) => setActiveTab(value as ActiveTab)} 
         className="space-y-4"
       >
         <TabsList className="w-full justify-start overflow-x-auto">
@@ -734,6 +730,7 @@ export default function AdminPage() {
           <TabsTrigger value="messages" className="flex items-center gap-2">
             <MessageSquare className="h-4 w-4" />
             Messages
+            {unreadMessagesCount > 0 && <Badge className="ml-2">{unreadMessagesCount}</Badge>}
           </TabsTrigger>
         </TabsList>
         
@@ -1307,6 +1304,11 @@ export default function AdminPage() {
           </DialogContent>
        </Dialog>
 
+        <div className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-sm border-t p-4 flex justify-center z-40">
+            <Button onClick={handleSaveChanges} disabled={saveStatus === 'saving' || saveStatus === 'idle'} size="lg">
+                <SaveButtonContent />
+            </Button>
+        </div>
     </div>
   );
 }
