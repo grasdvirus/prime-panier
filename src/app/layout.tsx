@@ -7,7 +7,6 @@ import { Footer } from '@/components/layout/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { CartProvider } from '@/contexts/cart-context';
 import { AuthProvider } from '@/contexts/auth-context';
-import { Marquee } from '@/components/layout/marquee';
 import { ScrollToTopButton } from '@/components/layout/scroll-to-top-button';
 
 const fontInter = Inter({
@@ -49,9 +48,6 @@ export default function RootLayout({
         <AuthProvider>
           <CartProvider>
             <div className="relative flex min-h-screen flex-col">
-              <div className="px-4 sm:px-6 lg:px-8 mb-4">
-                <Marquee />
-              </div>
               <Header />
               <main className="flex-1 w-full pt-2">{children}</main>
               <Footer />

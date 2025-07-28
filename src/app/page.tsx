@@ -7,6 +7,7 @@ import { BentoGrid } from '@/components/layout/bento-grid';
 import { CollectionCarousel } from '@/components/products/collection-carousel';
 import { InfoSection } from '@/components/layout/info-section';
 import { getCollections } from '@/lib/collections';
+import { Marquee } from '@/components/layout/marquee';
 
 export default async function Home() {
   const products = await getProducts();
@@ -15,6 +16,10 @@ export default async function Home() {
 
   return (
     <div className="w-full space-y-12 md:space-y-16 lg:space-y-24">
+      <div className="px-4 sm:px-6 lg:px-8 mb-4">
+        <Marquee />
+      </div>
+
       <section className="w-full -mt-2">
         <HomepageCarousel slides={slides} />
       </section>
