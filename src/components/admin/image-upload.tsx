@@ -50,8 +50,14 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
       onChange(downloadURL);
       toast({ title: 'Succès', description: 'Image téléversée.' });
     } catch (e: any) {
-      toast({ title: 'Erreur de téléversement', description: e.message || 'Une erreur est survenue', variant: 'destructive' });
-      console.error("Firebase Storage Error:", e);
+        let errorMessage = "Une erreur est survenue lors du téléversement.";
+        if (e.code === 'storage/unauthorized') {
+            errorMessage = "Erreur de permission. Vérifiez les règles de sécurité de Firebase Storage.";
+        } else if (e.code === 'storage/canceled') {
+            errorMessage = "Le téléversement a été annulé.";
+        }
+        toast({ title: 'Erreur de téléversement', description: errorMessage, variant: 'destructive' });
+        console.error("Firebase Storage Error:", e);
     } finally {
       setIsUploading(false);
     }
