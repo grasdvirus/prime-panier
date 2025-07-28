@@ -36,32 +36,21 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
     setIsUploading(true);
     
     try {
-      // 1. Get a signed URL from our API
+      const formData = new FormData();
+      formData.append('file', file);
+
       const res = await fetch('/api/upload', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename: file.name, contentType: file.type }),
+        body: formData,
       });
 
       if (!res.ok) {
-        throw new Error('Impossible d\'obtenir une URL de téléversement signée.');
-      }
-
-      const { uploadUrl, downloadUrl } = await res.json();
-
-      // 2. Upload the file to the signed URL
-      const uploadResponse = await fetch(uploadUrl, {
-        method: 'PUT',
-        body: file,
-        headers: { 'Content-Type': file.type },
-      });
-
-      if (!uploadResponse.ok) {
         throw new Error('Échec du téléversement de l\'image.');
       }
+
+      const { url } = await res.json();
       
-      // 3. Update the form with the final download URL
-      onChange(downloadUrl);
+      onChange(url);
       toast({ title: 'Succès', description: 'Image téléversée.' });
 
     } catch (e: any) {
