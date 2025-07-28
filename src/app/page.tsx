@@ -16,7 +16,7 @@ export default async function Home() {
 
   return (
     <div className="w-full space-y-12 md:space-y-16 lg:space-y-24">
-      <div className="px-4 sm:px-6 lg:px-8 mb-4">
+      <div className="px-4 sm:px-6 lg:px-8 mb-2">
         <Marquee />
       </div>
 
