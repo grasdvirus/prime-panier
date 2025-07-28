@@ -26,7 +26,7 @@ export function ProductGrid({ products }: ProductGridProps) {
   }, [products, filters.category]);
 
   return (
-    <section className="max-w-7xl mx-auto pt-12">
+    <section className="max-w-7xl mx-auto">
       <h2 className="text-3xl font-bold tracking-tighter text-center mb-8">Nouveaux Produits</h2>
       <ProductFilters products={products} filters={filters} setFilters={setFilters} />
       {filteredAndSortedProducts.length > 0 ? (
