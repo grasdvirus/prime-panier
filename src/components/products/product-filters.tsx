@@ -1,6 +1,7 @@
+
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { type Product } from '@/lib/products';
 import { cn } from '@/lib/utils';
 import { LayoutGrid, Shirt, Headphones, Home, Package, Sparkles, ToyBrick, Car, Gamepad2 } from 'lucide-react';
@@ -29,9 +30,14 @@ const getIconForCategory = (category: string) => {
 
 export function ProductFilters({ products, filters, setFilters }: ProductFiltersProps) {
     const categories = useMemo(() => {
-        const productCategories = products.map(p => p.category);
+        const productCategories = products.map(p => p.category).filter(Boolean); // Filter out empty/null categories
         return ['all', ...Array.from(new Set(productCategories))];
     }, [products]);
+
+    // Don't render filters if only "all" is available
+    if (categories.length <= 1) {
+        return null;
+    }
 
     const handleCategoryChange = (category: string) => {
       setFilters(f => ({ ...f, category }));
