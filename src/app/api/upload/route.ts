@@ -1,4 +1,4 @@
-'use server';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { writeFile } from 'fs/promises';
 import { join } from 'path';
@@ -40,3 +40,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: false, message: `Something went wrong: ${error.message}` }, { status: 500 });
   }
 }
+
