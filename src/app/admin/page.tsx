@@ -26,7 +26,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, PlusCircle, Trash2, Package, RefreshCw, Shirt, Headphones, Home, Star, Edit, MessageSquare, Mail, Sparkles, ToyBrick, Car, Gamepad2, Heart } from 'lucide-react';
+import { Loader2, PlusCircle, Trash2, Package, RefreshCw, Shirt, Headphones, Home, Star, Edit, MessageSquare, Mail, Sparkles, ToyBrick, Car, Gamepad2, Heart, ImageIcon, LayoutGrid, Layers, ScrollText, Phone } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ImageUpload } from '@/components/admin/image-upload';
 import {
@@ -1126,7 +1126,7 @@ export default function AdminPage() {
             </Card>
         </TabsContent>
         
-        <TabsContent value="info">
+        <TabsContent value="features">
              <Card>
                 <CardHeader className="flex flex-row items-center justify-between">
                     <CardTitle>Gestion de la Section Info</CardTitle>
@@ -1310,6 +1310,8 @@ export default function AdminPage() {
     </div>
   );
 }
+    
+
     
 
     
