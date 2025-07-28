@@ -9,10 +9,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Upload, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { app } from '@/lib/firebase';
-
-const storage = getStorage(app);
 
 interface ImageUploadProps {
   value: string;
@@ -25,8 +21,7 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
   const { toast } = useToast();
   const MAX_SIZE_MB = 10;
 
-  const onDrop = useCallback(async (acceptedFiles: File[]) => {
-    const file = acceptedFiles[0];
+  const handleUpload = useCallback(async (file: File) => {
     if (!file) return;
 
     if (file.size > MAX_SIZE_MB * 1024 * 1024) {
@@ -37,31 +32,42 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
       });
       return;
     }
-
+    
     setIsUploading(true);
     try {
-      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-      const filename = `${uniqueSuffix}-${file.name}`;
-      const storageRef = ref(storage, `uploads/${filename}`);
+      const data = new FormData();
+      data.set('file', file);
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: data,
+      });
+
+      if (!res.ok) {
+        throw new Error(await res.text());
+      }
       
-      const snapshot = await uploadBytes(storageRef, file);
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      
-      onChange(downloadURL);
-      toast({ title: 'Succès', description: 'Image téléversée.' });
+      const result = await res.json();
+      if (result.success) {
+        onChange(result.path);
+        toast({ title: 'Succès', description: 'Image téléversée.' });
+      } else {
+        throw new Error(result.message || 'La réponse de l\'API a échoué');
+      }
+
     } catch (e: any) {
-        let errorMessage = "Une erreur est survenue lors du téléversement.";
-        if (e.code === 'storage/unauthorized') {
-            errorMessage = "Erreur de permission. Vérifiez les règles de sécurité de Firebase Storage.";
-        } else if (e.code === 'storage/canceled') {
-            errorMessage = "Le téléversement a été annulé.";
-        }
-        toast({ title: 'Erreur de téléversement', description: errorMessage, variant: 'destructive' });
-        console.error("Firebase Storage Error:", e);
+      toast({ title: 'Erreur de téléversement', description: e.message, variant: 'destructive' });
+      console.error("Upload Error:", e);
     } finally {
       setIsUploading(false);
     }
   }, [onChange, toast]);
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    if (acceptedFiles[0]) {
+      handleUpload(acceptedFiles[0]);
+    }
+  }, [handleUpload]);
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
