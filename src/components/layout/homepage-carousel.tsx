@@ -111,7 +111,6 @@ export function HomepageCarousel({ slides }: HomepageCarouselProps) {
                 ))}
             </div>
         </Carousel>
-        <div className="absolute inset-0 pointer-events-none bg-gradient-to-r from-background via-transparent to-background opacity-30" />
     </div>
   );
 }

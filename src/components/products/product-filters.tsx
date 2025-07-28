@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { getProductCategoriesClient } from '@/lib/products-client';
+import React, { useState, useEffect, useMemo } from 'react';
+import { type Product } from '@/lib/products';
 import { cn } from '@/lib/utils';
 import { LayoutGrid, Shirt, Headphones, Home, Package, Sparkles, ToyBrick, Car, Gamepad2 } from 'lucide-react';
 
 interface ProductFiltersProps {
+  products: Product[];
   filters: { category: string; };
   setFilters: React.Dispatch<React.SetStateAction<{ category: string; }>>;
 }
@@ -26,16 +27,11 @@ const getIconForCategory = (category: string) => {
     return categoryIcons[category] || <Package />;
 };
 
-export function ProductFilters({ filters, setFilters }: ProductFiltersProps) {
-    const [categories, setCategories] = useState<string[]>(['all']);
-
-    useEffect(() => {
-        async function fetchCategories() {
-            const fetchedCategories = await getProductCategoriesClient();
-            setCategories(['all', ...Array.from(new Set(fetchedCategories))]);
-        }
-        fetchCategories();
-    }, []);
+export function ProductFilters({ products, filters, setFilters }: ProductFiltersProps) {
+    const categories = useMemo(() => {
+        const productCategories = products.map(p => p.category);
+        return ['all', ...Array.from(new Set(productCategories))];
+    }, [products]);
 
     const handleCategoryChange = (category: string) => {
       setFilters(f => ({ ...f, category }));

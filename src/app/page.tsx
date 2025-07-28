@@ -25,7 +25,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="px-4 sm:px-6 lg:px-8 pt-12 md:pt-16 lg:pt-24">
+      <section className="px-4 sm:px-6 lg:px-8 pt-12">
         <BentoGrid />
       </section>
 
@@ -33,10 +33,10 @@ export default async function Home() {
         <ProductGrid products={products} />
       </div>
 
-      <div className="px-4 sm:px-6 lg:px-8 pt-12 md:pt-16 lg:pt-24">
+      <section className="px-4 sm:px-6 lg:px-8 pt-12 md:pt-16 lg:pt-24">
          <h2 className="text-3xl font-bold tracking-tighter text-center mb-8">Parcourir par collection</h2>
          <CollectionCarousel collections={collections} />
-      </div>
+      </section>
 
       <section className="px-4 sm:px-6 lg:px-8 py-12 md:py-16 lg:py-24">
         <InfoSection />
