@@ -17,7 +17,7 @@ export default async function Home() {
   return (
     <div className="w-full">
       <section>
-        <div className="px-4 sm:px-6 lg:px-8 mb-px">
+        <div className="px-4 sm:px-6 lg:px-8 mb-4">
           <Marquee />
         </div>
         <div className="w-full">

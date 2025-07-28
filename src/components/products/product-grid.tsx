@@ -28,7 +28,6 @@ export function ProductGrid({ products }: ProductGridProps) {
   return (
     <section className="max-w-7xl mx-auto">
       <h2 className="text-3xl font-bold tracking-tighter text-center mb-8">Nouveaux Produits</h2>
-      <ProductFilters filters={filters} setFilters={setFilters} />
       {filteredAndSortedProducts.length > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredAndSortedProducts.map((product) => (
