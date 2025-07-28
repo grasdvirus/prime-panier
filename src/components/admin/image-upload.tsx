@@ -10,7 +10,7 @@ import { Loader2, Upload, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { app } from '@/lib/firebase'; // Importer l'app Firebase
+import { app } from '@/lib/firebase';
 
 const storage = getStorage(app);
 
