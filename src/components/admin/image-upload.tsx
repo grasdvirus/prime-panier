@@ -15,11 +15,18 @@ interface ImageUploadProps {
 export function ImageUpload({ value, onChange }: ImageUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const MAX_SIZE_MB = 5;
 
-  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const handleUpload = useCallback(async (file: File) => {
+    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+      toast({
+        title: 'Fichier trop volumineux',
+        description: `La taille maximale autorisée est de ${MAX_SIZE_MB}MB.`,
+        variant: 'destructive',
+      });
+      return;
+    }
 
     setIsUploading(true);
 
@@ -55,7 +62,47 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
 
   return (
     <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-2">
+      <div 
+        {...getRootProps()}
+        className={cn(
+            'relative w-full aspect-square rounded-md border-2 border-dashed bg-muted/25 flex items-center justify-center text-center p-4 transition-colors',
+            isDragActive && 'border-primary bg-primary/10',
+            (disabled || isUploading) && 'opacity-50 cursor-not-allowed'
+        )}
+      >
+        <input {...getInputProps()} />
+
+        {isUploading ? (
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        ) : value ? (
+            <>
+                <Image
+                    src={value}
+                    alt="Aperçu de l'image"
+                    fill
+                    className="object-contain"
+                />
+                <Button 
+                    type="button" 
+                    variant="destructive" 
+                    size="icon" 
+                    className="absolute top-1 right-1 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={handleRemoveImage}
+                    aria-label="Supprimer l'image"
+                >
+                    <X className="h-4 w-4" />
+                </Button>
+            </>
+        ) : (
+            <div className="flex flex-col items-center gap-2 text-muted-foreground">
+                <Upload className="h-8 w-8" />
+                <p className="text-sm">Glissez-déposez ou cliquez</p>
+                <p className="text-xs">pour téléverser une image.</p>
+            </div>
+        )}
+
+      </div>
+       <div className="flex items-center gap-2">
             <Input
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
