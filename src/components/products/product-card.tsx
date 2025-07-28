@@ -22,13 +22,15 @@ export function ProductCard({ product }: ProductCardProps) {
     addItem(product);
   };
 
+  const imageUrl = product.images?.[0] || 'https://placehold.co/600x600.png';
+
   return (
     <Link href={`/products/${product.id}`} className="group block h-full">
       <div className={cn('bento-card-wrapper h-full')}>
         <Card className="bento-card h-full overflow-hidden transition-all duration-300 group-hover:shadow-xl bg-card border-border/60 relative">
           <div className="aspect-square overflow-hidden relative">
             <Image
-              src={product.images[0]}
+              src={imageUrl}
               alt={product.name}
               width={600}
               height={600}
