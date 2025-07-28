@@ -16,7 +16,7 @@ export async function Marquee() {
   );
 
   return (
-    <div className="w-full bg-secondary text-secondary-foreground py-2">
+    <div className="w-full bg-secondary text-secondary-foreground py-2 rounded-lg">
         <div
             className={cn(
                 "relative flex w-full overflow-x-hidden"

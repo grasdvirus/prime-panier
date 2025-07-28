@@ -49,7 +49,9 @@ export default function RootLayout({
         <AuthProvider>
           <CartProvider>
             <div className="relative flex min-h-screen flex-col">
-              <Marquee />
+              <div className="px-4 sm:px-6 lg:px-8 mb-4">
+                <Marquee />
+              </div>
               <Header />
               <main className="flex-1 w-full pt-2">{children}</main>
               <Footer />
