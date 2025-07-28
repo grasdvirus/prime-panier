@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -18,6 +19,7 @@ export default function ContactPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
 
     try {
@@ -29,8 +31,10 @@ export default function ContactPage() {
         body: JSON.stringify({ name, email, message }),
       });
 
+      const result = await response.json();
+
       if (!response.ok) {
-        throw new Error("Une erreur s'est produite lors de l'envoi du message.");
+        throw new Error(result.message || "Une erreur s'est produite lors de l'envoi du message.");
       }
 
       toast({
@@ -118,3 +122,5 @@ export default function ContactPage() {
     </div>
   );
 }
+
+    

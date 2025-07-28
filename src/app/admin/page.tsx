@@ -58,15 +58,12 @@ import {
 } from "@/components/ui/select";
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { signOut } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
 import { cn } from '@/lib/utils';
 
 type SaveStatus = 'idle' | 'dirty' | 'saving' | 'success' | 'error';
-type ActiveTab = 'products' | 'orders' | 'slides' | 'bento' | 'collections' | 'features' | 'marquee' | 'messages';
+type ActiveTab = 'products' | 'orders' | 'slides' | 'bento' | 'collections' | 'features' | 'marquee' | 'messages' | 'reviews';
 
 async function getMessagesClient(): Promise<Message[]> {
     try {
@@ -97,61 +94,6 @@ async function fetchOrdersFromApi(): Promise<Order[]> {
 
 const emptyReview: ProductReview = { id: 0, author: '', rating: 5, comment: '', date: '' };
 
-// Composant pour afficher un indicateur de chargement
-const LoadingState = ({ message = 'Chargement...' }) => (
-  <div className="flex flex-col items-center justify-center p-8 text-center">
-    <Loader2 className="h-8 w-8 animate-spin mb-4" />
-    <p className="text-muted-foreground">{message}</p>
-  </div>
-);
-
-// Composant pour afficher un message d'erreur
-const ErrorState = ({ message, onRetry }: { message: string; onRetry: () => void }) => (
-  <div className="p-4 bg-destructive/10 border border-destructive/30 rounded-md">
-    <p className="text-destructive mb-4">{message}</p>
-    <Button variant="outline" size="sm" onClick={onRetry}>
-      <RefreshCw className="h-4 w-4 mr-2" />
-      Réessayer
-    </Button>
-  </div>
-);
-
-// Composant pour le bouton d'enregistrement
-const SaveButton = ({ status, onSave }: { status: SaveStatus; onSave: () => void }) => (
-  <Button 
-    onClick={onSave}
-    disabled={status === 'saving' || status === 'idle'}
-    className="min-w-[120px]"
-  >
-    {status === 'saving' ? (
-      <>
-        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-        Enregistrement...
-      </>
-    ) : (
-      'Enregistrer les modifications'
-    )}
-  </Button>
-);
-
-// Composant pour les champs de formulaire avec label
-const FormField = ({ 
-  label, 
-  children, 
-  className = '' 
-}: { 
-  label: string; 
-  children: React.ReactNode; 
-  className?: string;
-}) => (
-  <div className={cn('grid gap-2', className)}>
-    <Label className="text-sm font-medium">{label}</Label>
-    <div dir="rtl" className="[&>*]:w-full">
-      {children}
-    </div>
-  </div>
-);
-
 export default function AdminPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -161,8 +103,7 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('products');
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   
   // Données
   const [products, setProducts] = useState<Product[]>([]);
@@ -175,7 +116,6 @@ export default function AdminPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   
-  const [loading, setLoading] = useState(true);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [bentoItemToDelete, setBentoItemToDelete] = useState<Bento | null>(null);
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
@@ -263,7 +203,7 @@ export default function AdminPage() {
                 setSaveStatus('idle');
             } catch (error) {
                 console.error("Failed to load admin data:", error);
-                toast({ title: "Erreur", description: "Impossible de charger les données de l'administration.", variant: "destructive" });
+                toast({ title: "Erreur de chargement", description: "Impossible de charger les données de l'administration. Veuillez rafraîchir la page.", variant: "destructive" });
             } finally {
                 setLoading(false);
             }
@@ -279,7 +219,7 @@ export default function AdminPage() {
   }, [user, fetchOrders, toast, fetchMessages]);
 
   const markAsDirty = () => {
-    if (saveStatus === 'idle' || saveStatus === 'success') {
+    if (saveStatus === 'idle' || saveStatus === 'success' || saveStatus === 'error') {
       setSaveStatus('dirty');
     }
   }
@@ -563,11 +503,11 @@ export default function AdminPage() {
     } catch (error) {
       console.error('Failed to save data:', error);
       toast({
-        title: 'Erreur',
-        description: 'Impossible de sauvegarder les modifications.',
+        title: 'Erreur de sauvegarde',
+        description: 'Impossible de sauvegarder les modifications. Vérifiez votre connexion et réessayez.',
         variant: 'destructive',
       });
-      setSaveStatus('dirty'); 
+      setSaveStatus('error');
     }
   };
 
@@ -704,6 +644,10 @@ export default function AdminPage() {
             <Package className="h-4 w-4" />
             Produits
           </TabsTrigger>
+           <TabsTrigger value="reviews" className="flex items-center gap-2">
+            <Star className="h-4 w-4" />
+            Avis
+          </TabsTrigger>
           <TabsTrigger value="orders" className="flex items-center gap-2">
             <Shirt className="h-4 w-4" />
             Commandes
@@ -722,7 +666,7 @@ export default function AdminPage() {
           </TabsTrigger>
           <TabsTrigger value="features" className="flex items-center gap-2">
             <Star className="h-4 w-4" />
-            Fonctionnalités
+            Infos
           </TabsTrigger>
           <TabsTrigger value="marquee" className="flex items-center gap-2">
             <ScrollText className="h-4 w-4" />
@@ -814,7 +758,7 @@ export default function AdminPage() {
                             <Collapsible key={msg.id} className="border rounded-lg p-4" data-state={msg.read ? 'closed' : 'open'}>
                                 <CollapsibleTrigger className="w-full flex justify-between items-center text-left gap-4">
                                     <div className="flex items-center gap-3">
-                                       <div
+                                        <div
                                             role="button"
                                             className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-7 w-7"
                                             onClick={(e) => { e.stopPropagation(); handleMessageStatusChange(msg.id, !msg.read); }}
@@ -1306,17 +1250,12 @@ export default function AdminPage() {
        </Dialog>
 
         <div className="fixed bottom-0 left-0 right-0 bg-background/80 backdrop-blur-sm border-t p-4 flex justify-center z-40">
-            <Button onClick={handleSaveChanges} disabled={saveStatus === 'saving' || saveStatus === 'idle'} size="lg">
+            <Button onClick={handleSaveChanges} disabled={saveStatus === 'saving' || saveStatus === 'idle'} size="lg" className="w-full max-w-xs">
                 <SaveButtonContent />
             </Button>
         </div>
     </div>
   );
 }
-    
-
-    
-
-    
 
     
