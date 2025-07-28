@@ -9,6 +9,10 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Upload, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { app } from '@/lib/firebase'; // Importer l'app Firebase
+
+const storage = getStorage(app);
 
 interface ImageUploadProps {
   value: string;
@@ -36,15 +40,18 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
 
     setIsUploading(true);
     try {
-      const data = new FormData();
-      data.set('file', file);
-      const res = await fetch('/api/upload', { method: 'POST', body: data });
-      if (!res.ok) throw new Error(await res.text());
-      const { url } = await res.json();
-      onChange(url);
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+      const filename = `${uniqueSuffix}-${file.name}`;
+      const storageRef = ref(storage, `uploads/${filename}`);
+      
+      const snapshot = await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+      
+      onChange(downloadURL);
       toast({ title: 'Succès', description: 'Image téléversée.' });
     } catch (e: any) {
-      toast({ title: 'Erreur', description: e.message, variant: 'destructive' });
+      toast({ title: 'Erreur de téléversement', description: e.message || 'Une erreur est survenue', variant: 'destructive' });
+      console.error("Firebase Storage Error:", e);
     } finally {
       setIsUploading(false);
     }
