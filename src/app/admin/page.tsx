@@ -69,8 +69,8 @@ type ActiveTab = 'products' | 'orders' | 'slides' | 'bento' | 'collections' | 'f
 
 async function getMessagesClient(): Promise<Message[]> {
     try {
-        const res = await fetch(`/messages.json?v=${new Date().getTime()}`, { cache: 'no-store' });
-        if (!res.ok && res.status === 404) return [];
+        const res = await fetch(`/api/messages/get?v=${new Date().getTime()}`, { cache: 'no-store' });
+        if (!res.ok) return [];
         return await res.json();
     } catch {
         return [];
@@ -202,7 +202,7 @@ export default function AdminPage() {
                 title: "Nouvelle commande !",
                 description: `Vous avez reçu ${ords.length - lastOrderCountRef.current} nouvelle(s) commande(s).`,
             });
-            notificationSoundRef.current?.play().catch((e: unknown) => console.error("Error playing sound:", e));
+            notificationSoundRef.current?.play().catch(e => console.error("Error playing sound:", e));
         }
         lastOrderCountRef.current = ords.length;
     } catch (error) {
@@ -228,7 +228,9 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (user?.email === 'grasdvirus@gmail.com') {
-        notificationSoundRef.current = new Audio('/sons/notif.wav');
+        if (typeof Audio !== "undefined") {
+            notificationSoundRef.current = new Audio('/sons/notif.wav');
+        }
 
         async function loadData() {
             setLoading(true);
@@ -1163,3 +1165,4 @@ export default function AdminPage() {
     </div>
   );
 }
+    

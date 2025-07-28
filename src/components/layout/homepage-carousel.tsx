@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
@@ -19,11 +18,15 @@ export function HomepageCarousel({ slides }: HomepageCarouselProps) {
   const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
 
   const onInit = useCallback((emblaApi: EmblaCarouselType) => {
-    setScrollSnaps(emblaApi.scrollSnapList());
+    if (emblaApi) {
+      setScrollSnaps(emblaApi.scrollSnapList());
+    }
   }, []);
   
   const onSelect = useCallback((emblaApi: EmblaCarouselType) => {
-    setSelectedIndex(emblaApi.selectedScrollSnap());
+    if (emblaApi) {
+      setSelectedIndex(emblaApi.selectedScrollSnap());
+    }
   }, []);
 
   useEffect(() => {
@@ -37,7 +40,11 @@ export function HomepageCarousel({ slides }: HomepageCarouselProps) {
         emblaApi?.scrollNext();
     }, 5000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      emblaApi.off('select', onSelect);
+      emblaApi.off('reInit', onInit);
+    };
 
   }, [emblaApi, onInit, onSelect]);
 
@@ -58,7 +65,7 @@ export function HomepageCarousel({ slides }: HomepageCarouselProps) {
             {slides.map((slide, index) => (
                 <CarouselItem key={index}>
                     <Card className="border-0 rounded-lg overflow-hidden">
-                      <CardContent className="relative flex aspect-[16/10] md:aspect-video items-center justify-center p-0">
+                      <CardContent className="relative flex aspect-[16/10] md:aspect-[21/9] items-center justify-center p-0">
                         <Image
                           src={slide.imageUrl}
                           alt={slide.title}
@@ -68,7 +75,7 @@ export function HomepageCarousel({ slides }: HomepageCarouselProps) {
                           priority={slide.id === 1}
                         />
                         <div className="absolute inset-0 bg-black/40" />
-                        <div className="relative text-center text-white p-4">
+                        <div className="relative text-center text-white p-4 z-10">
                           <h2 className="text-3xl md:text-5xl font-bold tracking-tighter mb-2 font-headline">
                             {slide.title}
                           </h2>
@@ -82,10 +89,14 @@ export function HomepageCarousel({ slides }: HomepageCarouselProps) {
             ))}
         </CarouselContent>
 
-        <CarouselPrevious className="left-2 sm:left-4" />
-        <CarouselNext className="right-2 sm:right-4" />
+        <div className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20">
+            <CarouselPrevious />
+        </div>
+        <div className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20">
+            <CarouselNext />
+        </div>
       
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
             {scrollSnaps.map((_, index) => (
             <button
                 key={index}
@@ -101,3 +112,4 @@ export function HomepageCarousel({ slides }: HomepageCarouselProps) {
     </Carousel>
   );
 }
+    

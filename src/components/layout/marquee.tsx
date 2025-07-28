@@ -16,10 +16,10 @@ export async function Marquee() {
   );
 
   return (
-    <div className="w-full px-4 sm:px-6 lg:px-8 py-2">
+    <div className="w-full bg-secondary text-secondary-foreground py-2">
         <div
             className={cn(
-                "relative flex w-full overflow-x-hidden bg-muted/50 text-muted-foreground rounded-lg p-2"
+                "relative flex w-full overflow-x-hidden"
             )}
         >
             <div className="animate-marquee whitespace-nowrap">
@@ -33,3 +33,4 @@ export async function Marquee() {
     </div>
   );
 }
+    
