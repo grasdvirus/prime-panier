@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
@@ -26,7 +27,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, PlusCircle, Trash2, Package, RefreshCw, Shirt, Headphones, Home, Star, Edit, MessageSquare, Mail, Sparkles, ToyBrick, Car, Gamepad2, Heart, ImageIcon, LayoutGrid, Layers, ScrollText, Phone } from 'lucide-react';
+import { Loader2, PlusCircle, Trash2, Package, RefreshCw, Shirt, Headphones, Home, Star, Edit, MessageSquare, Mail, Sparkles, ToyBrick, Car, Gamepad2, Heart, ImageIcon, LayoutGrid, Layers, ScrollText, Phone, Lock } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ImageUpload } from '@/components/admin/image-upload';
 import {
@@ -813,14 +814,14 @@ export default function AdminPage() {
                             <Collapsible key={msg.id} className="border rounded-lg p-4" data-state={msg.read ? 'closed' : 'open'}>
                                 <CollapsibleTrigger className="w-full flex justify-between items-center text-left gap-4">
                                     <div className="flex items-center gap-3">
-                                       <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="h-7 w-7"
+                                       <div
+                                            role="button"
+                                            className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground h-7 w-7"
                                             onClick={(e) => { e.stopPropagation(); handleMessageStatusChange(msg.id, !msg.read); }}
                                         >
                                             {msg.read ? <Mail className="text-muted-foreground" /> : <Mail className="text-primary" />}
-                                        </Button>
+                                            <span className="sr-only">Marquer comme lu/non lu</span>
+                                        </div>
                                         <div>
                                             <p className="font-bold">{msg.name}</p>
                                             <p className="text-sm text-muted-foreground">{format(new Date(msg.createdAt), "'le' dd/MM/yyyy 'à' HH:mm", { locale: fr })}</p>
@@ -1312,6 +1313,8 @@ export default function AdminPage() {
     </div>
   );
 }
+    
+
     
 
     
