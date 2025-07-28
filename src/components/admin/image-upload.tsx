@@ -9,8 +9,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Upload, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
-import { storage } from '@/lib/firebase';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
 interface ImageUploadProps {
   value: string;
@@ -38,48 +36,38 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
     setIsUploading(true);
     
     try {
-      // Créer une référence de stockage unique
-      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-      const filename = `${uniqueSuffix}-${file.name.replace(/\s/g, '_')}`;
-      const storageRef = ref(storage, `uploads/${filename}`);
-      
-      const uploadTask = uploadBytesResumable(storageRef, file);
+      // 1. Get a signed URL from our API
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name, contentType: file.type }),
+      });
 
-      uploadTask.on('state_changed',
-        (snapshot) => {
-          // Optionnel: Gérer la progression de l'upload ici
-          // const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          // console.log('Upload is ' + progress + '% done');
-        }, 
-        (error) => {
-          console.error("Firebase Upload Error:", error);
-          let errorMessage = "Une erreur inconnue est survenue.";
-          switch (error.code) {
-            case 'storage/unauthorized':
-              errorMessage = "Vous n'avez pas la permission de téléverser des fichiers. Vérifiez les règles de sécurité de Firebase Storage.";
-              break;
-            case 'storage/canceled':
-              errorMessage = "Le téléversement a été annulé.";
-              break;
-            case 'storage/unknown':
-              errorMessage = "Une erreur inconnue est survenue, vérifiez votre connexion internet.";
-              break;
-          }
-          toast({ title: 'Erreur de téléversement', description: errorMessage, variant: 'destructive' });
-          setIsUploading(false);
-        }, 
-        () => {
-          // Téléversement réussi
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            onChange(downloadURL);
-            toast({ title: 'Succès', description: 'Image téléversée.' });
-            setIsUploading(false);
-          });
-        }
-      );
+      if (!res.ok) {
+        throw new Error('Impossible d\'obtenir une URL de téléversement signée.');
+      }
+
+      const { uploadUrl, downloadUrl } = await res.json();
+
+      // 2. Upload the file to the signed URL
+      const uploadResponse = await fetch(uploadUrl, {
+        method: 'PUT',
+        body: file,
+        headers: { 'Content-Type': file.type },
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error('Échec du téléversement de l\'image.');
+      }
+      
+      // 3. Update the form with the final download URL
+      onChange(downloadUrl);
+      toast({ title: 'Succès', description: 'Image téléversée.' });
 
     } catch (e: any) {
-      toast({ title: 'Erreur inattendue', description: e.message, variant: 'destructive' });
+      console.error("Upload error:", e);
+      toast({ title: 'Erreur de téléversement', description: e.message || "Une erreur inconnue est survenue.", variant: 'destructive' });
+    } finally {
       setIsUploading(false);
     }
   }, [onChange, toast]);
