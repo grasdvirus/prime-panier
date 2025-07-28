@@ -20,7 +20,7 @@ export default async function Home() {
         <Marquee />
       </div>
 
-      <section className="w-full -mt-2">
+      <section className="w-full">
         <HomepageCarousel slides={slides} />
       </section>
 
