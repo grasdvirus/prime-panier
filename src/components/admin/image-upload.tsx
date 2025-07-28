@@ -9,6 +9,8 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Upload, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
+import { storage } from '@/lib/firebase';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
 interface ImageUploadProps {
   value: string;
@@ -34,31 +36,50 @@ export function ImageUpload({ value, onChange, disabled }: ImageUploadProps) {
     }
     
     setIsUploading(true);
+    
     try {
-      const data = new FormData();
-      data.set('file', file);
-
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: data,
-      });
-
-      if (!res.ok) {
-        throw new Error(await res.text());
-      }
+      // Créer une référence de stockage unique
+      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+      const filename = `${uniqueSuffix}-${file.name.replace(/\s/g, '_')}`;
+      const storageRef = ref(storage, `uploads/${filename}`);
       
-      const result = await res.json();
-      if (result.success) {
-        onChange(result.path);
-        toast({ title: 'Succès', description: 'Image téléversée.' });
-      } else {
-        throw new Error(result.message || 'La réponse de l\'API a échoué');
-      }
+      const uploadTask = uploadBytesResumable(storageRef, file);
+
+      uploadTask.on('state_changed',
+        (snapshot) => {
+          // Optionnel: Gérer la progression de l'upload ici
+          // const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          // console.log('Upload is ' + progress + '% done');
+        }, 
+        (error) => {
+          console.error("Firebase Upload Error:", error);
+          let errorMessage = "Une erreur inconnue est survenue.";
+          switch (error.code) {
+            case 'storage/unauthorized':
+              errorMessage = "Vous n'avez pas la permission de téléverser des fichiers. Vérifiez les règles de sécurité de Firebase Storage.";
+              break;
+            case 'storage/canceled':
+              errorMessage = "Le téléversement a été annulé.";
+              break;
+            case 'storage/unknown':
+              errorMessage = "Une erreur inconnue est survenue, vérifiez votre connexion internet.";
+              break;
+          }
+          toast({ title: 'Erreur de téléversement', description: errorMessage, variant: 'destructive' });
+          setIsUploading(false);
+        }, 
+        () => {
+          // Téléversement réussi
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            onChange(downloadURL);
+            toast({ title: 'Succès', description: 'Image téléversée.' });
+            setIsUploading(false);
+          });
+        }
+      );
 
     } catch (e: any) {
-      toast({ title: 'Erreur de téléversement', description: e.message, variant: 'destructive' });
-      console.error("Upload Error:", e);
-    } finally {
+      toast({ title: 'Erreur inattendue', description: e.message, variant: 'destructive' });
       setIsUploading(false);
     }
   }, [onChange, toast]);
