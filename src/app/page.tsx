@@ -22,7 +22,7 @@ export default async function Home() {
         <div className="px-4 sm:px-6 lg:px-8 mb-4">
           <Marquee />
         </div>
-        <div className="w-full">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
           <HomepageCarousel slides={slides} />
         </div>
       </section>
