@@ -46,7 +46,7 @@ export function HomepageCarousel({ slides }: HomepageCarouselProps) {
   }
 
   return (
-    <div className="relative">
+    <div className="relative mx-2 md:mx-4">
          <Carousel
             setApi={setEmblaApi}
             plugins={[
@@ -62,7 +62,7 @@ export function HomepageCarousel({ slides }: HomepageCarouselProps) {
             <CarouselContent className="-ml-0 embla-fade">
                 {slides.map((slide, index) => (
                     <CarouselItem key={index} className="pl-0 embla-fade__slide">
-                        <Card className="border-0 rounded-2xl overflow-hidden mx-2 md:mx-4">
+                        <Card className="border-0 rounded-2xl overflow-hidden">
                           <CardContent className="relative flex aspect-[16/10] md:aspect-[21/9] items-center justify-center p-0">
                             <Image
                               src={slide.imageUrl}
