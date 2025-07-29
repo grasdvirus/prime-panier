@@ -18,8 +18,8 @@ interface HomepageCarouselProps {
 const DotButton = ({ selected, onClick }: { selected: boolean, onClick: () => void }) => (
   <button
     className={cn(
-      "h-3 w-3 rounded-full transition-all duration-300",
-      selected ? "bg-primary w-6" : "bg-muted hover:bg-muted-foreground/50"
+      "h-2 rounded-full bg-muted transition-all duration-300 hover:bg-muted-foreground/50",
+      selected ? "bg-primary w-8" : "w-2"
     )}
     type="button"
     onClick={onClick}
@@ -29,22 +29,31 @@ const DotButton = ({ selected, onClick }: { selected: boolean, onClick: () => vo
 
 export function HomepageCarousel({ slides }: HomepageCarouselProps) {
   const [emblaRef, emblaApi] = useEmblaCarousel(
-    { loop: true, align: 'start' }, 
+    { loop: true, align: 'center' }, 
     [Autoplay({ delay: 5000, stopOnInteraction: true, stopOnMouseEnter: true })]
   );
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
 
   const scrollPrev = useCallback(() => {
-    if (emblaApi) emblaApi.scrollPrev();
+    if (emblaApi) {
+      emblaApi.scrollPrev();
+      emblaApi.plugins().autoplay?.reset();
+    }
   }, [emblaApi]);
 
   const scrollNext = useCallback(() => {
-    if (emblaApi) emblaApi.scrollNext();
+    if (emblaApi) {
+      emblaApi.scrollNext();
+      emblaApi.plugins().autoplay?.reset();
+    }
   }, [emblaApi]);
 
   const scrollTo = useCallback((index: number) => {
-    if (emblaApi) emblaApi.scrollTo(index);
+    if (emblaApi) {
+      emblaApi.scrollTo(index);
+      emblaApi.plugins().autoplay?.reset();
+    }
   }, [emblaApi]);
 
   const onSelect = useCallback((emblaApi: EmblaCarouselType) => {
@@ -69,7 +78,13 @@ export function HomepageCarousel({ slides }: HomepageCarouselProps) {
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex">
           {slides.map((slide, index) => (
-            <div className="flex-[0_0_100%] p-2" key={index}>
+            <div 
+                className={cn(
+                    "flex-[0_0_90%] md:flex-[0_0_80%] p-2 transition-all duration-500",
+                    index === selectedIndex ? "" : "blur-sm scale-95"
+                )} 
+                key={index}
+            >
               <Card className="border-0 rounded-2xl overflow-hidden">
                 <CardContent className="relative flex aspect-[16/10] md:aspect-[21/9] items-center justify-center p-0">
                   <Image
