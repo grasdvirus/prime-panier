@@ -17,12 +17,12 @@ export default async function Home() {
   const settings = await getSiteSettings();
 
   return (
-    <div className="w-full">
-      <section>
-        <div className="px-4 sm:px-6 lg:px-8 mb-4">
+    <div className="w-full space-y-8">
+      <section className="space-y-4">
+        <div className="px-4 sm:px-6 lg:px-8">
           <Marquee />
         </div>
-        <div className="w-full px-4 sm:px-6 lg:px-8">
+        <div className="w-full">
           <HomepageCarousel slides={slides} />
         </div>
       </section>
