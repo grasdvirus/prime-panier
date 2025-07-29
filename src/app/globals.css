@@ -99,7 +99,7 @@
 }
 
 .embla {
-  overflow: visible;
+  overflow: hidden;
 }
 .embla__container {
   display: flex;
@@ -107,15 +107,28 @@
 .embla__slide {
   flex: 0 0 100%;
   min-width: 0;
-  opacity: 0.4;
-  filter: blur(4px);
-  transform: scale(0.95);
-  transition: opacity 0.3s ease-in-out, filter 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
-.embla__slide.is-selected {
+
+/* Styles for Embla Fade plugin */
+.embla-fade {
+  position: relative;
+  height: 100%;
+}
+.embla-fade__container {
+  display: flex;
+  height: 100%;
+}
+.embla-fade__slide {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  opacity: 0;
+  transition: opacity 0.4s ease-in-out;
+}
+.embla-fade__slide.is-selected {
   opacity: 1;
-  filter: blur(0);
-  transform: scale(1);
 }
 
 .bento-card-wrapper {

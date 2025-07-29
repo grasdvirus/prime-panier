@@ -4,6 +4,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import useEmblaCarousel, { type EmblaCarouselType } from 'embla-carousel-react';
+import Autoplay from 'embla-carousel-autoplay';
+import Fade from 'embla-carousel-fade';
 import { Card, CardContent } from '@/components/ui/card';
 import { type Slide } from '@/lib/slides';
 import { cn } from '@/lib/utils';
@@ -37,16 +39,6 @@ export function HomepageCarousel({ slides }: HomepageCarouselProps) {
     emblaApi.on('select', onSelect);
     emblaApi.on('reInit', onInit);
 
-    const interval = setInterval(() => {
-        emblaApi?.scrollNext();
-    }, 5000);
-
-    return () => {
-      clearInterval(interval);
-      emblaApi.off('select', onSelect);
-      emblaApi.off('reInit', onInit);
-    };
-
   }, [emblaApi, onInit, onSelect]);
 
   if (!slides || slides.length === 0) {
@@ -57,15 +49,19 @@ export function HomepageCarousel({ slides }: HomepageCarouselProps) {
     <div className="relative">
          <Carousel
             setApi={setEmblaApi}
+            plugins={[
+                Autoplay({ delay: 5000, stopOnInteraction: false }),
+                Fade()
+            ]}
             opts={{
                 align: "start",
                 loop: true,
             }}
             className="w-full"
         >
-            <CarouselContent className="-ml-0">
+            <CarouselContent className="-ml-0 embla-fade">
                 {slides.map((slide, index) => (
-                    <CarouselItem key={index} className="pl-0">
+                    <CarouselItem key={index} className="pl-0 embla-fade__slide">
                         <Card className="border-0 rounded-2xl overflow-hidden mx-2 md:mx-4">
                           <CardContent className="relative flex aspect-[16/10] md:aspect-[21/9] items-center justify-center p-0">
                             <Image
