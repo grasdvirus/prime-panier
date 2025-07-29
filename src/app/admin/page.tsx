@@ -13,7 +13,7 @@ import { getMarqueeClient, updateMarqueeClient } from '@/lib/marquee-client';
 import { getProductCategoriesClient } from '@/lib/products-client';
 import { updateOrderClient, deleteOrderClient } from '@/lib/orders-client';
 import { getSiteSettingsClient, updateSiteSettingsClient } from '@/lib/settings-client';
-import { type Product, type ProductReview } from '@/lib/products';
+import { type Product, type ProductReview, type ProductVariant, type ProductOption } from '@/lib/products';
 import { type Slide } from '@/lib/slides';
 import { type Bento } from '@/lib/bento';
 import { type Collection } from '@/lib/collections';
@@ -63,6 +63,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { Switch } from '@/components/ui/switch';
 
 type SaveStatus = 'idle' | 'dirty' | 'saving' | 'success' | 'error';
 type ActiveTab = 'products' | 'orders' | 'slides' | 'bento' | 'collections' | 'features' | 'marquee' | 'messages' | 'reviews' | 'settings';
@@ -128,6 +129,7 @@ export default function AdminPage() {
   const [orderToDelete, setOrderToDelete] = useState<Order | null>(null);
   const [slideToDelete, setSlideToDelete] = useState<Slide | null>(null);
   const [infoFeatureToDelete, setInfoFeatureToDelete] = useState<InfoFeature | null>(null);
+  const [collectionToDelete, setCollectionToDelete] = useState<Collection | null>(null);
 
   const [isAddCategoryDialogOpen, setIsAddCategoryDialogOpen] = useState(false);
   const [newCategory, setNewCategory] = useState({ name: '', icon: 'Package' });
@@ -198,7 +200,14 @@ export default function AdminPage() {
                     getMessagesClient(),
                     getSiteSettingsClient()
                 ]);
-                setProducts(prods.map(p => ({ ...p, images: p.images.length > 0 ? p.images : ['', ''], likes: p.likes || 0 })));
+                setProducts(prods.map(p => ({ 
+                    ...p, 
+                    images: p.images.length > 0 ? p.images : ['', ''], 
+                    likes: p.likes || 0,
+                    hasVariants: p.hasVariants ?? false,
+                    options: p.options || [],
+                    variants: p.variants || []
+                })));
                 setSlides(slds);
                 const bentoWithLinkType = bento.map(item => ({
                   ...item,
@@ -348,6 +357,9 @@ export default function AdminPage() {
       features: ['', '', ''],
       data_ai_hint: '',
       likes: 0,
+      hasVariants: false,
+      options: [],
+      variants: [],
     };
     setProducts(prev => [newProduct, ...prev]);
     markAsDirty();
@@ -409,7 +421,6 @@ export default function AdminPage() {
       }
     }
   };
-
 
   const handleAddCategory = () => {
     if (newCategory.name && !productCategories.includes(newCategory.name)) {
@@ -492,7 +503,6 @@ export default function AdminPage() {
     markAsDirty();
     toast({ title: "Avis supprimé" });
   };
-
 
   const handleSaveChanges = async () => {
     setSaveStatus('saving');
@@ -603,7 +613,121 @@ export default function AdminPage() {
         }));
         markAsDirty();
     };
-  
+
+    const handleAddCollection = () => {
+        const newId = collections.length > 0 ? Math.max(...collections.map(c => c.id)) + 1 : 1;
+        const newCollection: Collection = {
+            id: newId,
+            name: "Nouvelle Collection",
+            href: `/collections/${productCategories[0] || ''}`,
+            image: "https://placehold.co/400x500.png",
+            data_ai_hint: "fashion"
+        };
+        setCollections(prev => [newCollection, ...prev]);
+        markAsDirty();
+    };
+
+    const handleDeleteCollection = (collection: Collection) => {
+        setCollectionToDelete(collection);
+    };
+
+    const confirmDeleteCollection = () => {
+        if (collectionToDelete) {
+            setCollections(prev => prev.filter(c => c.id !== collectionToDelete.id));
+            markAsDirty();
+            setCollectionToDelete(null);
+            toast({
+                title: "Collection supprimée",
+                description: `La collection "${collectionToDelete.name}" a été supprimée.`,
+            });
+        }
+    };
+
+    // Product Variant Handlers
+    const generateVariants = useCallback((options: ProductOption[]): ProductVariant[] => {
+        if (options.length === 0) return [];
+
+        const combinations = options.reduce<string[][]>((acc, option) => {
+            if (acc.length === 0) {
+                return option.values.map(v => [v]);
+            }
+            const newAcc: string[][] = [];
+            acc.forEach(combo => {
+                option.values.forEach(value => {
+                    newAcc.push([...combo, value]);
+                });
+            });
+            return newAcc;
+        }, []);
+
+        return combinations.map((combo, index) => ({
+            id: index + 1,
+            options: combo,
+            price: 0,
+            stock: 0
+        }));
+    }, []);
+
+    const handleHasVariantsChange = useCallback((productId: number, hasVariants: boolean) => {
+        setProducts(prev => prev.map(p => {
+            if (p.id === productId) {
+                const newOptions = hasVariants && p.options.length === 0 ? [{ name: 'Taille', values: ['S', 'M', 'L'] }] : p.options;
+                const newVariants = hasVariants ? generateVariants(newOptions) : [];
+                return { ...p, hasVariants, options: newOptions, variants: newVariants };
+            }
+            return p;
+        }));
+        markAsDirty();
+    }, [generateVariants]);
+
+    const handleOptionChange = useCallback((productId: number, optionIndex: number, field: 'name' | 'values', value: string | string[]) => {
+        setProducts(prev => prev.map(p => {
+            if (p.id === productId) {
+                const newOptions = [...p.options];
+                newOptions[optionIndex] = { ...newOptions[optionIndex], [field]: value };
+                const newVariants = generateVariants(newOptions);
+                return { ...p, options: newOptions, variants: newVariants };
+            }
+            return p;
+        }));
+        markAsDirty();
+    }, [generateVariants]);
+
+    const handleAddOption = useCallback((productId: number) => {
+        setProducts(prev => prev.map(p => {
+            if (p.id === productId && p.options.length < 3) { // Limit to 3 options
+                const newOptions = [...p.options, { name: `Option ${p.options.length + 1}`, values: ['Valeur 1', 'Valeur 2'] }];
+                const newVariants = generateVariants(newOptions);
+                return { ...p, options: newOptions, variants: newVariants };
+            }
+            return p;
+        }));
+        markAsDirty();
+    }, [generateVariants]);
+
+    const handleRemoveOption = useCallback((productId: number, optionIndex: number) => {
+        setProducts(prev => prev.map(p => {
+            if (p.id === productId) {
+                const newOptions = p.options.filter((_, i) => i !== optionIndex);
+                const newVariants = generateVariants(newOptions);
+                return { ...p, options: newOptions, variants: newVariants };
+            }
+            return p;
+        }));
+        markAsDirty();
+    }, [generateVariants]);
+    
+    const handleVariantChange = useCallback((productId: number, variantId: number, field: 'price' | 'stock', value: number) => {
+        setProducts(prev => prev.map(p => {
+            if (p.id === productId) {
+                const newVariants = p.variants.map(v => v.id === variantId ? { ...v, [field]: value } : v);
+                return { ...p, variants: newVariants };
+            }
+            return p;
+        }));
+        markAsDirty();
+    }, []);
+
   if (authLoading || loading) {
     return (
         <div className="flex justify-center items-center min-h-[80vh]">
@@ -895,87 +1019,100 @@ export default function AdminPage() {
                         </Button>
                     </div>
                 </CardHeader>
-                <CardContent>
-                    <div className="hidden md:block">
-                        <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className="w-[250px]">Image 1</TableHead>
-                                <TableHead className="w-[250px]">Image 2</TableHead>
-                                <TableHead className="min-w-[150px]">Nom</TableHead>
-                                <TableHead className="min-w-[250px]">Description</TableHead>
-                                <TableHead className="min-w-[200px]">Détails</TableHead>
-                                <TableHead className="min-w-[250px]">Caractéristiques</TableHead>
-                                <TableHead>Action</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {products.map((product) => (
-                            <TableRow key={product.id}>
-                                <TableCell><ImageUpload value={product.images[0] || ''} onChange={(url) => handleProductImageChange(product.id, 0, url)} /></TableCell>
-                                <TableCell><ImageUpload value={product.images[1] || ''} onChange={(url) => handleProductImageChange(product.id, 1, url)} /></TableCell>
-                                <TableCell><Input value={product.name} onChange={e => handleInputChange(setProducts, product.id, 'name', e.target.value)} /></TableCell>
-                                <TableCell><Textarea value={product.description} onChange={e => handleInputChange(setProducts, product.id, 'description', e.target.value)} /></TableCell>
-                                <TableCell className="space-y-2">
-                                    <Input type="number" placeholder="Prix" value={product.price} onChange={e => handleInputChange(setProducts, product.id, 'price', Number(e.target.value))} />
-                                    <Input type="number" placeholder="Stock" value={product.stock} onChange={e => handleInputChange(setProducts, product.id, 'stock', Number(e.target.value))} />
-                                    <CategorySelector value={product.category} onChange={value => handleInputChange(setProducts, product.id, 'category', value)} />
-                                    <div className="flex items-center gap-2 pt-2">
-                                        <Heart className="h-4 w-4 text-destructive" />
-                                        <Input type="number" placeholder="Likes" value={product.likes} onChange={e => handleInputChange(setProducts, product.id, 'likes', Number(e.target.value))} />
-                                    </div>
-                                </TableCell>
-                                <TableCell><div className="space-y-2">{product.features.map((feature, fIndex) => (<Input key={fIndex} value={feature} placeholder={`Caractéristique ${fIndex + 1}`} onChange={e => handleProductFeatureChange(product.id, fIndex, e.target.value)} />))}</div></TableCell>
-                                <TableCell>
-                                    <Button variant="destructive" size="icon" onClick={() => handleDeleteProduct(product)}>
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
-                            ))}
-                        </TableBody>
-                        </Table>
-                    </div>
-                    <div className="md:hidden space-y-4">
-                        {products.map(product => (
-                            <Card key={product.id}>
-                                <CardHeader>
-                                    <Input className="text-lg font-bold" value={product.name} onChange={e => handleInputChange(setProducts, product.id, 'name', e.target.value)} />
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                        <ImageUpload value={product.images[0] || ''} onChange={(url) => handleProductImageChange(product.id, 0, url)} />
-                                        <ImageUpload value={product.images[1] || ''} onChange={(url) => handleProductImageChange(product.id, 1, url)} />
-                                     </div>
-                                     <div>
-                                        <Label>Description</Label>
-                                        <Textarea value={product.description} onChange={e => handleInputChange(setProducts, product.id, 'description', e.target.value)} />
-                                     </div>
-                                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                                        <div><Label>Prix</Label><Input type="number" placeholder="Prix" value={product.price} onChange={e => handleInputChange(setProducts, product.id, 'price', Number(e.target.value))} /></div>
-                                        <div><Label>Stock</Label><Input type="number" placeholder="Stock" value={product.stock} onChange={e => handleInputChange(setProducts, product.id, 'stock', Number(e.target.value))} /></div>
+                <CardContent className="space-y-4">
+                    {products.map(product => (
+                        <Collapsible key={product.id} className="border p-4 rounded-lg">
+                            <CollapsibleTrigger className="w-full flex justify-between items-center text-left">
+                                <span className='font-semibold'>{product.name}</span>
+                                <Button variant="ghost" size="icon">
+                                    <Edit className="h-4 w-4" />
+                                </Button>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="pt-4 mt-4 border-t space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* Left Column: Basic Info */}
+                                    <div className="space-y-4">
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <ImageUpload value={product.images[0] || ''} onChange={(url) => handleProductImageChange(product.id, 0, url)} />
+                                            <ImageUpload value={product.images[1] || ''} onChange={(url) => handleProductImageChange(product.id, 1, url)} />
+                                        </div>
+                                        <div><Label>Nom</Label><Input value={product.name} onChange={e => handleInputChange(setProducts, product.id, 'name', e.target.value)} /></div>
+                                        <div><Label>Description</Label><Textarea value={product.description} onChange={e => handleInputChange(setProducts, product.id, 'description', e.target.value)} /></div>
                                         <div><Label>Catégorie</Label><CategorySelector value={product.category} onChange={value => handleInputChange(setProducts, product.id, 'category', value)} /></div>
-                                     </div>
-                                      <div>
-                                        <Label>Likes</Label>
-                                        <div className="flex items-center gap-2">
+                                        <div>
+                                            <Label>Caractéristiques</Label>
+                                            <div className="space-y-2">{product.features.map((feature, fIndex) => (<Input key={fIndex} value={feature} placeholder={`Caractéristique ${fIndex + 1}`} onChange={e => handleProductFeatureChange(product.id, fIndex, e.target.value)} />))}</div>
+                                        </div>
+                                        <div className="flex items-center gap-2 pt-2">
+                                            <Label>Likes</Label>
                                             <Heart className="h-4 w-4 text-destructive" />
                                             <Input type="number" placeholder="Likes" value={product.likes} onChange={e => handleInputChange(setProducts, product.id, 'likes', Number(e.target.value))} />
                                         </div>
-                                     </div>
-                                      <div>
-                                        <Label>Caractéristiques</Label>
-                                        <div className="space-y-2">{product.features.map((feature, fIndex) => (<Input key={fIndex} value={feature} placeholder={`Caractéristique ${fIndex + 1}`} onChange={e => handleProductFeatureChange(product.id, fIndex, e.target.value)} />))}</div>
-                                     </div>
-                                </CardContent>
-                                <CardFooter>
-                                    <Button variant="destructive" className="w-full" onClick={() => handleDeleteProduct(product)}>
-                                        <Trash2 className="mr-2 h-4 w-4" /> Supprimer le produit
+                                    </div>
+                                    
+                                    {/* Right Column: Variants & Stock */}
+                                    <div className="space-y-4">
+                                        <div className="flex items-center space-x-2 border p-3 rounded-md">
+                                            <Switch id={`variants-switch-${product.id}`} checked={product.hasVariants} onCheckedChange={(checked) => handleHasVariantsChange(product.id, checked)} />
+                                            <Label htmlFor={`variants-switch-${product.id}`}>Activer les variantes (taille, couleur, etc.)</Label>
+                                        </div>
+
+                                        {!product.hasVariants ? (
+                                            <div className="space-y-2 border p-3 rounded-md">
+                                                <h4 className="font-medium">Inventaire Simple</h4>
+                                                <div><Label>Prix</Label><Input type="number" placeholder="Prix" value={product.price} onChange={e => handleInputChange(setProducts, product.id, 'price', Number(e.target.value))} /></div>
+                                                <div><Label>Stock</Label><Input type="number" placeholder="Stock" value={product.stock} onChange={e => handleInputChange(setProducts, product.id, 'stock', Number(e.target.value))} /></div>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-4 border p-3 rounded-md">
+                                                <h4 className="font-medium">Gestion des Variantes</h4>
+                                                {/* Options */}
+                                                <div className='space-y-4'>
+                                                    {product.options.map((option, optIndex) => (
+                                                        <div key={optIndex} className="space-y-2 border p-2 rounded-md relative">
+                                                            <Button variant="ghost" size="icon" className="absolute top-1 right-1 h-6 w-6 text-destructive" onClick={() => handleRemoveOption(product.id, optIndex)}><Trash2 className="h-4 w-4"/></Button>
+                                                            <div><Label>Nom de l'option (ex: Couleur)</Label><Input value={option.name} onChange={(e) => handleOptionChange(product.id, optIndex, 'name', e.target.value)} /></div>
+                                                            <div><Label>Valeurs (séparées par des virgules)</Label><Input value={option.values.join(',')} onChange={(e) => handleOptionChange(product.id, optIndex, 'values', e.target.value.split(',').map(s => s.trim()))} /></div>
+                                                        </div>
+                                                    ))}
+                                                    {product.options.length < 3 && <Button variant="outline" size="sm" onClick={() => handleAddOption(product.id)}><PlusCircle className="mr-2 h-4 w-4" />Ajouter une option</Button>}
+                                                </div>
+                                                
+                                                {/* Variants Table */}
+                                                {product.variants.length > 0 && (
+                                                    <div className="overflow-x-auto">
+                                                        <Table>
+                                                            <TableHeader>
+                                                                <TableRow>
+                                                                    {product.options.map((opt, i) => <TableHead key={i}>{opt.name}</TableHead>)}
+                                                                    <TableHead>Prix</TableHead>
+                                                                    <TableHead>Stock</TableHead>
+                                                                </TableRow>
+                                                            </TableHeader>
+                                                            <TableBody>
+                                                                {product.variants.map(variant => (
+                                                                    <TableRow key={variant.id}>
+                                                                        {variant.options.map((optVal, i) => <TableCell key={i}>{optVal}</TableCell>)}
+                                                                        <TableCell><Input type="number" value={variant.price} onChange={(e) => handleVariantChange(product.id, variant.id, 'price', Number(e.target.value))} /></TableCell>
+                                                                        <TableCell><Input type="number" value={variant.stock} onChange={(e) => handleVariantChange(product.id, variant.id, 'stock', Number(e.target.value))} /></TableCell>
+                                                                    </TableRow>
+                                                                ))}
+                                                            </TableBody>
+                                                        </Table>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                                <div className="flex justify-end pt-4">
+                                     <Button variant="destructive" onClick={() => handleDeleteProduct(product)}>
+                                        <Trash2 className="mr-2 h-4 w-4" /> Supprimer ce produit
                                     </Button>
-                                </CardFooter>
-                            </Card>
-                        ))}
-                    </div>
+                                </div>
+                            </CollapsibleContent>
+                        </Collapsible>
+                    ))}
                 </CardContent>
             </Card>
         </TabsContent>
@@ -1138,11 +1275,17 @@ export default function AdminPage() {
         
         <TabsContent value="collections">
             <Card>
-                <CardHeader><CardTitle>Gestion des Collections</CardTitle></CardHeader>
+                <CardHeader className="flex flex-row items-center justify-between">
+                    <CardTitle>Gestion des Collections</CardTitle>
+                    <Button onClick={handleAddCollection} variant="outline">
+                        <PlusCircle className="mr-2 h-4 w-4" />
+                        Ajouter une collection
+                    </Button>
+                </CardHeader>
                 <CardContent>
                     <div className="overflow-x-auto">
                         <Table>
-                            <TableHeader><TableRow><TableHead>Nom</TableHead><TableHead>Lien vers la catégorie</TableHead><TableHead className="w-[350px]">Image</TableHead></TableRow></TableHeader>
+                            <TableHeader><TableRow><TableHead>Nom</TableHead><TableHead>Lien vers la catégorie</TableHead><TableHead className="w-[350px]">Image</TableHead><TableHead>Action</TableHead></TableRow></TableHeader>
                             <TableBody>
                                 {collections.map(item => (
                                     <TableRow key={item.id}>
@@ -1154,6 +1297,11 @@ export default function AdminPage() {
                                             />
                                         </TableCell>
                                         <TableCell><ImageUpload value={item.image} onChange={url => handleInputChange(setCollections, item.id, 'image', url)}/></TableCell>
+                                        <TableCell>
+                                            <Button variant="destructive" size="icon" onClick={() => handleDeleteCollection(item)}>
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
@@ -1310,6 +1458,21 @@ export default function AdminPage() {
         </AlertDialogContent>
       </AlertDialog>
 
+      <AlertDialog open={!!collectionToDelete} onOpenChange={(open) => !open && setCollectionToDelete(null)}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Êtes-vous sûr ?</AlertDialogTitle>
+                <AlertDialogDescription>
+                    Cette action est irréversible. La collection "{collectionToDelete?.name}" sera définitivement supprimée.
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setCollectionToDelete(null)}>Annuler</AlertDialogCancel>
+                <AlertDialogAction onClick={confirmDeleteCollection}>Supprimer</AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
        <Dialog open={!!editingReview} onOpenChange={(open) => !open && setEditingReview(null)}>
           <DialogContent>
             <DialogHeader>
@@ -1352,3 +1515,5 @@ export default function AdminPage() {
     </div>
   );
 }
+
+    

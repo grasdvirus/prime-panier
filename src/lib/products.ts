@@ -9,6 +9,18 @@ export type ProductReview = {
   date: string; // ISO date string
 }
 
+export type ProductOption = {
+  name: string;
+  values: string[];
+}
+
+export type ProductVariant = {
+  id: number;
+  options: string[];
+  price: number;
+  stock: number;
+}
+
 export type Product = {
   id: number;
   name: string;
@@ -22,6 +34,9 @@ export type Product = {
   features: string[];
   data_ai_hint: string;
   likes: number;
+  hasVariants: boolean;
+  options: ProductOption[];
+  variants: ProductVariant[];
 };
 
 
@@ -32,7 +47,14 @@ async function fetchProductsOnServer(): Promise<Product[]> {
             return [];
         }
         const products = productsSnapshot.docs.map(doc => doc.data() as Product);
-        return products.map(p => ({ ...p, reviews: p.reviews || [], likes: p.likes || 0 }));
+        return products.map(p => ({ 
+            ...p, 
+            reviews: p.reviews || [], 
+            likes: p.likes || 0,
+            hasVariants: p.hasVariants ?? false,
+            options: p.options || [],
+            variants: p.variants || [],
+        }));
     } catch (error) {
         console.error('Failed to fetch products from Firestore:', error);
         return [];
@@ -56,3 +78,5 @@ export async function getProductCategories(): Promise<string[]> {
   const allCategories = [...new Set([...defaultCategories, ...categories])];
   return allCategories;
 }
+
+    

@@ -9,7 +9,14 @@ export async function getProductsClient(): Promise<Product[]> {
         return [];
     }
     const products: Product[] = await res.json();
-    return products.map(p => ({ ...p, reviews: p.reviews || [], likes: p.likes || 0 }));
+    return products.map(p => ({ 
+        ...p, 
+        reviews: p.reviews || [], 
+        likes: p.likes || 0,
+        hasVariants: p.hasVariants ?? false,
+        options: p.options || [],
+        variants: p.variants || [],
+    }));
 }
 
 export async function getProductCategoriesClient(): Promise<string[]> {
@@ -39,3 +46,5 @@ export async function updateProductsClient(products: Product[]): Promise<void> {
     throw new Error(errorData.message);
   }
 }
+
+    
