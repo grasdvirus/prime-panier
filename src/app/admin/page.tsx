@@ -64,6 +64,10 @@ import { cn } from '@/lib/utils';
 
 type SaveStatus = 'idle' | 'dirty' | 'saving' | 'success' | 'error';
 type ActiveTab = 'products' | 'orders' | 'slides' | 'bento' | 'collections' | 'features' | 'marquee' | 'messages' | 'reviews';
+type BentoLinkType = 'collection' | 'external';
+interface BentoWithLinkType extends Bento {
+  linkType: BentoLinkType;
+}
 
 async function getMessagesClient(): Promise<Message[]> {
     try {
@@ -108,7 +112,7 @@ export default function AdminPage() {
   // Données
   const [products, setProducts] = useState<Product[]>([]);
   const [slides, setSlides] = useState<Slide[]>([]);
-  const [bentoItems, setBentoItems] = useState<Bento[]>([]);
+  const [bentoItems, setBentoItems] = useState<BentoWithLinkType[]>([]);
   const [collections, setCollections] = useState<Collection[]>([]);
   const [infoFeatures, setInfoFeatures] = useState<InfoFeature[]>([]);
   const [marquee, setMarquee] = useState<Marquee>({ messages: [] });
@@ -192,7 +196,11 @@ export default function AdminPage() {
                 ]);
                 setProducts(prods.map(p => ({ ...p, images: p.images.length > 0 ? p.images : ['', ''], likes: p.likes || 0 })));
                 setSlides(slds);
-                setBentoItems(bento);
+                const bentoWithLinkType = bento.map(item => ({
+                  ...item,
+                  linkType: (item.href.startsWith('http') ? 'external' : 'collection') as BentoLinkType,
+                }));
+                setBentoItems(bentoWithLinkType);
                 setCollections(colls);
                 setInfoFeatures(info);
                 setMarquee(marq);
@@ -425,14 +433,15 @@ export default function AdminPage() {
 
   const handleAddBentoItem = () => {
     const newId = bentoItems.length > 0 ? Math.max(...bentoItems.map(p => p.id)) + 1 : 1;
-    const newBentoItem: Bento = {
+    const newBentoItem: BentoWithLinkType = {
         id: newId,
         title: "Nouveau titre",
         subtitle: "Nouveau sous-titre",
         imageUrl: "https://placehold.co/600x400.png",
-        href: "/collections/Vêtements",
+        href: `/collections/Vêtements`,
         className: "md:col-span-1",
-        data_ai_hint: "item"
+        data_ai_hint: "item",
+        linkType: "collection",
     };
     setBentoItems(prev => [newBentoItem, ...prev]);
     markAsDirty();
@@ -483,10 +492,13 @@ export default function AdminPage() {
         images: p.images.filter(img => img && img.trim() !== '')
       }));
 
+      // Strip linkType from bentoItems before saving
+      const bentoToSave = bentoItems.map(({ linkType, ...rest }) => rest);
+
       await Promise.all([
           updateProductsClient(productsToSave),
           updateSlidesClient(slides),
-          updateBentoClient(bentoItems),
+          updateBentoClient(bentoToSave),
           updateCollectionsClient(collections),
           updateInfoFeaturesClient(infoFeatures),
           updateMarqueeClient(marquee),
@@ -1026,11 +1038,50 @@ export default function AdminPage() {
                                    <Label>Sous-titre / Description</Label>
                                    <Input value={item.subtitle} onChange={e => handleInputChange(setBentoItems, item.id, 'subtitle', e.target.value)} />
                                 </div>
+
                                 <div className="space-y-2">
-                                   <Label>Lien (interne ou externe)</Label>
-                                   <Input value={item.href} onChange={e => handleInputChange(setBentoItems, item.id, 'href', e.target.value)} placeholder="/collections/Vêtements ou https://..."/>
+                                   <Label>Type de lien</Label>
+                                   <Select 
+                                      value={item.linkType} 
+                                      onValueChange={(value: BentoLinkType) => {
+                                        handleInputChange(setBentoItems, item.id, 'linkType', value);
+                                        // Reset href when changing type
+                                        if (value === 'collection' && productCategories.length > 0) {
+                                            handleInputChange(setBentoItems, item.id, 'href', `/collections/${productCategories[0]}`);
+                                        } else if (value === 'external') {
+                                            handleInputChange(setBentoItems, item.id, 'href', 'https://');
+                                        }
+                                      }}
+                                    >
+                                       <SelectTrigger><SelectValue/></SelectTrigger>
+                                       <SelectContent>
+                                           <SelectItem value="collection">Collection</SelectItem>
+                                           <SelectItem value="external">Lien Externe</SelectItem>
+                                       </SelectContent>
+                                   </Select>
                                 </div>
+
                                 <div className="space-y-2">
+                                  <Label>Destination du lien</Label>
+                                  {item.linkType === 'collection' ? (
+                                    <Select 
+                                      value={item.href.replace('/collections/', '')} 
+                                      onValueChange={value => handleInputChange(setBentoItems, item.id, 'href', `/collections/${value}`)}
+                                    >
+                                        <SelectTrigger><SelectValue /></SelectTrigger>
+                                        <SelectContent>
+                                            {productCategories.map(cat => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                  ) : (
+                                    <Input 
+                                      value={item.href} 
+                                      onChange={e => handleInputChange(setBentoItems, item.id, 'href', e.target.value)} 
+                                      placeholder="https://example.com/produit"
+                                    />
+                                  )}
+                                </div>
+                                <div className="space-y-2 md:col-span-2">
                                    <Label>Image</Label>
                                    <ImageUpload value={item.imageUrl} onChange={url => handleInputChange(setBentoItems, item.id, 'imageUrl', url)} />
                                 </div>
@@ -1257,5 +1308,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
-    
