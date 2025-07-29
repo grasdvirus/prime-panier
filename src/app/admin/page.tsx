@@ -135,7 +135,6 @@ export default function AdminPage() {
   const [newCategory, setNewCategory] = useState({ name: '', icon: 'Package' });
   const [editingReview, setEditingReview] = useState<{ product: Product, review: ProductReview } | null>(null);
   
-  const notificationSoundRef = useRef<HTMLAudioElement | null>(null);
   const lastOrderCountRef = useRef<number>(0);
 
   const fetchCategories = useCallback(async () => {
@@ -155,7 +154,6 @@ export default function AdminPage() {
                 title: "Nouvelle commande !",
                 description: `Vous avez reçu ${ords.length - lastOrderCountRef.current} nouvelle(s) commande(s).`,
             });
-            notificationSoundRef.current?.play().catch(e => console.error("Error playing sound:", e));
         }
         lastOrderCountRef.current = ords.length;
     } catch (error) {
@@ -181,10 +179,6 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (user?.email === 'grasdvirus@gmail.com') {
-        if (typeof Audio !== "undefined") {
-            notificationSoundRef.current = new Audio('/sons/notif.wav');
-        }
-
         async function loadData() {
             setLoading(true);
             try {
@@ -1517,7 +1511,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
-    
-
-    
