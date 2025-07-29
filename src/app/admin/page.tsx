@@ -12,6 +12,7 @@ import { getInfoFeaturesClient, updateInfoFeaturesClient } from '@/lib/info-feat
 import { getMarqueeClient, updateMarqueeClient } from '@/lib/marquee-client';
 import { getProductCategoriesClient } from '@/lib/products-client';
 import { updateOrderClient, deleteOrderClient } from '@/lib/orders-client';
+import { getSiteSettingsClient, updateSiteSettingsClient } from '@/lib/settings-client';
 import { type Product, type ProductReview } from '@/lib/products';
 import { type Slide } from '@/lib/slides';
 import { type Bento } from '@/lib/bento';
@@ -19,6 +20,7 @@ import { type Collection } from '@/lib/collections';
 import { type InfoFeature } from '@/lib/info-features';
 import { type Marquee } from '@/lib/marquee';
 import { type Order } from '@/lib/orders';
+import { type SiteSettings } from '@/lib/settings';
 import { type Message } from '@/app/api/contact/route';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -27,7 +29,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, PlusCircle, Trash2, Package, RefreshCw, Shirt, Headphones, Home, Star, Edit, MessageSquare, Mail, Sparkles, ToyBrick, Car, Gamepad2, Heart, ImageIcon, LayoutGrid, Layers, ScrollText, Phone, Lock } from 'lucide-react';
+import { Loader2, PlusCircle, Trash2, Package, RefreshCw, Shirt, Headphones, Home, Star, Edit, MessageSquare, Mail, Sparkles, ToyBrick, Car, Gamepad2, Heart, ImageIcon, LayoutGrid, Layers, ScrollText, Phone, Lock, Settings } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ImageUpload } from '@/components/admin/image-upload';
 import {
@@ -63,7 +65,7 @@ import { fr } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 
 type SaveStatus = 'idle' | 'dirty' | 'saving' | 'success' | 'error';
-type ActiveTab = 'products' | 'orders' | 'slides' | 'bento' | 'collections' | 'features' | 'marquee' | 'messages' | 'reviews';
+type ActiveTab = 'products' | 'orders' | 'slides' | 'bento' | 'collections' | 'features' | 'marquee' | 'messages' | 'reviews' | 'settings';
 type BentoLinkType = 'collection' | 'external';
 interface BentoWithLinkType extends Bento {
   linkType: BentoLinkType;
@@ -119,6 +121,7 @@ export default function AdminPage() {
   const [productCategories, setProductCategories] = useState<string[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>({ productsPerPage: 8 });
   
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
   const [bentoItemToDelete, setBentoItemToDelete] = useState<Bento | null>(null);
@@ -183,7 +186,7 @@ export default function AdminPage() {
         async function loadData() {
             setLoading(true);
             try {
-                const [prods, slds, bento, colls, info, marq, cats, ords, msgs] = await Promise.all([
+                const [prods, slds, bento, colls, info, marq, cats, ords, msgs, settings] = await Promise.all([
                     getProductsClient(), 
                     getSlidesClient(),
                     getBentoClient(),
@@ -192,7 +195,8 @@ export default function AdminPage() {
                     getMarqueeClient(),
                     getProductCategoriesClient(),
                     fetchOrdersFromApi(),
-                    getMessagesClient()
+                    getMessagesClient(),
+                    getSiteSettingsClient()
                 ]);
                 setProducts(prods.map(p => ({ ...p, images: p.images.length > 0 ? p.images : ['', ''], likes: p.likes || 0 })));
                 setSlides(slds);
@@ -207,6 +211,7 @@ export default function AdminPage() {
                 setProductCategories(cats);
                 setOrders(ords);
                 setMessages(msgs);
+                setSiteSettings(settings);
                 lastOrderCountRef.current = ords.length;
                 setSaveStatus('idle');
             } catch (error) {
@@ -245,6 +250,11 @@ export default function AdminPage() {
     );
     markAsDirty();
   }, []);
+
+  const handleSettingsChange = (field: keyof SiteSettings, value: any) => {
+    setSiteSettings(prev => ({ ...prev, [field]: value }));
+    markAsDirty();
+  };
   
   const handleOrderStatusChange = async (orderId: string, status: Order['status']) => {
     const originalOrders = orders;
@@ -502,6 +512,7 @@ export default function AdminPage() {
           updateCollectionsClient(collections),
           updateInfoFeaturesClient(infoFeatures),
           updateMarqueeClient(marquee),
+          updateSiteSettingsClient(siteSettings),
       ]);
       await fetchCategories();
       await fetchOrders(true);
@@ -689,7 +700,40 @@ export default function AdminPage() {
             Messages
             {unreadMessagesCount > 0 && <Badge className="ml-2">{unreadMessagesCount}</Badge>}
           </TabsTrigger>
+           <TabsTrigger value="settings" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            Paramètres
+          </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="settings">
+          <Card>
+            <CardHeader>
+              <CardTitle>Paramètres du Site</CardTitle>
+              <CardDescription>Gérez les paramètres globaux de votre boutique.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 border p-4 rounded-lg">
+                  <div className='space-y-2'>
+                    <Label htmlFor="products-per-page">Produits par Page (Accueil)</Label>
+                    <p className="text-sm text-muted-foreground">
+                        Définissez combien de produits sont affichés par défaut sur la page d'accueil.
+                    </p>
+                  </div>
+                  <div>
+                    <Input 
+                      id="products-per-page" 
+                      type="number"
+                      value={siteSettings.productsPerPage}
+                      onChange={e => handleSettingsChange('productsPerPage', Number(e.target.value))}
+                      min="1"
+                      className="w-full md:w-48"
+                    />
+                  </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
         
         <TabsContent value="orders">
           <Card>

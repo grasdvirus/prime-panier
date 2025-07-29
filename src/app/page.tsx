@@ -8,11 +8,13 @@ import { CollectionCarousel } from '@/components/products/collection-carousel';
 import { InfoSection } from '@/components/layout/info-section';
 import { getCollections } from '@/lib/collections';
 import { Marquee } from '@/components/layout/marquee';
+import { getSiteSettings } from '@/lib/settings';
 
 export default async function Home() {
   const products = await getProducts();
   const slides = await getSlides();
   const collections = await getCollections();
+  const settings = await getSiteSettings();
 
   return (
     <div className="w-full">
@@ -30,7 +32,12 @@ export default async function Home() {
       </section>
 
       <div className="px-4 sm:px-6 lg:px-8 pt-12">
-        <ProductGrid products={products} />
+        <ProductGrid 
+            products={products} 
+            title="Nouveaux Produits" 
+            paginated 
+            productsPerPage={settings.productsPerPage}
+        />
       </div>
 
       <section className="px-4 sm:px-6 lg:px-8 pt-12 md:pt-16 lg:pt-24">
@@ -44,4 +51,3 @@ export default async function Home() {
     </div>
   );
 }
-    
