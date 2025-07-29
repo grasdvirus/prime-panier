@@ -1022,11 +1022,13 @@ export default function AdminPage() {
                 <CardContent className="space-y-4">
                     {products.map(product => (
                         <Collapsible key={product.id} className="border p-4 rounded-lg">
-                            <CollapsibleTrigger className="w-full flex justify-between items-center text-left">
-                                <span className='font-semibold'>{product.name}</span>
-                                <Button variant="ghost" size="icon">
-                                    <Edit className="h-4 w-4" />
-                                </Button>
+                            <CollapsibleTrigger asChild>
+                                <div className="w-full flex justify-between items-center text-left cursor-pointer">
+                                    <span className='font-semibold'>{product.name}</span>
+                                    <div className="p-2 rounded-md hover:bg-accent">
+                                      <Edit className="h-4 w-4" />
+                                    </div>
+                                </div>
                             </CollapsibleTrigger>
                             <CollapsibleContent className="pt-4 mt-4 border-t space-y-6">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1515,5 +1517,7 @@ export default function AdminPage() {
     </div>
   );
 }
+
+    
 
     
