@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from 'next/image';
@@ -54,7 +55,7 @@ export function CartSheet() {
             <ScrollArea className="flex-1">
               <div className="flex flex-col gap-6 p-4">
                 {items.map((item) => (
-                  <div key={item.product.id} className="flex items-start gap-4">
+                  <div key={item.id} className="flex items-start gap-4">
                     <div className="relative h-20 w-20 overflow-hidden rounded-md">
                       <Image
                         src={item.product.images[0]}
@@ -72,13 +73,20 @@ export function CartSheet() {
                       >
                         {item.product.name}
                       </Link>
-                      <p className="text-sm text-muted-foreground">{item.product.price.toLocaleString('fr-FR')} FCFA</p>
+                      {item.variant && (
+                        <p className="text-xs text-muted-foreground">
+                          {item.variant.options.join(' / ')}
+                        </p>
+                      )}
+                      <p className="text-sm text-muted-foreground">
+                        {(item.variant?.price ?? item.product.price).toLocaleString('fr-FR')} FCFA
+                      </p>
                       <div className="mt-2 flex items-center gap-2">
                         <Button
                           variant="outline"
                           size="icon"
                           className="h-7 w-7"
-                          onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         >
                           <Minus className="h-4 w-4" />
                         </Button>
@@ -87,19 +95,21 @@ export function CartSheet() {
                           variant="outline"
                           size="icon"
                           className="h-7 w-7"
-                          onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         >
                           <Plus className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-2">
-                      <p className='font-semibold'>{(item.product.price * item.quantity).toLocaleString('fr-FR')} FCFA</p>
+                      <p className='font-semibold'>
+                        {((item.variant?.price ?? item.product.price) * item.quantity).toLocaleString('fr-FR')} FCFA
+                      </p>
                       <Button
                         variant="ghost"
                         size="icon"
                         className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                        onClick={() => removeItem(item.product.id)}
+                        onClick={() => removeItem(item.id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useForm } from 'react-hook-form';
@@ -70,9 +71,11 @@ export function CheckoutForm({ onOrderSuccess }: CheckoutFormProps) {
             },
             items: items.map(item => ({
                 id: item.product.id,
-                name: item.product.name,
+                name: item.variant 
+                    ? `${item.product.name} (${item.variant.options.join(' / ')})`
+                    : item.product.name,
                 quantity: item.quantity,
-                price: item.product.price,
+                price: item.variant?.price ?? item.product.price,
             })),
             total: total,
             status: 'pending',

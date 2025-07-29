@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useCart } from '@/contexts/cart-context';
@@ -17,7 +18,7 @@ export function OrderSummary() {
       <ScrollArea className="h-full max-h-96">
         <div className="space-y-4 pr-4">
           {items.map((item) => (
-            <div key={item.product.id} className="flex items-center gap-4">
+            <div key={item.id} className="flex items-center gap-4">
               <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md border">
                 <Image
                   src={item.product.images[0]}
@@ -32,9 +33,14 @@ export function OrderSummary() {
               </div>
               <div className="flex-1">
                 <p className="font-medium">{item.product.name}</p>
+                {item.variant && (
+                  <p className="text-xs text-muted-foreground">{item.variant.options.join(' / ')}</p>
+                )}
                 <p className="text-sm text-muted-foreground">Qté: {item.quantity}</p>
               </div>
-              <p className="font-medium">{(item.product.price * item.quantity).toLocaleString('fr-FR')} FCFA</p>
+              <p className="font-medium">
+                {((item.variant?.price ?? item.product.price) * item.quantity).toLocaleString('fr-FR')} FCFA
+              </p>
             </div>
           ))}
         </div>

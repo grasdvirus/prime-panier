@@ -1,19 +1,22 @@
+
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
-import { type Product } from '@/lib/products';
+import { type Product, type ProductVariant } from '@/lib/products';
 import { useToast } from '@/hooks/use-toast';
 
 export type CartItem = {
+  id: string; // Unique ID for the cart item, e.g., "product_1-variant_2"
   product: Product;
   quantity: number;
+  variant?: ProductVariant;
 };
 
 type CartContextType = {
   items: CartItem[];
-  addItem: (product: Product, quantity?: number) => void;
-  removeItem: (productId: number) => void;
-  updateQuantity: (productId: number, quantity: number) => void;
+  addItem: (product: Product, quantity?: number, variant?: ProductVariant) => void;
+  removeItem: (itemId: string) => void;
+  updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
   getCartTotal: () => number;
   getCartItemCount: () => number;
@@ -50,34 +53,36 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [items]);
 
-  const addItem = useCallback((product: Product, quantity: number = 1) => {
+  const addItem = useCallback((product: Product, quantity: number = 1, variant?: ProductVariant) => {
+    const cartItemId = variant ? `${product.id}-${variant.id}` : `${product.id}`;
+    
     setItems((prevItems) => {
-      const existingItem = prevItems.find((item) => item.product.id === product.id);
+      const existingItem = prevItems.find((item) => item.id === cartItemId);
       if (existingItem) {
         return prevItems.map((item) =>
-          item.product.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
+          item.id === cartItemId ? { ...item, quantity: item.quantity + quantity } : item
         );
       }
-      return [...prevItems, { product, quantity }];
+      return [...prevItems, { id: cartItemId, product, quantity, variant }];
     });
     toast({
       title: 'Ajouté au panier',
-      description: `${product.name} a été ajouté à votre panier.`,
+      description: `${product.name} ${variant ? `(${variant.options.join(', ')})` : ''} a été ajouté à votre panier.`,
     });
     setCartOpen(true);
   }, [toast]);
 
-  const removeItem = useCallback((productId: number) => {
-    setItems((prevItems) => prevItems.filter((item) => item.product.id !== productId));
+  const removeItem = useCallback((itemId: string) => {
+    setItems((prevItems) => prevItems.filter((item) => item.id !== itemId));
   }, []);
 
-  const updateQuantity = useCallback((productId: number, quantity: number) => {
+  const updateQuantity = useCallback((itemId: string, quantity: number) => {
     setItems((prevItems) => {
       if (quantity <= 0) {
-        return prevItems.filter((item) => item.product.id !== productId);
+        return prevItems.filter((item) => item.id !== itemId);
       }
       return prevItems.map((item) =>
-        item.product.id === productId ? { ...item, quantity } : item
+        item.id === itemId ? { ...item, quantity } : item
       );
     });
   }, []);
@@ -87,7 +92,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const getCartTotal = useCallback(() => {
-    return items.reduce((total, item) => total + item.product.price * item.quantity, 0);
+    return items.reduce((total, item) => {
+        const price = item.variant?.price ?? item.product.price;
+        return total + price * item.quantity;
+    }, 0);
   }, [items]);
 
   const getCartItemCount = useCallback(() => {
