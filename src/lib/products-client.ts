@@ -1,3 +1,4 @@
+
 // Client-side functions for products
 
 import { type Product } from './products';

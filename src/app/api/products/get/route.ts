@@ -1,3 +1,4 @@
+
 import { NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase-admin';
 import { type Product } from '@/lib/products';
@@ -6,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const productsSnapshot = await adminDb.collection('products').orderBy('id', 'asc').get();
+    const productsSnapshot = await adminDb.collection('products').orderBy('id', 'desc').get();
     
     if (productsSnapshot.empty) {
       return NextResponse.json([]);
@@ -20,3 +21,4 @@ export async function GET() {
     return NextResponse.json({ message: 'Failed to retrieve products' }, { status: 500 });
   }
 }
+

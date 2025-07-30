@@ -1,3 +1,4 @@
+
 import 'server-only';
 import { adminDb } from './firebase-admin';
 
@@ -42,7 +43,7 @@ export type Product = {
 
 async function fetchProductsOnServer(): Promise<Product[]> {
     try {
-        const productsSnapshot = await adminDb.collection('products').orderBy('id', 'asc').get();
+        const productsSnapshot = await adminDb.collection('products').orderBy('id', 'desc').get();
         if (productsSnapshot.empty) {
             return [];
         }
